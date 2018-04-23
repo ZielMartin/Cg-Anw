@@ -4,14 +4,8 @@
 #include <string>
 #include <fstream>
 #include <vector>
-
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
-
-#include <windef.h>
-
-
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 

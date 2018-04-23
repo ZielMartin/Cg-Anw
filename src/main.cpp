@@ -1,13 +1,7 @@
 #include <iostream>
 #include <vector>
-
-#include <windef.h> // According to comments above
 #include <GL/glew.h> // Before any gl headers
 #include <GL/gl.h>
-
-//#include <GL/glext.h> // Linux headers
-//#include <GL/wglext.h> // Windows headers - Not sure which ones cygwin needs. Just try it
-
 #include <GL/glu.h> // Always after gl.h
 #include <GLFW/glfw3.h> // When all gl-headers have been included
 
@@ -317,6 +311,8 @@ void keyboard(GLFWwindow* window, unsigned int codepoint)
 int main(int argc, char** argv)
 {
     GLFWwindow* window;
+
+    std::cout << "TEST";
 
     // Initialize glfw library (window toolkit).
     if (!glfwInit())
