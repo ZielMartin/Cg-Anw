@@ -1,35 +1,33 @@
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.6)
 project(Cg_Anw)
 
 set(CMAKE_CXX_STANDARD 14)
-# Find includes in corresponding build directories
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-# Instruct CMake to run moc automatically when needed.
-set(CMAKE_AUTOMOC ON)
+set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
+if (UNIX AND NOT CYGWIN)
+    find_package(GLFW)
+    find_package(OPENGL REQUIRED)
+    find_package(GLEW REQUIRED)
+elseif (WIN32)
+    add_definitions(-DGLEW_STATIC)
+    find_package(OPENGL REQUIRED)
 
-find_package(PkgConfig REQUIRED)
-pkg_search_module(GLFW REQUIRED glfw3)
-find_package(OpenGL REQUIRED)
-find_package(GLUT REQUIRED)
-find_package(GLEW REQUIRED)
+    set(GLFW_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/libs/glfw-3.1.2.bin.WIN64/include)
+    set(GLEW_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/libs/glew-2.1.0/include)
+    set(GLM_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/libs/glm-0.9.7.2)
 
+    set(${GLFW_STATIC_LIBRARIES} ${PROJECT_SOURCE_DIR}/libs/glfw-3.1.2.bin.WIN64/lib-mingw-w64/libglfw3.a)
+    set(${GLEW_LIBRARIES} ${PROJECT_SOURCE_DIR}/libs/glew-2.1.0/lib/libglew32.a)
 
-find_package(Qt5Core)
-# Find the QtWidgets library
-find_package(Qt5Widgets)
+else ()
+    message("UNSUPPORTED OS")
+endif ()
 
+include_directories("include" ${GLEW_INCLUDE_DIRS} ${GLFW_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIRS} ${GLM_INCLUDE_DIRS})
 
-get_target_property(QtCore_location Qt5::Core LOCATION)
+set(SOURCE_FILES src/main.cpp src/GLSLProgram.cpp)
+set(INCLUDE_FILES include/GLSLProgram.h)
+add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${INCLUDE_FILES})
 
-include_directories(include ${GLFW_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS} ${GTEST_INCLUDE_DIRS})
-
-
-
-
-set(SOURCE_FILES src/logo.cpp src/glwidget.cpp src/window.cpp src/mainwindow.cpp)
-set(INCLUDE_FILES include/logo.h include/glwidget.h include/mainwindow.h include/window.h)
-add_executable(Cg_Anw main.cpp ${SOURCE_FILES} ${INCLUDE_FILES})
-
-# Use the Widgets module from Qt 5.
-target_link_libraries(Cg_Anw Qt5::Widgets)
+target_link_libraries(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/libs/glfw-3.1.2.bin.WIN64/lib-mingw-w64/libglfw3.a ${PROJECT_SOURCE_DIR}/libs/glew-2.1.0/lib/libglew32.a ${OPENGL_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${GLFW_STATIC_LIBRARIES} ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES})
