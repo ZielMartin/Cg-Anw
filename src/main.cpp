@@ -312,8 +312,6 @@ int main(int argc, char** argv)
 {
     GLFWwindow* window;
 
-    std::cout << "TEST";
-
     // Initialize glfw library (window toolkit).
     if (!glfwInit())
         return -1;

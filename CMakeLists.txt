@@ -18,8 +18,8 @@ elseif (WIN32)
     set(GLEW_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/libs/glew-2.1.0/include)
     set(GLM_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/libs/glm-0.9.7.2)
 
-    set(${GLFW_STATIC_LIBRARIES} ${PROJECT_SOURCE_DIR}/libs/glfw-3.1.2.bin.WIN64/lib-mingw-w64/libglfw3.a)
-    set(${GLEW_LIBRARIES} ${PROJECT_SOURCE_DIR}/libs/glew-2.1.0/lib/libglew32.a)
+    set(GLFW_STATIC_LIBRARIES ${PROJECT_SOURCE_DIR}/libs/glfw-3.1.2.bin.WIN64/lib-mingw-w64/libglfw3.a)
+    set(GLEW_LIBRARIES ${PROJECT_SOURCE_DIR}/libs/glew-2.1.0/lib/libglew32.a)
 
 else ()
     message("UNSUPPORTED OS")
@@ -32,7 +32,7 @@ set(INCLUDE_FILES include/GLSLProgram.h)
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${INCLUDE_FILES})
 
-target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLFW_STATIC_LIBRARIES} ${GLEW_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLFW_STATIC_LIBRARIES})
 
 add_custom_command(
         TARGET ${PROJECT_NAME} POST_BUILD
