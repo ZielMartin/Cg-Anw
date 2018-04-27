@@ -98,7 +98,10 @@ CMAKE_EXE_LINKER_FLAGS_RELEASE:STRING=
 CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO:STRING=
 
 //Convert GNU import libraries to MS format (requires Visual Studio)
-CMAKE_GNUtoMS:BOOL=OFF
+CMAKE_GNUtoMS:BOOL=ON
+
+//Visual Studio vcvarsamd64.bat
+CMAKE_GNUtoMS_VCVARS:FILEPATH=C:/Microsoft Visual Studio/2017/Community/VC/Auxiliary/Build/vcvars64.bat
 
 //User executables (bin)
 CMAKE_INSTALL_BINDIR:PATH=bin
@@ -267,10 +270,10 @@ CMAKE_STRIP:FILEPATH=C:/win-builds/bin/strip.exe
 // .SILENT directive, and all commands will be echoed to the console
 // during the make.  This is useful for debugging only. With Visual
 // Studio IDE projects all commands are done without /nologo.
-CMAKE_VERBOSE_MAKEFILE:BOOL=OFF
+CMAKE_VERBOSE_MAKEFILE:BOOL=ON
 
 //Build FreeGLUT demos.
-FREEGLUT_BUILD_DEMOS:BOOL=ON
+FREEGLUT_BUILD_DEMOS:BOOL=OFF
 
 //Build FreeGLUT shared library.
 FREEGLUT_BUILD_SHARED_LIBS:BOOL=ON
@@ -388,6 +391,8 @@ CMAKE_GENERATOR_INSTANCE:INTERNAL=
 CMAKE_GENERATOR_PLATFORM:INTERNAL=
 //Name of generator toolset.
 CMAKE_GENERATOR_TOOLSET:INTERNAL=
+//ADVANCED property for variable: CMAKE_GNUtoMS_VCVARS
+CMAKE_GNUtoMS_VCVARS-ADVANCED:INTERNAL=1
 //Source directory with the top level CMakeLists.txt file for this
 // project
 CMAKE_HOME_DIRECTORY:INTERNAL=C:/Users/ZielM/git/Cg-Anw/libs/freeglut-3.0.0

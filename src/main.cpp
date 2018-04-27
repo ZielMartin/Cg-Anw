@@ -2,6 +2,7 @@
 #include <gl/glut.h>
 #include <c++/4.8.3/iostream>
 
+
 class Point
 {
     int Xvalue, Yvalue;

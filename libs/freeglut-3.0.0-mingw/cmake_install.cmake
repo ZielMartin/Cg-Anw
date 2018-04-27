@@ -33,7 +33,10 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY OPTIONAL FILES "C:/Users/ZielM/git/Cg-Anw/libs/freeglut-3.0.0-mingw/lib/libfreeglut.dll.a")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY OPTIONAL FILES
+    "C:/Users/ZielM/git/Cg-Anw/libs/freeglut-3.0.0-mingw/lib/libfreeglut.dll.a"
+    "C:/Users/ZielM/git/Cg-Anw/libs/freeglut-3.0.0-mingw/lib/libfreeglut.lib"
+    )
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)

@@ -41,6 +41,7 @@ file(REMOVE_RECURSE
   "bin/libfreeglut.pdb"
   "bin/libfreeglut.dll"
   "lib/libfreeglut.dll.a"
+  "lib/libfreeglut.lib"
   "bin/libfreeglut.dll.manifest"
 )
 

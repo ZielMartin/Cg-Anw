@@ -29,6 +29,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "C:/CMake/share/cmake-3.11/Modules/FindPackageHandleStandardArgs.cmake"
   "C:/CMake/share/cmake-3.11/Modules/FindPackageMessage.cmake"
   "C:/CMake/share/cmake-3.11/Modules/GNUInstallDirs.cmake"
+  "C:/CMake/share/cmake-3.11/Modules/Platform/GNUtoMS_lib.bat.in"
   "C:/CMake/share/cmake-3.11/Modules/Platform/Windows-GNU-C-ABI.cmake"
   "C:/CMake/share/cmake-3.11/Modules/Platform/Windows-GNU-C.cmake"
   "C:/CMake/share/cmake-3.11/Modules/Platform/Windows-GNU-CXX-ABI.cmake"
@@ -56,6 +57,7 @@ set(CMAKE_MAKEFILE_OUTPUTS
 
 # Byproducts of CMake generate step:
 set(CMAKE_MAKEFILE_PRODUCTS
+  "CMakeFiles/CMakeGNUtoMS_lib.bat"
   "src/fg_version.h"
   "config.h"
   "freeglut.rc"
@@ -65,28 +67,6 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
-  "CMakeFiles/Lorenz.dir/DependInfo.cmake"
-  "CMakeFiles/subwin.dir/DependInfo.cmake"
   "CMakeFiles/freeglut.dir/DependInfo.cmake"
-  "CMakeFiles/subwin_static.dir/DependInfo.cmake"
-  "CMakeFiles/smooth_opengl3.dir/DependInfo.cmake"
   "CMakeFiles/freeglut_static.dir/DependInfo.cmake"
-  "CMakeFiles/CallbackMaker.dir/DependInfo.cmake"
-  "CMakeFiles/Fractals_random_static.dir/DependInfo.cmake"
-  "CMakeFiles/Fractals_static.dir/DependInfo.cmake"
-  "CMakeFiles/CallbackMaker_static.dir/DependInfo.cmake"
-  "CMakeFiles/smooth_opengl3_static.dir/DependInfo.cmake"
-  "CMakeFiles/Fractals_random.dir/DependInfo.cmake"
-  "CMakeFiles/Fractals.dir/DependInfo.cmake"
-  "CMakeFiles/multi-touch.dir/DependInfo.cmake"
-  "CMakeFiles/Lorenz_static.dir/DependInfo.cmake"
-  "CMakeFiles/shapes.dir/DependInfo.cmake"
-  "CMakeFiles/One.dir/DependInfo.cmake"
-  "CMakeFiles/shapes_static.dir/DependInfo.cmake"
-  "CMakeFiles/One_static.dir/DependInfo.cmake"
-  "CMakeFiles/Resizer.dir/DependInfo.cmake"
-  "CMakeFiles/Resizer_static.dir/DependInfo.cmake"
-  "CMakeFiles/multi-touch_static.dir/DependInfo.cmake"
-  "CMakeFiles/timer.dir/DependInfo.cmake"
-  "CMakeFiles/timer_static.dir/DependInfo.cmake"
   )
