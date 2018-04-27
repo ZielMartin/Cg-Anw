@@ -22,19 +22,9 @@ elseif (WIN32)
     set(GLEW_LIBRARIES ${PROJECT_SOURCE_DIR}/libs/glew-2.1.0/lib/libglew32.a)
     set(FREEGLUT_LIBRARIES ${PROJECT_SOURCE_DIR}/libs/freeglut-3.0.0-mingw/lib/libfreeglut.dll.a)
 
-
-    set(CMAKE_PREFIX_PATH "C:\\Qt\\5.10.1\\mingw53_32\\")
-
 else ()
     message("UNSUPPORTED OS")
 endif ()
-
-# Instruct CMake to run moc automatically when needed.
-set(CMAKE_AUTOMOC ON)
-
-# Find the Qt-libraries
-find_package(Qt5Core REQUIRED)
-find_package(Qt5Widgets REQUIRED)
 
 include_directories("include" ${GLEW_INCLUDE_DIRS} ${FREEGLUT_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIRS} ${GLM_INCLUDE_DIRS})
 
