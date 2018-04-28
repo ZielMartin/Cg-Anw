@@ -30,7 +30,7 @@ endif ()
 include_directories("include" ${GLEW_INCLUDE_DIRS} ${FREEGLUT_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIRS} ${GLM_INCLUDE_DIRS})
 
 set(SOURCE_FILES src/main.cpp)
-set(INCLUDE_FILES include/GLSLProgram.h)
+set(INCLUDE_FILES include/GLSLProgram.h src/Vertex.cpp src/Vertex.h)
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${INCLUDE_FILES})
 

@@ -1,79 +1,84 @@
-#include <stdlib.h>
-#include <gl/glut.h>
-#include <c++/4.8.3/iostream>
+#include <iostream>
+#include <GL/glut.h>
+using namespace std;
+
+int cx = 0, cy = 0, cz = 0;
+int cn;
 
 
-class Point
-{
-    int Xvalue, Yvalue;
-public:
-    void xy(int x, int y)
-    {
-        Xvalue = x;
-        Yvalue = y;
-    }
+int rotationX = 40, rotationY = 1, rotationZ = 1;
 
-    //return individual x y value
-    int x() { return Xvalue; }
-    int y() { return Yvalue; }
-};
-
-Point point[30];
-int count = 0;
-
-void Display()
-{
-    glClearColor(1.0, 1.0, 1.0, 0.0);
-    glClear(GL_COLOR_BUFFER_BIT); // clear display window
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    const double w = glutGet( GLUT_WINDOW_WIDTH );
-    const double h = glutGet( GLUT_WINDOW_HEIGHT );
-    gluOrtho2D(0.0, w, 0.0, h);
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-
-    glColor3f(1.0, 1.0, 1.0);
-
-    glPointSize(5.0f);
-    glBegin(GL_POINTS);
-    for (int i = 0; i < count; i++)
-    {
-        int x = point[i].x();
-        int y = point[i].y();
-
-        glColor3f(0.3, 0.3, 0.3);
-        glVertex2i(x, h - y);
-    }
-    glEnd();
-
-    glFlush();
+void drawSpheres() {
+    glPushMatrix();
+    glColor3f(1, 1, 1);
+    glTranslatef(cx, cy, cz);
+    glutSolidSphere(0.1,100,50);
+    glPopMatrix();
 }
 
-void mouse(int button, int state, int x, int y)
-{
-    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
-    {
-        point[count].xy(x, y);
-        count++;
+void drawGrid() {
+    int i;
+    for (i = 0; i < 40; i++) {
+        glPushMatrix();
+        if (i < 20) { glTranslatef(0, 0, i); }
+        if (i >= 20) { glTranslatef(i - 20, 0, 0); glRotatef(-90, 0, 1, 0); }
+        glBegin(GL_LINES);
+        glColor3f(1, 1, 1); glLineWidth(1);
+        glVertex3f(0, -0.1, 0); glVertex3f(19, -0.1, 0);
+        glEnd();
+        glPopMatrix();
     }
+}
+
+
+void display() {
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glLoadIdentity();
+    glTranslatef(-13, 0, -45);
+    glRotatef(rotationX, rotationY, rotationZ, 0);
+
+    drawGrid();
+
+    drawSpheres();
+    glutSwapBuffers();
+}
+
+void init() {
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(35, 1.0f, 0.1f, 1000);
+    glMatrixMode(GL_MODELVIEW);
+    glEnable(GL_DEPTH_TEST);
+    glClearColor(0.2, 0.2, 0.2, 1);
+
+}
+
+void keyboard(unsigned char key, int x, int y) {
+
+    if (key == 'w') { cz -= 1; }
+    if (key == 's') { cz += 1; }
+
+    if (key == 'a') { cx -= 1; }
+    if (key == 'd') { cx += 1; }
+
+    if (key == 'q') { cy += 1; }
+    if (key == 'z') { cy -= 1; }
+
+
     glutPostRedisplay();
 }
 
-int main( int argc, char *argv[] )
-{
-    std::cout<<"asd"<<std::endl;
 
+
+int main(int argc, char** argv) {
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB );
-    glutInitWindowSize(1200, 800);
-    glutCreateWindow("NURBS Curve");
-
-    glutMouseFunc(mouse);
-    glutDisplayFunc(Display);
-
+    glutInitDisplayMode(GLUT_DOUBLE);
+    glutInitWindowSize(800, 600);
+    glutCreateWindow("");
+    init();
+    glutDisplayFunc(display);
+    glutKeyboardFunc(keyboard);
     glutMainLoop();
     return 0;
 }
