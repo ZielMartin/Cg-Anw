@@ -61,7 +61,6 @@ void VerticesWrapper::moveSelected(glm::vec3 relativeMovement) {
         vertex->y += relativeMovement.y;
         vertex->z += relativeMovement.z;
 
-        std::cout<<"move: "<<vertex->x<<std::endl;
 
     }
 }
