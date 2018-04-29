@@ -1,3 +1,0 @@
-C:\CMake\bin\cmake.exe -E remove -f CMakeFiles\One_static.dir/objects.a
-C:\win-builds\bin\ar.exe cr CMakeFiles\One_static.dir/objects.a @CMakeFiles\One_static.dir\objects1.rsp
-C:\win-builds\bin\gcc.exe  -Wall -pedantic   -Wl,--whole-archive CMakeFiles\One_static.dir/objects.a -Wl,--no-whole-archive  -o bin\One_static.exe -Wl,--out-implib,lib\libOne_static.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\One_static.dir\linklibs.rsp

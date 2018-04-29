@@ -1,8 +1,0 @@
-C:/Users/ZielM/git/Cg-Anw/libs/freeglut-3.0.0-mingw/CMakeFiles/install/strip.dir
-C:/Users/ZielM/git/Cg-Anw/libs/freeglut-3.0.0-mingw/CMakeFiles/freeglut.dir
-C:/Users/ZielM/git/Cg-Anw/libs/freeglut-3.0.0-mingw/CMakeFiles/install/local.dir
-C:/Users/ZielM/git/Cg-Anw/libs/freeglut-3.0.0-mingw/CMakeFiles/install.dir
-C:/Users/ZielM/git/Cg-Anw/libs/freeglut-3.0.0-mingw/CMakeFiles/edit_cache.dir
-C:/Users/ZielM/git/Cg-Anw/libs/freeglut-3.0.0-mingw/CMakeFiles/freeglut_static.dir
-C:/Users/ZielM/git/Cg-Anw/libs/freeglut-3.0.0-mingw/CMakeFiles/rebuild_cache.dir
-C:/Users/ZielM/git/Cg-Anw/libs/freeglut-3.0.0-mingw/CMakeFiles/list_install_components.dir

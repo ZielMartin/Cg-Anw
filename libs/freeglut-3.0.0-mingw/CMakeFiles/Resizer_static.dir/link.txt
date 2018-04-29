@@ -1,3 +1,0 @@
-C:\CMake\bin\cmake.exe -E remove -f CMakeFiles\Resizer_static.dir/objects.a
-C:\win-builds\bin\ar.exe cr CMakeFiles\Resizer_static.dir/objects.a @CMakeFiles\Resizer_static.dir\objects1.rsp
-C:\win-builds\bin\g++.exe    -Wl,--whole-archive CMakeFiles\Resizer_static.dir/objects.a -Wl,--no-whole-archive  -o bin\Resizer_static.exe -Wl,--out-implib,lib\libResizer_static.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\Resizer_static.dir\linklibs.rsp

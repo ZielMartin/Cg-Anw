@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.6)
 project(Cg_Anw)
 
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_VERBOSE_MAKEFILE TRUE)
+#set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
 if (UNIX AND NOT CYGWIN)
     find_package(OpenGL REQUIRED)
