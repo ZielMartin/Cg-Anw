@@ -28,8 +28,8 @@ endif ()
 
 include_directories(include ${GLEW_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIRS} ${GLM_INCLUDE_DIRS})
 
-set(SOURCE_FILES src/main.cpp)
-set(INCLUDE_FILES include/GLSLProgram.h include/Vertex.h)
+set(SOURCE_FILES src/main.cpp src/VerticesWrapper.cpp)
+set(INCLUDE_FILES include/GLSLProgram.h include/VerticesWrapper.h)
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${INCLUDE_FILES})
 

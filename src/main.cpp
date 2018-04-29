@@ -1,19 +1,27 @@
 #include <iostream>
 #include <GL/glut.h>
+#include <c++/4.8.3/vector>
+#include "VerticesWrapper.h"
+
 using namespace std;
 
-int cx = 0, cy = 0, cz = 0;
-int cn;
+VerticesWrapper *vw;
 
 
 int rotationX = 40, rotationY = 1, rotationZ = 1;
 
 void drawSpheres() {
-    glPushMatrix();
-    glColor3f(1, 1, 1);
-    glTranslatef(cx, cy, cz);
-    glutSolidSphere(0.1,100,50);
-    glPopMatrix();
+
+    for(glm::vec4 *vertex : *vw->getVertices())
+    {
+        glPushMatrix();
+        glColor3f(1, 1, 1);
+        glTranslatef(vertex->x,vertex->y, vertex->z);
+        cout<<"draw: "<<vertex->x<<endl;
+        glutSolidSphere(0.1,100,50);
+        glPopMatrix();
+    }
+
 }
 
 void drawGrid() {
@@ -54,24 +62,42 @@ void init() {
 
 }
 
+
+
 void keyboard(unsigned char key, int x, int y) {
 
-    if (key == 'w') { cz -= 1; }
-    if (key == 's') { cz += 1; }
+    if (key == 'w') { vw->moveSelected(glm::vec3(0.0,0.0,-1.0)); }
+    if (key == 's') { vw->moveSelected(glm::vec3(0.0,0.0,1.0)); }
 
-    if (key == 'a') { cx -= 1; }
-    if (key == 'd') { cx += 1; }
+    if (key == 'a') { vw->moveSelected(glm::vec3(-1.0,0.0,0.0)); }
+    if (key == 'd') { vw->moveSelected(glm::vec3(1.0,0.0,0.0)); }
 
-    if (key == 'q') { cy += 1; }
-    if (key == 'z') { cy -= 1; }
+    if (key == 'q') { vw->moveSelected(glm::vec3(0.0,-1.0,0.0)); }
+    if (key == 'z') { vw->moveSelected(glm::vec3(0.0,1.0,0.0)); }
 
 
     glutPostRedisplay();
 }
 
+void mouseClicks(int button, int state, int x, int y) {
+    if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+        glm::vec4 *newVertex = new glm::vec4(1.0,1.0,1.0,1.0);
+        vw->addVertex(newVertex);
+
+        vector<glm::vec4 *>selected;
+        selected.push_back(newVertex);
+        vw->setSelectedVertices(&selected);
+
+        cout<<"click: "<<newVertex->x<<endl;
+
+    }
+}
+
 
 
 int main(int argc, char** argv) {
+    vw = VerticesWrapper::getInstance();
+
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE);
     glutInitWindowSize(800, 600);
@@ -79,6 +105,7 @@ int main(int argc, char** argv) {
     init();
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
+    glutMouseFunc(mouseClicks);
     glutMainLoop();
     return 0;
 }
