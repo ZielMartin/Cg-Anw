@@ -11,12 +11,20 @@ VerticesWrapper *vw;
 int rotationX = 40, rotationY = 1, rotationZ = 1;
 
 glm::vec3 background(0.2, 0.2, 0.2);
+glm::vec3 selectedSphereColor(1,0,0);
+glm::vec3 sphereColor(1,1,1);
 
 void drawSpheres() {
-    for(glm::vec4 *vertex : *vw->getVertices())
-    {
+    for(int i  = 0; i < vw->getVertices()->size(); i ++){
+        glm::vec4 *vertex = vw->getVertices()->at(i).first;
         glPushMatrix();
-        glColor3f(1, 1, 1);
+        if(vw->getVertices()->at(i).second){
+            glColor3f(selectedSphereColor.r, selectedSphereColor.g, selectedSphereColor.b);
+        }else{
+            glColor3f(sphereColor.r, sphereColor.g, sphereColor.b);
+
+        }
+
         glTranslatef(vertex->x,vertex->y, vertex->z);
         glutSolidSphere(0.1,100,50);
         glPopMatrix();
@@ -112,7 +120,7 @@ glm::vec3 getWorldCoordinates(int x, int y){
     gluUnProject( winX, winY, winZ, modelview, projection, viewport, &objx, &objy, &objz);
 
     cout << objx << " , " << objy << " , " << objz << "\n";
-    
+
     return glm::vec3(objx,objy,objz);
 
 }
@@ -120,12 +128,17 @@ glm::vec3 getWorldCoordinates(int x, int y){
 void mouseClicks(int button, int state, int x, int y) {
     if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
 
-        glm::vec4 *newVertex = new glm::vec4(getWorldCoordinates(x,y),1.0);
-        vw->addVertex(newVertex);
+        if( vw->getVertices()->size()>=1){
+            vw->getVertices()->at( vw->getVertices()->size()-1).second = false;
 
-        vector<glm::vec4 *>selected;
-        selected.push_back(newVertex);
-        vw->setSelectedVertices(&selected);
+        }
+
+
+        glm::vec4 *newVertex = new glm::vec4(getWorldCoordinates(x,y),1.0);
+        vw->addVertex(newVertex, true);
+
+
+    }else if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN && glutGetModifiers() == GLUT_ACTIVE_CTRL) {
 
     }
 }

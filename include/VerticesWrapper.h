@@ -20,26 +20,24 @@ class VerticesWrapper {
     /* Private constructor to prevent instancing. */
         VerticesWrapper();
 
-        std::vector<glm::vec4*> vertices;
-        std::vector<glm::vec4*> selectedVertices;
+        //bool: true if selected
+        std::vector<std::pair<glm::vec4*,bool>> vertices;
 
 
     public:
         /* Static access method. */
         static VerticesWrapper* getInstance();
 
-        std::vector<glm::vec4 *> *addVertex(glm::vec4 *vertex);
-        std::vector<glm::vec4 *> *deleteVertex(glm::vec4 *vertex);
+    std::vector<std::pair<glm::vec4*,bool>> *addVertex(glm::vec4 *vertex, bool selected);
+    std::vector<std::pair<glm::vec4*,bool>> *deleteVertex(glm::vec4 *vertex);
 
         bool selectVertex(glm::vec4 *vertex);
         void moveSelected(glm::vec3 relativeMovement);
 
 
         //Getters & Setters
-        const std::vector<glm::vec4 *> *getVertices() const;
-        void setVertices(const std::vector<glm::vec4 *> &vertices);
-        const std::vector<glm::vec4 *> *getSelectedVertices() const;
-        void setSelectedVertices(const std::vector<glm::vec4 *> *selectedVertices);
+        std::vector<std::pair<glm::vec4*,bool>> *getVertices();
+        void setVertices(const std::vector<std::pair<glm::vec4*,bool>> &vertices);
 
 
 
