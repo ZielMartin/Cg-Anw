@@ -2,19 +2,35 @@
 // Created by Johannes on 30.04.2018.
 //
 
+
 #include "OGLWidget.h"
 #include "OGLWidgetUI.h"
 
 
 using namespace std;
 
+//Create the Camera
+Camera camera;
+
 
 VerticesWrapper *vw = VerticesWrapper::getInstance();
-glm::vec3 background = (glm::vec3(0.2, 0.2, 0.2));
-glm::vec3 selectedSphereColor = (glm::vec3(1, 0, 0));
-glm::vec3 sphereColor = (glm::vec3(1, 1, 1));
-glm::vec3 gridColor = (glm::vec3(1, 1, 1));
-int rotationX = 40, rotationY = 1, rotationZ = 1;
+glm::vec3 background = glm::vec3(0.2, 0.2, 0.2);
+glm::vec3 gridPane = glm::vec3(0,0,0);
+glm::vec3 selectedSphereColor = glm::vec3(1, 0, 0);
+glm::vec3 sphereColor = glm::vec3(1, 1, 1);
+glm::vec3 gridColor = glm::vec3(1, 1, 1);
+
+
+class Window {
+public:
+    Window() {
+        this->interval = 1000 / 60;		//60 FPS
+        this->window_handle = -1;
+    }
+    int window_handle, interval;
+    glm::ivec2 size;
+    float window_aspect;
+} window;
 
 
 void drawSpheres() {
@@ -42,13 +58,12 @@ void drawSpheres() {
 //TODO: make invisible
 void drawInvisiblePane() {
     glPushMatrix();
-    glColor3f(background.r, background.g, background.b);
+    glColor3f(gridPane.r, gridPane.g, gridPane.b);
     glBegin(GL_POLYGON);
-    glVertex3f(0, -0.1, 0);
-    glVertex3f(GRIDLENGTH, -0.1, 0);
-    glVertex3f(GRIDLENGTH, -0.1, GRIDLENGTH);
-    glVertex3f(0, -0.1, GRIDLENGTH);
-
+    glVertex3f(-GRIDLENGTH/2, -0.1, -GRIDLENGTH/2);
+    glVertex3f(GRIDLENGTH/2, -0.1, -GRIDLENGTH/2);
+    glVertex3f(GRIDLENGTH/2, -0.1, GRIDLENGTH/2);
+    glVertex3f(-GRIDLENGTH/2, -0.1, GRIDLENGTH/2);
     glEnd();
     glPopMatrix();
 
@@ -56,54 +71,120 @@ void drawInvisiblePane() {
 
 void drawGrid() {
     int i;
-    for (i = 0; i < GRIDLENGTH*2; i++) {
-        glPushMatrix();
-        if (i < GRIDLENGTH) { glTranslatef(0, 0, i); }
-        if (i >= GRIDLENGTH) {
-            glTranslatef(i - GRIDLENGTH, 0, 0);
-            glRotatef(-90, 0, 1, 0);
+    for (i = -GRIDLENGTH; i <= GRIDLENGTH; i++) {
+        if (i <= 0) {
+            glPushMatrix();
+            glTranslatef(0, 0, i + GRIDLENGTH/2);
+            glLineWidth(1);
+            glBegin(GL_LINES);
+            glColor3f(gridColor.r, gridColor.g, gridColor.b);
+            glVertex3f(-GRIDLENGTH/2, 0, 0);
+            glVertex3f(GRIDLENGTH/2, 0, 0);
+            glEnd();
+            glPopMatrix();
         }
-        glLineWidth(1);
-        glBegin(GL_LINES);
-        glColor3f(gridColor.r, gridColor.g, gridColor.b);
-        glVertex3f(0, 0, 0);
-        glVertex3f(GRIDLENGTH-1, 0, 0);
-        glEnd();
-        glPopMatrix();
+        if (i >= 0) {
+            glPushMatrix();
+            glTranslatef(i - GRIDLENGTH/2, 0, 0);
+            glRotatef(-90, 0, 1, 0);
+            glLineWidth(1);
+            glBegin(GL_LINES);
+            glColor3f(gridColor.r, gridColor.g, gridColor.b);
+            glVertex3f(-GRIDLENGTH/2, 0, 0);
+            glVertex3f(GRIDLENGTH/2, 0, 0);
+            glEnd();
+            glPopMatrix();
+        }
+
     }
 }
 
 
 void display() {
 
+    //glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
+    glClearColor(background.r, background.g, background.b, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glLoadIdentity();
-    glTranslatef(-13, 0, -45);
-    glRotatef(rotationX, rotationY, rotationZ, 0);
+    glViewport(0, 0, window.size.x, window.size.y);
+
+    glm::mat4 model, view, projection;
+    camera.Update();
+    camera.GetMatricies(projection, view, model);
+
+    glm::mat4 mvp = projection* view * model;	//Compute the mvp matrix
+    glLoadMatrixf(glm::value_ptr(mvp));
+    //glLoadIdentity();
+
+    //glTranslatef(-1, 0, -45);
+    //glScalef(zoom,zoom,zoom);
+    //glRotatef(rotation.a, rotation.x, rotation.y, rotation.z);
     drawGrid();
     drawInvisiblePane();
     drawSpheres();
     glutSwapBuffers();
 }
+//Used when person drags mouse around
+void CallBackMotionFunc(int x, int y) {
+    camera.Move2D(x, y);
+}
+//Redraw based on fps set for window
+void TimerFunc(int value) {
+    if (window.window_handle != -1) {
+        glutTimerFunc(window.interval, TimerFunc, value);
+        glutPostRedisplay();
+    }
+}
+
+
+
+//Invalidate the window handle when window is closed
+void CloseFunc() {
+    window.window_handle = -1;
+}
+
+//Resize the window and properly update the camera viewport
+void ReshapeFunc(int w, int h) {
+    if (h > 0) {
+        window.size = glm::ivec2(w, h);
+        window.window_aspect = float(w) / float(h);
+    }
+    camera.SetViewport(0, 0, window.size.x, window.size.y);
+}
+
 
 void initOGLWidget(int argc, char **argv) {
 
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE);
+    glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH);
     glutInitWindowSize(WIDOWWIDTH, WIDOWHEIGHT);
-    glutCreateWindow("");
 
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(35, 1.0f, 0.1f, 1000);
-    glMatrixMode(GL_MODELVIEW);
-    glClearColor(background.r, background.g, background.b, 1);
-    glEnable(GL_DEPTH_TEST);
 
+
+    //Setup window and callbacks
+    window.window_handle = glutCreateWindow("modeller");
+    glutReshapeFunc(ReshapeFunc);
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
+    glutSpecialFunc(specialKeyboard);
     glutMouseFunc(mouseClicks);
+    glutMotionFunc(CallBackMotionFunc);
+    glutTimerFunc(window.interval, TimerFunc, 0);
+
+    glewExperimental = GL_TRUE;
+
+    if (glewInit() != GLEW_OK) {
+        cerr << "GLEW failed to initialize." << endl;
+    }
+    //Setup camera
+    camera.SetMode(FREE);
+    camera.SetPosition(glm::vec3(20, 10, 10));
+    camera.SetLookAt(glm::vec3(0, 0, 0));
+    camera.SetClipping(.1, 1000);
+    camera.SetFOV(45);
+    //Start the glut loop!
     glutMainLoop();
+
 }
 
 

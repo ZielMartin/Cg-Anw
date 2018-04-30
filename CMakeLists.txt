@@ -28,8 +28,8 @@ endif ()
 
 include_directories(include ${GLEW_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIRS} ${GLM_INCLUDE_DIRS})
 
-set(SOURCE_FILES src/main.cpp src/VerticesWrapper.cpp src/OGLWidget.cpp  src/OGLWidgetUI.cpp)
-set(INCLUDE_FILES include/GLSLProgram.h include/VerticesWrapper.h  include/OGLWidget.h  include/OGLWidgetUI.h)
+set(SOURCE_FILES src/main.cpp src/VerticesWrapper.cpp src/OGLWidget.cpp  src/OGLWidgetUI.cpp src/camera.cpp)
+set(INCLUDE_FILES include/GLSLProgram.h include/VerticesWrapper.h  include/OGLWidget.h  include/OGLWidgetUI.h include/camera.h)
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${INCLUDE_FILES})
 

@@ -7,27 +7,31 @@
 
 
 #include <iostream>
+#include <GL/glew.h>
 #include <GL/glut.h>
 #include <c++/4.8.3/vector>
 #include "VerticesWrapper.h"
+#include "camera.h"
 
 
 #define SPHERERADIUS 0.1
 #define SPHERESLICES 100
 #define SPHERESTACKS 50
 #define GRIDLENGTH 20
-#define WIDOWWIDTH 800
+#define WIDOWWIDTH 1024
 #define WIDOWHEIGHT 600
 
-
-
-
+extern Camera camera;
 extern VerticesWrapper *vw;
 extern glm::vec3 background;
 extern glm::vec3 selectedSphereColor;
 extern glm::vec3 sphereColor;
 extern glm::vec3 gridColor;
-extern int rotationX, rotationY, rotationZ;
+extern glm::vec4 rotation;
+extern GLfloat zoom;
+
+
+
 
 
 
