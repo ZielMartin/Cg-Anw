@@ -13,34 +13,36 @@
 
 class VerticesWrapper {
 
-    private:
-        /* Here will be the instance stored. */
-        static VerticesWrapper* instance;
+private:
+    /* Here will be the instance stored. */
+    static VerticesWrapper *instance;
 
     /* Private constructor to prevent instancing. */
-        VerticesWrapper();
+    VerticesWrapper();
 
-        //bool: true if selected
-        std::vector<std::pair<glm::vec4*,bool>> vertices;
-
-
-    public:
-        /* Static access method. */
-        static VerticesWrapper* getInstance();
-
-    std::vector<std::pair<glm::vec4*,bool>> *addVertex(glm::vec4 *vertex, bool selected);
-    std::vector<std::pair<glm::vec4*,bool>> *deleteVertex(glm::vec4 *vertex);
-
-        bool selectVertex(glm::vec4 *vertex);
-        void moveSelected(glm::vec3 relativeMovement);
+    //bool: true if selected
+    std::vector<std::pair<glm::vec4 *, bool>> vertices;
 
 
-        //Getters & Setters
-        std::vector<std::pair<glm::vec4*,bool>> *getVertices();
-        void setVertices(const std::vector<std::pair<glm::vec4*,bool>> &vertices);
+public:
+    /* Static access method. */
+    static VerticesWrapper *getInstance();
+
+    std::vector<std::pair<glm::vec4 *, bool>> *addVertex(glm::vec3 vertex, bool selected);
+
+    std::vector<std::pair<glm::vec4 *, bool>> *deleteSelectedVertices();
+
+    bool selectVertex(glm::vec3 *worldCoordinates, float radius);
+
+    void moveSelected(glm::vec3 relativeMovement);
+
+    void resetSelected();
 
 
+    //Getters & Setters
+    std::vector<std::pair<glm::vec4 *, bool>> *getVertices();
 
+    void setVertices(const std::vector<std::pair<glm::vec4 *, bool>> &vertices);
 
 
 };

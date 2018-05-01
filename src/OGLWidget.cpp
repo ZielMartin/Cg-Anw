@@ -153,8 +153,7 @@ void initOGLWidget(int argc, char **argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH);
     glutInitWindowSize(WIDOWWIDTH, WIDOWHEIGHT);
-
-
+    
     //Setup window and callbacks
     window.window_handle = glutCreateWindow("modeller");
     glutReshapeFunc(ReshapeFunc);

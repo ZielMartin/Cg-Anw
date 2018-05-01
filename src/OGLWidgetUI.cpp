@@ -47,12 +47,7 @@ void keyboard(unsigned char key, int x, int y) {
             vw->moveSelected(glm::vec3(0.0, MOVESTEPSIZE, 0.0));
             break;
         case 'r':
-            for (int i = 0; i < vw->getVertices()->size(); i++) {
-                if (vw->getVertices()->at(i).second) {
-                    vw->getVertices()->erase(vw->getVertices()->begin() + i);
-                    i--;
-                }
-            }
+            vw->deleteSelectedVertices();
         default:
             break;
     }
@@ -61,19 +56,19 @@ void keyboard(unsigned char key, int x, int y) {
 }
 
 void specialKeyboard(int key, int x, int y) {
-    std::cout << "specialKeyboard: " << key << std::endl;
+    //std::cout << "specialKeyboard: " << key << std::endl;
     switch (key) {
         case 101:              //UP ARROW
-            vw->moveSelected(glm::vec3(0.0, 0.0, -MOVESTEPSIZE));
-            break;
-        case 100:            //LEFT ARROW
             vw->moveSelected(glm::vec3(-MOVESTEPSIZE, 0.0, 0.0));
             break;
-        case 103:            //DOWN ARROW
+        case 100:            //LEFT ARROW
             vw->moveSelected(glm::vec3(0.0, 0.0, MOVESTEPSIZE));
             break;
-        case 102:            //RIGHT ARROW
+        case 103:            //DOWN ARROW
             vw->moveSelected(glm::vec3(MOVESTEPSIZE, 0.0, 0.0));
+            break;
+        case 102:            //RIGHT ARROW
+            vw->moveSelected(glm::vec3(0.0, 0.0, -MOVESTEPSIZE));
             break;
         default:
             break;
@@ -87,24 +82,13 @@ void mouseClicks(int button, int state, int x, int y) {
 
     if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN && glutGetModifiers() == GLUT_ACTIVE_CTRL) {
 
-        for (int i = 0; i < vw->getVertices()->size(); i++) {
-            glm::vec4 *vertex = vw->getVertices()->at(i).first;
-            bool *selected = &vw->getVertices()->at(i).second;
-            if (vertex->x - worldCoordinates.x < 0.1 && vertex->x - worldCoordinates.x > -0.1
-                && vertex->y - worldCoordinates.y < 0.1 && vertex->y - worldCoordinates.y > -0.1
-                && vertex->z - worldCoordinates.z < 0.1 && vertex->z - worldCoordinates.z > -0.1) {
-                *selected = !*selected;
-                break;
-            }
-        }
-
+        vw->selectVertex(&worldCoordinates, SPHERERADIUS);
 
     } else if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN) {
-        for (int i = 0; i < vw->getVertices()->size(); i++) {
-            vw->getVertices()->at(i).second = false;
-        }
-        glm::vec4 *newVertex = new glm::vec4(worldCoordinates, 1.0);
-        vw->addVertex(newVertex, true);
+
+        vw->resetSelected();
+
+        vw->addVertex(worldCoordinates, true);
         //std::cout << "addvertex"  << std::endl;
     } else if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
         camera.SetPos(button, state, x, y);

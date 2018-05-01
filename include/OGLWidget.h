@@ -31,10 +31,6 @@ extern glm::vec4 rotation;
 extern GLfloat zoom;
 
 
-
-
-
-
 void initOGLWidget(int argc, char **argv);
 
 glm::vec3 getWorldCoordinates(int x, int y);
