@@ -29,24 +29,87 @@ namespace cg {
             // before each test).
 
             HE_vert vertsExample[] = {
-                    HE_vert(-1.0, -1.0, -1.0),
                     HE_vert(-1.0, -1.0, 1.0),
-                    HE_vert(-1.0, 1.0, -1.0),
-                    HE_vert(-1.0, 1.0, 1.0),
-                    HE_vert(1.0, -1.0, -1.0),
                     HE_vert(1.0, -1.0, 1.0),
+                    HE_vert(-1.0, 1.0, 1.0),
+                    HE_vert(1.0, 1.0, 1.0),
+                    HE_vert(-1.0, 1.0, -1.0),
                     HE_vert(1.0, 1.0, -1.0),
-                    HE_vert(1.0, 1.0, 1.0)
+                    HE_vert(-1.0, -1.0, -1.0),
+                    HE_vert(1.0, -1.0, -1.0)
             };
 
-            halfEdgeStruct.verts = std::vector<std::shared_ptr<HE_vert>>();
+            std::vector<std::vector<int>> faces = {
+                    {0, 1, 2},
+                    {2, 1, 3},
 
-            for(HE_vert &vert : vertsExample) {
-                halfEdgeStruct.verts.push_back(std::shared_ptr<HE_vert>(new HE_vert(vert)));
+                    {2, 3, 4},
+                    {4, 3, 5},
+
+                    {4, 5, 6},
+                    {6, 5, 7},
+
+                    {6, 7, 0},
+                    {0, 7, 1},
+
+                    {1, 7, 3},
+                    {3, 7, 5},
+
+                    {6, 0, 4},
+                    {4, 0, 2}
+            };
+
+            halfEdgeStruct.verts = VertList();
+
+            for (HE_vert &vert : vertsExample) {
+                halfEdgeStruct.verts.push_back(VertPointer(new HE_vert(vert)));
             }
 
-            for(std::shared_ptr<HE_vert> &vert : halfEdgeStruct.verts) {
+            EdgeList beschleunigungsListe = EdgeList();
 
+
+            for (std::vector<int> &faceIndices : faces) {
+                FacePointer newFace = FacePointer(new HE_face);
+                EdgePointer prev = nullptr;
+
+                for (int &num : faceIndices) {
+                    EdgePointer curr = EdgePointer(new HE_edge);
+                    VertPointer edgeStartingFrom = halfEdgeStruct.verts[num];
+
+                    halfEdgeStruct.edges.push_back(curr);
+                    curr->vert = edgeStartingFrom;
+
+                    if(edgeStartingFrom->edge == nullptr)
+                        edgeStartingFrom->edge = curr;
+
+                    if (newFace->edge == nullptr)
+                        newFace->edge = curr;
+
+                    if (prev != nullptr)
+                        prev->next = curr;
+
+                    prev = curr;
+                }
+                prev->next = newFace->edge;
+            }
+
+            for (EdgePointer currentEdge : halfEdgeStruct.edges) {
+                if (currentEdge->pair == nullptr) {
+
+                    VertPointer pointingTo = currentEdge->next->vert;
+                    bool matchFound = false;
+                    for (EdgePointer edgeWithoutPair : beschleunigungsListe) {
+                        if (edgeWithoutPair->vert == pointingTo &&
+                            currentEdge->vert == edgeWithoutPair->next->vert) {
+                            matchFound = true;
+                            currentEdge->pair = edgeWithoutPair;
+                            edgeWithoutPair->pair = currentEdge;
+                        }
+                    }
+                    if (!matchFound) {
+                        beschleunigungsListe.push_back(currentEdge);
+                    }
+                }
             }
 
         }
@@ -63,18 +126,18 @@ namespace cg {
 
     TEST_F(HE_WrapperTest, TestPairs) {
         int failed = 0;
-        for (std::shared_ptr<HE_edge> edge : halfEdgeStruct.edges) {
-            std::shared_ptr<HE_edge> e = edge;
+        for (EdgePointer edge : halfEdgeStruct.edges) {
+            EdgePointer e = edge;
             do {
                 //vergleiche ziel-vertex von e mit start-vertex von seinem pair & start-vertex von e mit ziel-vertex seines pairs
                 if ((e->next->vert != e->pair->vert) || (e->pair->next->vert != e->vert)) {
                     failed++;
                 }
                 e = e->next;
-            } while (e != edge);
+            } while (e.get() != e.get());
         }
-        std::cout << std::endl << failed << " pairs sind inkonsistent: es gibt: " << halfEdgeStruct.edges.size() << " halfedges" << std::endl;
-        std::cout << std::endl;
+        ASSERT_EQ(0, failed) << failed << " pairs sind inkonsistent: es gibt: " << halfEdgeStruct.edges.size()
+                             << " halfedges";
     }
 
 
@@ -84,9 +147,9 @@ namespace cg {
 
         int failed = 0;
 
-        for (std::shared_ptr<HE_face> f : halfEdgeStruct.faces) {
+        for (FacePointer f : halfEdgeStruct.faces) {
             int edgeCounter = 0;
-            std::shared_ptr<HE_edge> e = f->edge;
+            EdgePointer e = f->edge;
             do {
                 if ((e->vert->edge->vert != e->vert) || e->face != f) {
                     failed++;
@@ -95,12 +158,13 @@ namespace cg {
                 edgeCounter++;
 
                 e = e->next;
-            } while (e != f->edge);
+            } while (e.get() != f->edge.get());
 
             facevalenz[edgeCounter]++;
 
         }
-        std::cout << failed << " faces sind inkonsistent: es gibt: " << halfEdgeStruct.faces.size() << " faces" << std::endl;
+        ASSERT_EQ(0, failed) << failed << " faces sind inkonsistent: es gibt: " << halfEdgeStruct.faces.size()
+                             << " faces" << std::endl;
 
         for (std::map<int, int>::iterator iter = facevalenz.begin(); iter != facevalenz.end(); ++iter) {
             std::cout << "Facevalenz: " << iter->first << " Face-Anzahl: " << iter->second << std::endl;
@@ -114,15 +178,15 @@ namespace cg {
 
         int failed = 0;
 
-        for (std::shared_ptr<HE_vert> v : halfEdgeStruct.verts) {
+        for (VertPointer v : halfEdgeStruct.verts) {
 
             //vertexvalenz
             //vertexvalenz[v->alledges.size()]++;
 
 
-            std::shared_ptr<HE_edge> e = v->edge;
+            EdgePointer e = v->edge;
             do {
-                std::cout << "DO" << std::endl;
+                ASSERT_NE(nullptr, e) << "IST NULL";
                 e = e->pair->next;
             } while (e != v->edge);
         }

@@ -15,6 +15,14 @@
 #include <map>
 #include <vector>
 
+#define VertPointer std::shared_ptr<HE_vert>
+#define EdgePointer std::shared_ptr<HE_edge>
+#define FacePointer std::shared_ptr<HE_face>
+
+#define VertList std::vector<VertPointer>
+#define EdgeList std::vector<EdgePointer>
+#define FaceList std::vector<FacePointer>
+
 namespace cg {
     struct HE_vert {
 
