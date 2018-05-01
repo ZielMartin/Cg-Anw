@@ -6,10 +6,10 @@
  * User-Interaction-Interface
  * - add point with right-click on grid
  * - select multiple points with ctrl + right-click on point
- * - move point/points with w,a,s,d,q,z
+ * - move point/points arrow-keys and '+','-'
  * - remove selected point/points with r
  *
- * - move camera with arrow-keys and '+','-'
+ * - move camera with with w,a,s,d,q,e
  * - rotate camera with mouse click and drag window
  */
 
@@ -17,34 +17,33 @@
 #include "OGLWidget.h"
 
 
-
 void keyboard(unsigned char key, int x, int y) {
 
     //std::cout << "keyboard: " << key << std::endl;
 
     switch (key) {
-        case '+':
+        case 'w':
             camera.Move(FORWARD);
             break;
-        case '-':
+        case 's':
             camera.Move(BACK);
             break;
-        case 'w':
-            vw->moveSelected(glm::vec3(0.0, 0.0, -MOVESTEPSIZE));
+        case 'e':
+            camera.Move(UP);
             break;
         case 'a':
-            vw->moveSelected(glm::vec3(-MOVESTEPSIZE, 0.0, 0.0));
-            break;
-        case 's':
-            vw->moveSelected(glm::vec3(0.0, 0.0, MOVESTEPSIZE));
-            break;
-        case 'd':
-            vw->moveSelected(glm::vec3(MOVESTEPSIZE, 0.0, 0.0));
+            camera.Move(LEFT);
             break;
         case 'q':
+            camera.Move(DOWN);
+            break;
+        case 'd':
+            camera.Move(RIGHT);
+            break;
+        case '-':            //DOWN
             vw->moveSelected(glm::vec3(0.0, -MOVESTEPSIZE, 0.0));
             break;
-        case 'z':
+        case '+':            //UP
             vw->moveSelected(glm::vec3(0.0, MOVESTEPSIZE, 0.0));
             break;
         case 'r':
@@ -62,19 +61,19 @@ void keyboard(unsigned char key, int x, int y) {
 }
 
 void specialKeyboard(int key, int x, int y) {
-    //std::cout << "specialKeyboard: " << key << std::endl;
+    std::cout << "specialKeyboard: " << key << std::endl;
     switch (key) {
-        case 101:
-            camera.Move(UP);
+        case 101:              //UP ARROW
+            vw->moveSelected(glm::vec3(0.0, 0.0, -MOVESTEPSIZE));
             break;
-        case 100:
-            camera.Move(LEFT);
+        case 100:            //LEFT ARROW
+            vw->moveSelected(glm::vec3(-MOVESTEPSIZE, 0.0, 0.0));
             break;
-        case 103:
-            camera.Move(DOWN);
+        case 103:            //DOWN ARROW
+            vw->moveSelected(glm::vec3(0.0, 0.0, MOVESTEPSIZE));
             break;
-        case 102:
-            camera.Move(RIGHT);
+        case 102:            //RIGHT ARROW
+            vw->moveSelected(glm::vec3(MOVESTEPSIZE, 0.0, 0.0));
             break;
         default:
             break;
@@ -107,7 +106,7 @@ void mouseClicks(int button, int state, int x, int y) {
         glm::vec4 *newVertex = new glm::vec4(worldCoordinates, 1.0);
         vw->addVertex(newVertex, true);
         //std::cout << "addvertex"  << std::endl;
-    } else if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
+    } else if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
         camera.SetPos(button, state, x, y);
         //std::cout << "setpos"  << std::endl;
 

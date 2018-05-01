@@ -14,8 +14,8 @@ Camera camera;
 
 
 VerticesWrapper *vw = VerticesWrapper::getInstance();
-glm::vec3 background = glm::vec3(0.2, 0.2, 0.2);
-glm::vec3 gridPane = glm::vec3(0,0,0);
+glm::vec3 backgroundColor = glm::vec3(0.2, 0.2, 0.2);
+glm::vec3 gridPaneColor = glm::vec3(0,0,0);
 glm::vec3 selectedSphereColor = glm::vec3(1, 0, 0);
 glm::vec3 sphereColor = glm::vec3(1, 1, 1);
 glm::vec3 gridColor = glm::vec3(1, 1, 1);
@@ -52,13 +52,13 @@ void drawSpheres() {
 }
 
 /**
- * same color as background, grid underlying square.
+ * grid underlying square.
  * necessary because mouse position is only correct detected while clicking on objects
  */
 //TODO: make invisible
 void drawInvisiblePane() {
     glPushMatrix();
-    glColor3f(gridPane.r, gridPane.g, gridPane.b);
+    glColor3f(gridPaneColor.r, gridPaneColor.g, gridPaneColor.b);
     glBegin(GL_POLYGON);
     glVertex3f(-GRIDLENGTH/2, -0.1, -GRIDLENGTH/2);
     glVertex3f(GRIDLENGTH/2, -0.1, -GRIDLENGTH/2);
@@ -102,9 +102,8 @@ void drawGrid() {
 
 void display() {
 
-    //glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
-    glClearColor(background.r, background.g, background.b, 1);
+    glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glViewport(0, 0, window.size.x, window.size.y);
 
@@ -114,11 +113,7 @@ void display() {
 
     glm::mat4 mvp = projection* view * model;	//Compute the mvp matrix
     glLoadMatrixf(glm::value_ptr(mvp));
-    //glLoadIdentity();
 
-    //glTranslatef(-1, 0, -45);
-    //glScalef(zoom,zoom,zoom);
-    //glRotatef(rotation.a, rotation.x, rotation.y, rotation.z);
     drawGrid();
     drawInvisiblePane();
     drawSpheres();
@@ -158,7 +153,6 @@ void initOGLWidget(int argc, char **argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH);
     glutInitWindowSize(WIDOWWIDTH, WIDOWHEIGHT);
-
 
 
     //Setup window and callbacks
