@@ -35,7 +35,7 @@ public:
 
 void drawSpheres() {
     for (int i = 0; i < vw->getVertices()->size(); i++) {
-        glm::vec4 *vertex = vw->getVertices()->at(i).first;
+        std::shared_ptr<glm::vec4> vertex = vw->getVertices()->at(i).first;
         glPushMatrix();
         if (vw->getVertices()->at(i).second) {
             glColor3f(selectedSphereColor.r, selectedSphereColor.g, selectedSphereColor.b);
@@ -153,7 +153,7 @@ void initOGLWidget(int argc, char **argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH);
     glutInitWindowSize(WIDOWWIDTH, WIDOWHEIGHT);
-    
+
     //Setup window and callbacks
     window.window_handle = glutCreateWindow("modeller");
     glutReshapeFunc(ReshapeFunc);

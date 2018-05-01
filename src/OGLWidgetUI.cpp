@@ -82,7 +82,7 @@ void mouseClicks(int button, int state, int x, int y) {
 
     if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN && glutGetModifiers() == GLUT_ACTIVE_CTRL) {
 
-        vw->selectVertex(&worldCoordinates, SPHERERADIUS);
+        vw->selectVertex(worldCoordinates, SPHERERADIUS);
 
     } else if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN) {
 
