@@ -13,6 +13,7 @@
  * - rotate camera with mouse click and drag window
  */
 
+#include <VectorsWrapper.h>
 #include "OGLWidgetUI.h"
 #include "OGLWidget.h"
 
@@ -78,6 +79,7 @@ void specialKeyboard(int key, int x, int y) {
 }
 
 void mouseClicks(int button, int state, int x, int y) {
+    camera.SetPos(button, state, x, y);
     glm::vec3 worldCoordinates = getWorldCoordinates(x, y);
 
     if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN && glutGetModifiers() == GLUT_ACTIVE_CTRL) {
@@ -90,10 +92,6 @@ void mouseClicks(int button, int state, int x, int y) {
 
         vw->addVertex(worldCoordinates, true);
         //std::cout << "addvertex"  << std::endl;
-    } else if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-        camera.SetPos(button, state, x, y);
-        //std::cout << "setpos"  << std::endl;
-
     }
 }
 

@@ -2,7 +2,7 @@
 // Created by Johannes on 29.04.2018.
 //
 
-#include <c++/4.8.3/iostream>
+
 #include "VerticesWrapper.h"
 
 
@@ -35,6 +35,7 @@ bool VerticesWrapper::selectVertex(glm::vec3 worldCoordinates, float radius) {
             && vertex->y - worldCoordinates.y < radius && vertex->y - worldCoordinates.y > -radius
             && vertex->z - worldCoordinates.z < radius && vertex->z - worldCoordinates.z > -radius) {
             *selected = !*selected;
+            VectorsWrapper *vevW = VectorsWrapper::getInstance();
             return true;
             break;
         }
@@ -45,16 +46,16 @@ bool VerticesWrapper::selectVertex(glm::vec3 worldCoordinates, float radius) {
 void VerticesWrapper::resetSelected() {
     for (int i = 0; i < getVertices()->size(); i++) {
         getVertices()->at(i).second = false;
-        std::cout<<getVertices()->at(i).second<<std::endl;
     }
 }
 
 
-void VerticesWrapper::addVertex(glm::vec3 vertex, bool selected) {
+std::shared_ptr<glm::vec4> VerticesWrapper::addVertex(glm::vec3 vertex, bool selected = false) {
     glm::vec4 v(vertex, 1.0);
     std::shared_ptr<glm::vec4> vp = std::make_shared<glm::vec4>(v);
     std::pair<std::shared_ptr<glm::vec4>, bool> pair(vp,selected);
     VerticesWrapper::vertices.push_back(pair);
+    return vp;
 }
 
 void VerticesWrapper::deleteSelectedVertices() {

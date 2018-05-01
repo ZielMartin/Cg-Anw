@@ -1,4 +1,5 @@
 //camera.cpp
+#include <c++/4.8.3/iostream>
 #include "camera.h"
 using namespace std;
 
@@ -157,6 +158,7 @@ void Camera::Move2D(int x, int y) {
 		ChangePitch(.08f * mouse_delta.y);
 	}
 	mouse_position = glm::vec3(x, y, 0);
+
 }
 
 void Camera::SetPos(int button, int state, int x, int y) {
@@ -171,6 +173,7 @@ void Camera::SetPos(int button, int state, int x, int y) {
 		move_camera = false;
 	}
 	mouse_position = glm::vec3(x, y, 0);
+
 }
 
 CameraType Camera::GetMode() {

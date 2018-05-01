@@ -14,6 +14,7 @@ Camera camera;
 
 
 VerticesWrapper *vw = VerticesWrapper::getInstance();
+VectorsWrapper *vecW = VectorsWrapper::getInstance();
 glm::vec3 backgroundColor = glm::vec3(0.2, 0.2, 0.2);
 glm::vec3 gridPaneColor = glm::vec3(0,0,0);
 glm::vec3 selectedSphereColor = glm::vec3(1, 0, 0);
@@ -98,7 +99,17 @@ void drawGrid() {
 
     }
 }
-
+void drawLines(){
+    glPushMatrix();
+    glLineWidth(1);
+    glBegin(GL_LINES);
+    glColor3f(gridColor.r, gridColor.g, gridColor.b);
+    for (int i = 0; i < vecW->getEdges()->size(); i++) {
+        glVertex3f(vecW->getEdges()->at(i).get()->x, vecW->getEdges()->at(i).get()->y, vecW->getEdges()->at(i).get()->z);
+    }
+    glEnd();
+    glPopMatrix();
+}
 
 void display() {
 
@@ -117,6 +128,7 @@ void display() {
     drawGrid();
     drawInvisiblePane();
     drawSpheres();
+    drawLines();
     glutSwapBuffers();
 }
 //Used when person drags mouse around

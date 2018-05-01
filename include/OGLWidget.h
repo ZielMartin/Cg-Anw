@@ -23,6 +23,7 @@
 
 extern Camera camera;
 extern VerticesWrapper *vw;
+extern VectorsWrapper *vecW;
 extern glm::vec3 backgroundColor;
 extern glm::vec3 selectedSphereColor;
 extern glm::vec3 sphereColor;

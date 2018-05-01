@@ -10,6 +10,8 @@
 #include <glm/vec3.hpp>
 #include <c++/4.8.3/vector>
 #include <c++/4.8.3/memory>
+#include "VectorsWrapper.h"
+#include <c++/4.8.3/iostream>
 
 
 class VerticesWrapper {
@@ -30,7 +32,7 @@ public:
     /* Static access method. */
     static VerticesWrapper *getInstance();
 
-    void addVertex(glm::vec3 vertex, bool selected);
+    std::shared_ptr<glm::vec4> addVertex(glm::vec3 vertex, bool selected);
 
     void deleteSelectedVertices();
 
