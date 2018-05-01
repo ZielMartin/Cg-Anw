@@ -4,7 +4,7 @@
 #define OBJECT_H
 
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
+//#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
 // Converts degrees to radians.

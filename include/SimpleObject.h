@@ -82,11 +82,11 @@ namespace cg {
 
         void initBoundingBox(const vec3List &vertices);
 
-        friend std::ostream &operator<<(std::ostream &os, const SimpleObject &object) {
-            os << object.name << " SimpleObject [ " << "programSimple: " << object.programSimple << " object: "
-               << object.object << " ]";
-            return os;
-        }
+//        friend std::ostream &operator<<(std::ostream &os, const SimpleObject &object) {
+//            os << object.name << " SimpleObject [ " << "programSimple: " << object.programSimple << " object: "
+//               << object.object << " ]";
+//            return os;
+//        }
 
 
     public:
