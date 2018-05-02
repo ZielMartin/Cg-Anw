@@ -5,12 +5,14 @@
 /**
  * User-Interaction-Interface
  * - add point with right-click on grid
- * - select multiple points with ctrl + right-click on point
+ * - select multiple points with ctrl + left-click on point
  * - move point/points arrow-keys and '+','-'
  * - remove selected point/points with r
  *
  * - move camera with with w,a,s,d,q,e
  * - rotate camera with mouse click and drag window
+ *
+ * - draw a line between two points: alt + left-click on the points one after another
  */
 
 #include <VectorsWrapper.h>
@@ -82,16 +84,42 @@ void mouseClicks(int button, int state, int x, int y) {
     camera.SetPos(button, state, x, y);
     glm::vec3 worldCoordinates = getWorldCoordinates(x, y);
 
-    if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN && glutGetModifiers() == GLUT_ACTIVE_CTRL) {
+    static std::shared_ptr<glm::vec4> vertA;
+    static std::shared_ptr<glm::vec4> vertB;
 
-        vw->selectVertex(worldCoordinates, SPHERERADIUS);
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN && glutGetModifiers() == GLUT_ACTIVE_CTRL) {
 
-    } else if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN) {
+        vw->selectVertex(worldCoordinates, SPHERERADIUS, true);
+
+    } else if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN && glutGetModifiers() != GLUT_ACTIVE_ALT) {
 
         vw->resetSelected();
 
         vw->addVertex(worldCoordinates, true);
         //std::cout << "addvertex"  << std::endl;
+    } else if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN && glutGetModifiers() == GLUT_ACTIVE_ALT) {
+
+        //first define vertA
+        if (vertA == nullptr) {
+            vertA = vw->selectVertex(worldCoordinates, SPHERERADIUS, false);
+
+        } else if (vertB == nullptr) {  //then vertB
+            vertB = vw->selectVertex(worldCoordinates, SPHERERADIUS, false);
+
+            if (vertB.get() != vertA.get() && vertB != nullptr) {
+                VectorsWrapper *vecW = VectorsWrapper::getInstance();
+                vecW->addEdge(vertA, vertB);
+            } else {
+                //if double click on vertex or no vertex clicked
+                vertB = nullptr;
+                vertA = nullptr;
+            }
+        } else {
+            vertA = vw->selectVertex(worldCoordinates, SPHERERADIUS, false);
+            vertB = nullptr;
+        }
+
+
     }
 }
 

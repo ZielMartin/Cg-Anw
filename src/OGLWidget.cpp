@@ -101,11 +101,12 @@ void drawGrid() {
 }
 void drawLines(){
     glPushMatrix();
-    glLineWidth(1);
+    glLineWidth(4);
     glBegin(GL_LINES);
     glColor3f(gridColor.r, gridColor.g, gridColor.b);
     for (int i = 0; i < vecW->getEdges()->size(); i++) {
-        glVertex3f(vecW->getEdges()->at(i).get()->x, vecW->getEdges()->at(i).get()->y, vecW->getEdges()->at(i).get()->z);
+        glVertex3f(vecW->getEdges()->at(i).first->x, vecW->getEdges()->at(i).first->y, vecW->getEdges()->at(i).first->z);
+        glVertex3f(vecW->getEdges()->at(i).second->x, vecW->getEdges()->at(i).second->y, vecW->getEdges()->at(i).second->z);
     }
     glEnd();
     glPopMatrix();

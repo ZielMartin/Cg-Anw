@@ -21,7 +21,7 @@ private:
     /* Private constructor to prevent instancing. */
     VectorsWrapper();
 
-    std::vector<std::shared_ptr<glm::vec4>> edges;
+    std::vector<std::pair<std::shared_ptr<glm::vec4>, std::shared_ptr<glm::vec4>>> edges;
 
 
 
@@ -30,13 +30,15 @@ public:
     /* Static access method. */
     static VectorsWrapper *getInstance();
 
-    void addEdge(std::shared_ptr<glm::vec4> vert);
+    void addEdge(std::shared_ptr<glm::vec4> vertA, std::shared_ptr<glm::vec4> vertB);
+
+    void deleteEdge(std::shared_ptr<glm::vec4> vert);
 
 
     //Getters & Setters
-    std::vector<std::shared_ptr<glm::vec4>> *getEdges();
+    std::vector<std::pair<std::shared_ptr<glm::vec4>, std::shared_ptr<glm::vec4>>> *getEdges();
 
-    void setVertices(const std::vector<std::shared_ptr<glm::vec4>> &edges);
+    void setVertices(const std::vector<std::pair<std::shared_ptr<glm::vec4>, std::shared_ptr<glm::vec4>>> &edges);
 };
 
 

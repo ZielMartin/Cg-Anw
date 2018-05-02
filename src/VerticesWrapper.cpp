@@ -27,20 +27,20 @@ void VerticesWrapper::setVertices(const std::vector<std::pair<std::shared_ptr<gl
     VerticesWrapper::vertices = vertices;
 }
 
-bool VerticesWrapper::selectVertex(glm::vec3 worldCoordinates, float radius) {
+std::shared_ptr<glm::vec4> VerticesWrapper::selectVertex(glm::vec3 worldCoordinates, float radius, bool markSelected) {
     for (int i = 0; i < getVertices()->size(); i++) {
-        glm::vec4 *vertex = getVertices()->at(i).first.get();
+
+        std::shared_ptr<glm::vec4> vertex = getVertices()->at(i).first;
         bool *selected = &getVertices()->at(i).second;
         if (vertex->x - worldCoordinates.x < radius && vertex->x - worldCoordinates.x > -radius
             && vertex->y - worldCoordinates.y < radius && vertex->y - worldCoordinates.y > -radius
             && vertex->z - worldCoordinates.z < radius && vertex->z - worldCoordinates.z > -radius) {
-            *selected = !*selected;
-            VectorsWrapper *vevW = VectorsWrapper::getInstance();
-            return true;
-            break;
+            markSelected?*selected = !*selected:0;
+            return vertex;
+
         }
     }
-    return false;
+    return nullptr;
 }
 
 void VerticesWrapper::resetSelected() {
@@ -58,9 +58,14 @@ std::shared_ptr<glm::vec4> VerticesWrapper::addVertex(glm::vec3 vertex, bool sel
     return vp;
 }
 
+/*
+ * very inefficient, find better solution!
+ */
 void VerticesWrapper::deleteSelectedVertices() {
     for (int i = 0; i < getVertices()->size(); i++) {
         if (getVertices()->at(i).second) {
+            VectorsWrapper *vecW = VectorsWrapper::getInstance();
+            vecW->deleteEdge(getVertices()->at(i).first);
             getVertices()->at(i).first.reset();
             getVertices()->erase(getVertices()->begin() + i);
             i--;

@@ -36,7 +36,7 @@ public:
 
     void deleteSelectedVertices();
 
-    bool selectVertex(glm::vec3 worldCoordinates, float radius);
+    std::shared_ptr<glm::vec4> selectVertex(glm::vec3 worldCoordinates, float radius, bool markSelected);
 
     void moveSelected(glm::vec3 relativeMovement);
 
