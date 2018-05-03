@@ -72,7 +72,7 @@ if (WIN32)
             COMMAND ${CMAKE_COMMAND} -E copy
             #${GLFW_PATH}/lib-mingw-w64/glfw3.dll
             ${GLEW_PATH}/lib/glew32.dll
-            ${GLUT_PATH}/lib/libfreeglut.dll.a
+            ${GLUT_PATH}/lib/libfreeglut.dll
             ${GTEST_PATH}/lib/libgmock.dll
             ${CMAKE_CURRENT_BINARY_DIR}/
     )
