@@ -23,32 +23,20 @@
 #define EdgeList std::vector<EdgePointer>
 #define FaceList std::vector<FacePointer>
 
+#define BeschleunigungsStruktur std::map<VertPointer, EdgeList>
+
 namespace cg {
     struct HE_vert {
-
-        HE_vert(double x, double y, double z) {
-            this->x = x;
-            this->y = y;
-            this->z = z;
+        HE_vert(glm::vec3 pos) {
+            this->pos = pos;
         }
 
-        double x = -1.0;
-        double y = -1.0;
-        double z = -1.0;
-
-        glm::vec3 toVec() {
-            return glm::vec3(x, y, z);
-        }
+        glm::vec3 pos;
 
         /**
          * one of the half-edges emanting from the vertex
          */
         std::shared_ptr<struct HE_edge> edge = nullptr;
-
-        friend std::ostream &operator<<(std::ostream &os, const HE_vert &vert) {
-            os << "vert{ " << "x: " << vert.x << " y: " << vert.y << " z: " << vert.z << " }";
-            return os;
-        }
     };
 
     struct HE_edge {
@@ -71,16 +59,6 @@ namespace cg {
          * next half-edge around the face
          */
         std::shared_ptr<struct HE_edge> next = nullptr;
-
-        friend std::ostream &operator<<(std::ostream &os, const HE_edge &edge) {
-            if (edge.vert != nullptr)
-                os << "edge{ " << "vert: " << *edge.vert << " pair: " << edge.pair << " face: " << edge.face
-                   << " next: " << edge.next << " }";
-            else
-                os << "edge{ " << "vert: " << edge.vert << " pair: " << edge.pair << " face: " << edge.face << " next: "
-                   << edge.next << " }";
-            return os;
-        }
     };
 
 
@@ -89,41 +67,30 @@ namespace cg {
          * one of the half-edges bordering the face
          */
         std::shared_ptr<struct HE_edge> edge = nullptr;
-
-        friend std::ostream &operator<<(std::ostream &os, const HE_face &face) {
-            if (face.edge != nullptr)
-                os << "face{ " << "edge: " << *face.edge << " }";
-            else
-                os << "face{ " << "edge: " << face.edge << " }";
-            return os;
-        }
-
-
-    };
-
-    struct HalfEdgeStruct {
-        std::vector<std::shared_ptr<HE_vert>> verts;
-        std::vector<std::shared_ptr<HE_edge>> edges;
-        std::vector<std::shared_ptr<HE_face>> faces;
-
-        std::map<std::shared_ptr<HE_vert>, std::vector<std::shared_ptr<HE_edge>>> beschleunigunsStruktur;
-
-        void clear(void) {
-            verts.clear();
-            edges.clear();
-            faces.clear();
-            beschleunigunsStruktur.clear();
-        }
     };
 
     class HE_Wrapper {
     public:
+        void addVert(VertPointer);
+        void addEdge(EdgePointer);
+        void addFace(FacePointer);
+
         void clear(void);
-        void deleteVert(std::shared_ptr<HE_vert>);
-        void deleteEdge(std::shared_ptr<HE_edge>);
-        void deleteFace(std::shared_ptr<HE_face>);
+
+        void deleteVert(VertPointer);
+        void deleteEdge(EdgePointer);
+        void deleteFace(FacePointer);
+
+        const VertList &getVerts() const;
+
+        const EdgeList &getEdges() const;
+
+        const FaceList &getFaces() const;
+
     private:
-        HalfEdgeStruct halfEdgeStruct;
+        VertList verts;
+        EdgeList edges;
+        FaceList faces;
     };
 }
 #endif /* INCLUDE_HALFEDGE_H_ */

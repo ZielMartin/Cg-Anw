@@ -49,7 +49,7 @@ file(GLOB TEST_FILES
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${INCLUDE_FILES})
 
-add_executable(${PROJECT_NAME}_TEST ${TEST_FILES} ${GTEST_INCLUDE_DIRS})
+add_executable(${PROJECT_NAME}_TEST ${TEST_FILES} src/HalfEdge.cpp src/SimpleObjParser.cpp ${GTEST_INCLUDE_DIRS})
 
 target_link_libraries(${PROJECT_NAME} ${GLUT_LIBRARIES} ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES} ${GTEST_LIBRARIES})
 
@@ -57,6 +57,7 @@ target_link_libraries(${PROJECT_NAME}_TEST ${GTEST_LIBRARIES})
 
 add_custom_command(
         TARGET ${PROJECT_NAME} POST_BUILD
+        TARGET ${PROJECT_NAME}_TEST POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${PROJECT_SOURCE_DIR}/shader
         ${CMAKE_CURRENT_BINARY_DIR}/shader
@@ -64,6 +65,7 @@ add_custom_command(
 if (WIN32)
     add_custom_command(
             TARGET ${PROJECT_NAME} POST_BUILD
+            TARGET ${PROJECT_NAME}_TEST POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy
             #${GLFW_PATH}/lib-mingw-w64/glfw3.dll
             ${GLEW_PATH}/lib/glew32.dll
