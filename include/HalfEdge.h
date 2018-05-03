@@ -28,10 +28,14 @@
 namespace cg {
     struct HE_vert {
         HE_vert(glm::vec3 pos) {
+            this->pos = glm::vec4(pos, 1.0);
+        }
+
+        HE_vert(glm::vec4 pos) {
             this->pos = pos;
         }
 
-        glm::vec3 pos;
+        glm::vec4 pos;
 
         /**
          * one of the half-edges emanting from the vertex
@@ -75,6 +79,9 @@ namespace cg {
         void addEdge(EdgePointer);
         void addFace(FacePointer);
 
+        VertPointer createVert(glm::vec4);
+        FacePointer createFace(VertList);
+
         void clear(void);
 
         void deleteVert(VertPointer);
@@ -91,6 +98,7 @@ namespace cg {
         VertList verts;
         EdgeList edges;
         FaceList faces;
+        BeschleunigungsStruktur beschleunigungsStruktur;
     };
 }
 #endif /* INCLUDE_HALFEDGE_H_ */

@@ -58,4 +58,74 @@ namespace cg {
         return this->faces;
     }
 
+    VertPointer HE_Wrapper::createVert(glm::vec4 pos) {
+        VertPointer newVert = VertPointer(new HE_vert(pos));
+        this->verts.push_back(newVert);
+        return newVert;
+    }
+
+    FacePointer HE_Wrapper::createFace(VertList verts) {
+        FacePointer newFace = FacePointer(new HE_face);
+        this->addFace(newFace);
+        EdgePointer prev = nullptr;
+
+        EdgeList edges;
+
+        for (VertPointer vert : verts) {
+            EdgePointer curr = EdgePointer(new HE_edge);
+            this->addEdge(curr);
+            edges.push_back(curr);
+
+            curr->vert = vert;
+            curr->face = newFace;
+
+            if (vert->edge == nullptr)
+                vert->edge = curr;
+
+            if (newFace->edge == nullptr)
+                newFace->edge = curr;
+
+            if (prev != nullptr)
+                prev->next = curr;
+
+            prev = curr;
+        }
+        prev->next = newFace->edge;
+
+        for (EdgePointer currentEdge : edges) {
+            if (currentEdge->pair == nullptr) {
+
+                VertPointer emanatingFrom = currentEdge->vert;
+                VertPointer pointingTo = currentEdge->next->vert;
+
+                BeschleunigungsStruktur::iterator it;
+                it = beschleunigungsStruktur.find(pointingTo);
+
+                if (it != beschleunigungsStruktur.end()) {
+                    EdgeList &edgesEmanatingFromVert = (*it).second;
+                    bool matchFound = false;
+
+                    for (EdgeList::iterator iterator = edgesEmanatingFromVert.begin();
+                         iterator != edgesEmanatingFromVert.end();
+                         iterator++) {
+                        EdgePointer emanatingEdge = *iterator;
+                        if (emanatingEdge->vert == pointingTo &&
+                            emanatingFrom == emanatingEdge->next->vert) {
+                            matchFound = true;
+
+                            emanatingEdge->pair = currentEdge;
+                            currentEdge->pair = emanatingEdge;
+
+                            edgesEmanatingFromVert.erase(iterator);
+                        }
+                    }
+
+                    if (!matchFound) {
+                        beschleunigungsStruktur[emanatingFrom].push_back(currentEdge);
+                    }
+                }
+            }
+        }
+    }
+
 }
