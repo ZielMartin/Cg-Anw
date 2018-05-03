@@ -8,6 +8,8 @@
 
 
 using namespace std;
+using namespace glm;
+
 
 //Create the Camera
 Camera camera;
@@ -15,11 +17,12 @@ Camera camera;
 
 VerticesWrapper *vw = VerticesWrapper::getInstance();
 VectorsWrapper *vecW = VectorsWrapper::getInstance();
-glm::vec3 backgroundColor = glm::vec3(0.2, 0.2, 0.2);
-glm::vec3 gridPaneColor = glm::vec3(0,0,0);
-glm::vec3 selectedSphereColor = glm::vec3(1, 0, 0);
-glm::vec3 sphereColor = glm::vec3(1, 1, 1);
-glm::vec3 gridColor = glm::vec3(1, 1, 1);
+vec3 backgroundColor = vec3(0,0,0);
+vec3 gridPaneColor = vec3(0.2, 0.2, 0.2);
+vec3 selectedSphereColor = vec3(1, 0, 0);
+vec3 sphereColor = vec3(1, 1, 1);
+vec3 gridColor = vec3(1, 1, 1);
+bool grid = true;
 
 
 class Window {
@@ -29,14 +32,14 @@ public:
         this->window_handle = -1;
     }
     int window_handle, interval;
-    glm::ivec2 size;
+    ivec2 size;
     float window_aspect;
 } window;
 
 
 void drawSpheres() {
     for (int i = 0; i < vw->getVertices()->size(); i++) {
-        std::shared_ptr<glm::vec4> vertex = vw->getVertices()->at(i).first;
+        shared_ptr<vec4> vertex = vw->getVertices()->at(i).first;
         glPushMatrix();
         if (vw->getVertices()->at(i).second) {
             glColor3f(selectedSphereColor.r, selectedSphereColor.g, selectedSphereColor.b);
@@ -57,7 +60,7 @@ void drawSpheres() {
  * necessary because mouse position is only correct detected while clicking on objects
  */
 //TODO: make invisible
-void drawInvisiblePane() {
+void drawGridPane() {
     glPushMatrix();
     glColor3f(gridPaneColor.r, gridPaneColor.g, gridPaneColor.b);
     glBegin(GL_POLYGON);
@@ -119,15 +122,17 @@ void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glViewport(0, 0, window.size.x, window.size.y);
 
-    glm::mat4 model, view, projection;
+    mat4 model, view, projection;
     camera.Update();
     camera.GetMatricies(projection, view, model);
 
-    glm::mat4 mvp = projection* view * model;	//Compute the mvp matrix
-    glLoadMatrixf(glm::value_ptr(mvp));
+    mat4 mvp = projection* view * model;	//Compute the mvp matrix
+    glLoadMatrixf(value_ptr(mvp));
 
-    drawGrid();
-    drawInvisiblePane();
+    if(grid){
+        drawGrid();
+        drawGridPane();
+    }
     drawSpheres();
     drawLines();
     glutSwapBuffers();
@@ -154,7 +159,7 @@ void CloseFunc() {
 //Resize the window and properly update the camera viewport
 void ReshapeFunc(int w, int h) {
     if (h > 0) {
-        window.size = glm::ivec2(w, h);
+        window.size = ivec2(w, h);
         window.window_aspect = float(w) / float(h);
     }
     camera.SetViewport(0, 0, window.size.x, window.size.y);
@@ -184,8 +189,8 @@ void initOGLWidget(int argc, char **argv) {
     }
     //Setup camera
     camera.SetMode(FREE);
-    camera.SetPosition(glm::vec3(20, 10, 10));
-    camera.SetLookAt(glm::vec3(0, 0, 0));
+    camera.SetPosition(vec3(20, 10, 10));
+    camera.SetLookAt(vec3(0, 0, 0));
     camera.SetClipping(.1, 1000);
     camera.SetFOV(45);
     //Start the glut loop!
@@ -195,7 +200,7 @@ void initOGLWidget(int argc, char **argv) {
 
 
 
-glm::vec3 getWorldCoordinates(int x, int y) {
+vec3 getWorldCoordinates(int x, int y) {
     double objx, objy, objz;
     GLint viewport[4];
     GLdouble modelview[16];
@@ -211,7 +216,7 @@ glm::vec3 getWorldCoordinates(int x, int y) {
 
     //cout << objx << " , " << objy << " , " << objz << "\n";
 
-    return glm::vec3(objx, objy, objz);
+    return vec3(objx, objy, objz);
 
 }
 

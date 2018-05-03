@@ -51,6 +51,8 @@ void keyboard(unsigned char key, int x, int y) {
             break;
         case 'r':
             vw->deleteSelectedVertices();
+        case 'g':
+            grid = !grid;
         default:
             break;
     }

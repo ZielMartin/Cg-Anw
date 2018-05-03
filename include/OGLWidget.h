@@ -17,7 +17,7 @@
 #define SPHERERADIUS 0.1
 #define SPHERESLICES 100
 #define SPHERESTACKS 50
-#define GRIDLENGTH 20
+#define GRIDLENGTH 50
 #define WIDOWWIDTH 1024
 #define WIDOWHEIGHT 600
 
@@ -28,8 +28,7 @@ extern glm::vec3 backgroundColor;
 extern glm::vec3 selectedSphereColor;
 extern glm::vec3 sphereColor;
 extern glm::vec3 gridColor;
-extern glm::vec4 rotation;
-extern GLfloat zoom;
+extern bool grid;
 
 
 void initOGLWidget(int argc, char **argv);
@@ -38,7 +37,7 @@ glm::vec3 getWorldCoordinates(int x, int y);
 
 void drawSpheres();
 
-void drawInvisiblePane();
+void drawGridPane();
 
 void drawGrid();
 
