@@ -13,58 +13,56 @@
 #include <glm/glm.hpp>
 #include <memory>
 #include <map>
+#include <vector>
+
+#define VertPointer std::shared_ptr<HE_vert>
+#define EdgePointer std::shared_ptr<HE_edge>
+#define FacePointer std::shared_ptr<HE_face>
+
+#define VertList std::vector<VertPointer>
+#define EdgeList std::vector<EdgePointer>
+#define FaceList std::vector<FacePointer>
+
+#define BeschleunigungsStruktur std::map<VertPointer, EdgeList>
 
 namespace cg {
     struct HE_vert {
-        float x = -1.0;
-        float y = -1.0;
-        float z = -1.0;
-
-        glm::vec3 toVec() {
-            return glm::vec3(x, y, z);
+        HE_vert(glm::vec3 pos) {
+            this->pos = glm::vec4(pos, 1.0);
         }
+
+        HE_vert(glm::vec4 pos) {
+            this->pos = pos;
+        }
+
+        glm::vec4 pos;
 
         /**
          * one of the half-edges emanting from the vertex
          */
-        struct HE_edge *edge = nullptr;
-
-        friend std::ostream &operator<<(std::ostream &os, const HE_vert &vert) {
-            os << "vert{ " << "x: " << vert.x << " y: " << vert.y << " z: " << vert.z << " }";
-            return os;
-        }
+        std::shared_ptr<struct HE_edge> edge = nullptr;
     };
 
     struct HE_edge {
         /**
          * start-vertex of the half-edge
          */
-        struct HE_vert *vert = nullptr;
+        std::shared_ptr<struct HE_vert> vert = nullptr;
 
         /**
          * oppositely oriented adjacent half-edge
          */
-        struct HE_edge *pair = nullptr;
+        std::shared_ptr<struct HE_edge> pair = nullptr;
 
         /**
          * face the half-edge borders
          */
-        struct HE_face *face = nullptr;
+        std::shared_ptr<struct HE_face> face = nullptr;
 
         /**
          * next half-edge around the face
          */
-        struct HE_edge *next = nullptr;
-
-        friend std::ostream &operator<<(std::ostream &os, const HE_edge &edge) {
-            if (edge.vert != nullptr)
-                os << "edge{ " << "vert: " << *edge.vert << " pair: " << edge.pair << " face: " << edge.face
-                   << " next: " << edge.next << " }";
-            else
-                os << "edge{ " << "vert: " << edge.vert << " pair: " << edge.pair << " face: " << edge.face << " next: "
-                   << edge.next << " }";
-            return os;
-        }
+        std::shared_ptr<struct HE_edge> next = nullptr;
     };
 
 
@@ -72,32 +70,35 @@ namespace cg {
         /**
          * one of the half-edges bordering the face
          */
-        struct HE_edge *edge = nullptr;
-
-        friend std::ostream &operator<<(std::ostream &os, const HE_face &face) {
-            if (face.edge != nullptr)
-                os << "face{ " << "edge: " << *face.edge << " }";
-            else
-                os << "face{ " << "edge: " << face.edge << " }";
-            return os;
-        }
-
-
+        std::shared_ptr<struct HE_edge> edge = nullptr;
     };
 
-    struct HalfEdgeStruct {
-        std::vector<std::shared_ptr<HE_vert>> verts;
-        std::vector<std::shared_ptr<HE_edge>> edges;
-        std::vector<std::shared_ptr<HE_face>> faces;
+    class HE_Wrapper {
+    public:
+        void addVert(VertPointer);
+        void addEdge(EdgePointer);
+        void addFace(FacePointer);
 
-        std::map<std::shared_ptr<HE_vert>, std::vector<std::shared_ptr<HE_edge>>> beschleunigunsStruktur;
+        VertPointer createVert(glm::vec4);
+        FacePointer createFace(VertList);
 
-        void clear(void) {
-            verts.clear();
-            edges.clear();
-            faces.clear();
-            beschleunigunsStruktur.clear();
-        }
+        void clear(void);
+
+        void deleteVert(VertPointer);
+        void deleteEdge(EdgePointer);
+        void deleteFace(FacePointer);
+
+        const VertList &getVerts() const;
+
+        const EdgeList &getEdges() const;
+
+        const FaceList &getFaces() const;
+
+    private:
+        VertList verts;
+        EdgeList edges;
+        FaceList faces;
+        BeschleunigungsStruktur beschleunigungsStruktur;
     };
 }
 #endif /* INCLUDE_HALFEDGE_H_ */

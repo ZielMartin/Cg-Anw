@@ -2,7 +2,6 @@
 // Created by Johannes on 29.04.2018.
 //
 
-
 #include "VerticesWrapper.h"
 
 using namespace std;

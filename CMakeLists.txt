@@ -8,38 +8,72 @@ if (UNIX AND NOT CYGWIN)
     find_package(OpenGL REQUIRED)
     find_package(GLEW REQUIRED)
     find_package(GLUT REQUIRED)
+
+    set(GTEST_PATH ${PROJECT_SOURCE_DIR}/libs/googletest-release-1.8.0-mingw)
+    set(GTEST_INCLUDE_DIRS ${GTEST_PATH}/include)
+
+    set(GTEST_LIBRARIES gtest)
 elseif (WIN32)
-    add_definitions(-D GLEW_STATIC)
-    add_definitions(-D FREEGLUT_STATIC)
     find_package(OPENGL REQUIRED)
 
-    set(GLFW_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/libs/glfw-3.1.2.bin.WIN64/include)
-    set(GLEW_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/libs/glew-2.1.0/include)
-    set(GLM_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/libs/glm-0.9.7.2)
-    set(GLUT_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/libs/freeglut-3.0.0-mingw/include)
+    set(GLFW_PATH ${PROJECT_SOURCE_DIR}/libs/glfw-3.1.2.bin.WIN64/)
+    set(GLEW_PATH ${PROJECT_SOURCE_DIR}/libs/glew-2.1.0)
+    set(GLM_PATH ${PROJECT_SOURCE_DIR}/libs/glm-0.9.7.2)
+    set(GLUT_PATH ${PROJECT_SOURCE_DIR}/libs/freeglut-3.0.0)
+    set(GTEST_PATH ${PROJECT_SOURCE_DIR}/libs/googletest-release-1.8.0-mingw)
 
-    set(GLFW_STATIC_LIBRARIES ${PROJECT_SOURCE_DIR}/libs/glfw-3.1.2.bin.WIN64/lib-mingw-w64/libglfw3.a)
-    set(GLEW_LIBRARIES ${PROJECT_SOURCE_DIR}/libs/glew-2.1.0/lib/libglew32.a)
-    set(GLUT_LIBRARIES ${PROJECT_SOURCE_DIR}/libs/freeglut-3.0.0-mingw/lib/libfreeglut_static.a winmm gdi32)
+    set(GLFW_INCLUDE_DIRS ${GLFW_PATH}/include)
+    set(GLEW_INCLUDE_DIRS ${GLEW_PATH}/include)
+    set(GLM_INCLUDE_DIRS ${GLM_PATH})
+    set(GLUT_INCLUDE_DIRS ${GLUT_PATH}/include)
+    set(GTEST_INCLUDE_DIRS ${GTEST_PATH}/include)
 
+    set(GLFW_STATIC_LIBRARIES ${GLFW_PATH}/lib-mingw-w64/glfw3.dll)
+    set(GLEW_LIBRARIES ${GLEW_PATH}/lib/glew32.dll)
+    set(GLUT_LIBRARIES ${GLUT_PATH}/lib/libfreeglut.dll winmm gdi32)
+    set(GTEST_LIBRARIES ${GTEST_PATH}/lib/libgmock.dll)
+
+    add_definitions("-static")
 else ()
     message("UNSUPPORTED OS")
 endif ()
 
-include_directories(include ${GLEW_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIRS} ${GLM_INCLUDE_DIRS})
+include_directories(include ${GLEW_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIRS} ${GLM_INCLUDE_DIRS} ${GTEST_INCLUDE_DIRS})
 
-set(SOURCE_FILES src/main.cpp src/VerticesWrapper.cpp src/OGLWidget.cpp  src/OGLWidgetUI.cpp src/camera.cpp src/VectorsWrapper.cpp)
-set(INCLUDE_FILES include/GLSLProgram.h include/VerticesWrapper.h  include/OGLWidget.h  include/OGLWidgetUI.h include/camera.h include/VectorsWrapper.h)
+file(GLOB SOURCE_FILES
+        src/*.cpp)
+
+file(GLOB INCLUDE_FILES
+        include/*.h
+        include/*.hpp)
+
+file(GLOB TEST_FILES
+        test/*.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${INCLUDE_FILES})
 
-target_link_libraries(${PROJECT_NAME} ${GLUT_LIBRARIES} ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES})
+add_executable(${PROJECT_NAME}_TEST ${TEST_FILES} src/HalfEdge.cpp src/SimpleObjParser.cpp ${GTEST_INCLUDE_DIRS})
+
+target_link_libraries(${PROJECT_NAME} ${GLUT_LIBRARIES} ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES} ${GTEST_LIBRARIES})
+
+target_link_libraries(${PROJECT_NAME}_TEST ${GTEST_LIBRARIES})
 
 add_custom_command(
         TARGET ${PROJECT_NAME} POST_BUILD
+        TARGET ${PROJECT_NAME}_TEST POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${PROJECT_SOURCE_DIR}/shader
         ${CMAKE_CURRENT_BINARY_DIR}/shader
 )
-
-
+if (WIN32)
+    add_custom_command(
+            TARGET ${PROJECT_NAME} POST_BUILD
+            TARGET ${PROJECT_NAME}_TEST POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+            #${GLFW_PATH}/lib-mingw-w64/glfw3.dll
+            ${GLEW_PATH}/lib/glew32.dll
+            ${GLUT_PATH}/lib/libfreeglut.dll.a
+            ${GTEST_PATH}/lib/libgmock.dll
+            ${CMAKE_CURRENT_BINARY_DIR}/
+    )
+endif ()

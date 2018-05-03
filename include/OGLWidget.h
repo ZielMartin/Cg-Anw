@@ -9,7 +9,7 @@
 #include <iostream>
 #include <GL/glew.h>
 #include <GL/glut.h>
-#include <c++/4.8.3/vector>
+#include <vector>
 #include "VerticesWrapper.h"
 #include "camera.h"
 
