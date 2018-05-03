@@ -8,7 +8,11 @@ if (UNIX AND NOT CYGWIN)
     find_package(OpenGL REQUIRED)
     find_package(GLEW REQUIRED)
     find_package(GLUT REQUIRED)
-    find_package(GTEST REQUIRED)
+
+    set(GTEST_PATH ${PROJECT_SOURCE_DIR}/libs/googletest-release-1.8.0-mingw)
+    set(GTEST_INCLUDE_DIRS ${GTEST_PATH}/include)
+
+    set(GTEST_LIBRARIES gtest)
 elseif (WIN32)
     find_package(OPENGL REQUIRED)
 

@@ -8,7 +8,7 @@
 
 #include <iostream>
 #include <GL/glut.h>
-#include <c++/4.8.3/vector>
+#include <vector>
 #include "VerticesWrapper.h"
 
 
