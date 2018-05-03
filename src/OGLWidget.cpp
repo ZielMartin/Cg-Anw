@@ -209,7 +209,7 @@ glm::vec3 getWorldCoordinates(int x, int y) {
     glReadPixels(x, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
     gluUnProject(winX, winY, winZ, modelview, projection, viewport, &objx, &objy, &objz);
 
-    cout << objx << " , " << objy << " , " << objz << "\n";
+    //cout << objx << " , " << objy << " , " << objz << "\n";
 
     return glm::vec3(objx, objy, objz);
 

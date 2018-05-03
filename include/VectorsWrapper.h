@@ -7,9 +7,9 @@
 
 
 #include <glm/vec4.hpp>
-#include <c++/4.8.3/utility>
-#include <c++/4.8.3/vector>
-#include <c++/4.8.3/memory>
+#include <utility>
+#include <vector>
+#include <memory>
 
 
 class VectorsWrapper {

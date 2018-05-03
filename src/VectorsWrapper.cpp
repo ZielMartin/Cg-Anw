@@ -5,6 +5,10 @@
 
 #include "VectorsWrapper.h"
 
+using namespace std;
+using namespace glm;
+
+
 /* Null, because instance will be initialized on demand. */
 VectorsWrapper *VectorsWrapper::instance = 0;
 
@@ -19,12 +23,12 @@ VectorsWrapper *VectorsWrapper::getInstance() {
 VectorsWrapper::VectorsWrapper() {}
 
 
-void VectorsWrapper::addEdge(std::shared_ptr<glm::vec4> vertA, std::shared_ptr<glm::vec4> vertB){
-    std::pair<std::shared_ptr<glm::vec4>, std::shared_ptr<glm::vec4>> pair(vertA, vertB);
+void VectorsWrapper::addEdge(shared_ptr<vec4> vertA, shared_ptr<vec4> vertB){
+    pair<shared_ptr<vec4>, shared_ptr<vec4>> pair(vertA, vertB);
     edges.push_back(pair);
 }
 
-void VectorsWrapper::deleteEdge(std::shared_ptr<glm::vec4> vert){
+void VectorsWrapper::deleteEdge(shared_ptr<vec4> vert){
     for(int j = 0; j < getEdges()->size(); j++){
         if(getEdges()->at(j).first == vert || getEdges()->at(j).second == vert ){
             getEdges()->at(j).first.reset();
@@ -38,10 +42,10 @@ void VectorsWrapper::deleteEdge(std::shared_ptr<glm::vec4> vert){
 
 
 //Getters & Setters
-std::vector<std::pair<std::shared_ptr<glm::vec4>, std::shared_ptr<glm::vec4>>> *VectorsWrapper::getEdges(){
+vector<pair<shared_ptr<vec4>, shared_ptr<vec4>>> *VectorsWrapper::getEdges(){
     return &edges;
 }
 
-void VectorsWrapper::setVertices(const std::vector<std::pair<std::shared_ptr<glm::vec4>, std::shared_ptr<glm::vec4>>> &edges){
+void VectorsWrapper::setVertices(const vector<pair<shared_ptr<vec4>, shared_ptr<vec4>>> &edges){
     this->edges = edges;
 }

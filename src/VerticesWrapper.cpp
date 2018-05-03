@@ -5,6 +5,8 @@
 
 #include "VerticesWrapper.h"
 
+using namespace std;
+using namespace glm;
 
 /* Null, because instance will be initialized on demand. */
 VerticesWrapper *VerticesWrapper::instance = 0;
@@ -19,18 +21,18 @@ VerticesWrapper *VerticesWrapper::getInstance() {
 
 VerticesWrapper::VerticesWrapper() {}
 
-std::vector<std::pair<std::shared_ptr<glm::vec4>, bool>> *VerticesWrapper::getVertices() {
+vector<pair<shared_ptr<vec4>, bool>> *VerticesWrapper::getVertices() {
     return &vertices;
 }
 
-void VerticesWrapper::setVertices(const std::vector<std::pair<std::shared_ptr<glm::vec4>, bool>> &vertices) {
+void VerticesWrapper::setVertices(const vector<pair<shared_ptr<vec4>, bool>> &vertices) {
     VerticesWrapper::vertices = vertices;
 }
 
-std::shared_ptr<glm::vec4> VerticesWrapper::selectVertex(glm::vec3 worldCoordinates, float radius, bool markSelected) {
+shared_ptr<vec4> VerticesWrapper::selectVertex(vec3 worldCoordinates, float radius, bool markSelected) {
     for (int i = 0; i < getVertices()->size(); i++) {
 
-        std::shared_ptr<glm::vec4> vertex = getVertices()->at(i).first;
+        shared_ptr<vec4> vertex = getVertices()->at(i).first;
         bool *selected = &getVertices()->at(i).second;
         if (vertex->x - worldCoordinates.x < radius && vertex->x - worldCoordinates.x > -radius
             && vertex->y - worldCoordinates.y < radius && vertex->y - worldCoordinates.y > -radius
@@ -50,10 +52,10 @@ void VerticesWrapper::resetSelected() {
 }
 
 
-std::shared_ptr<glm::vec4> VerticesWrapper::addVertex(glm::vec3 vertex, bool selected = false) {
-    glm::vec4 v(vertex, 1.0);
-    std::shared_ptr<glm::vec4> vp = std::make_shared<glm::vec4>(v);
-    std::pair<std::shared_ptr<glm::vec4>, bool> pair(vp,selected);
+shared_ptr<vec4> VerticesWrapper::addVertex(vec3 vertex, bool selected = false) {
+    vec4 v(vertex, 1.0);
+    shared_ptr<vec4> vp = make_shared<vec4>(v);
+    pair<shared_ptr<vec4>, bool> pair(vp,selected);
     VerticesWrapper::vertices.push_back(pair);
     return vp;
 }
@@ -74,11 +76,11 @@ void VerticesWrapper::deleteSelectedVertices() {
 }
 
 
-void VerticesWrapper::moveSelected(glm::vec3 relativeMovement) {
+void VerticesWrapper::moveSelected(vec3 relativeMovement) {
     for (int i = 0; i < vertices.size(); i++) {
         {
             if (vertices[i].second) {
-                std::pair<std::shared_ptr<glm::vec4>, bool> vertex = getVertices()->at(i);
+                pair<shared_ptr<vec4>, bool> vertex = getVertices()->at(i);
                 vertex.first.get()->x += relativeMovement.x;
                 vertex.first.get()->y += relativeMovement.y;
                 vertex.first.get()->z += relativeMovement.z;

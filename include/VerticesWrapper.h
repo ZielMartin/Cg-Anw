@@ -8,10 +8,10 @@
 
 #include <glm/vec4.hpp>
 #include <glm/vec3.hpp>
-#include <c++/4.8.3/vector>
-#include <c++/4.8.3/memory>
+#include <vector>
+#include <memory>
 #include "VectorsWrapper.h"
-#include <c++/4.8.3/iostream>
+#include <iostream>
 
 
 class VerticesWrapper {
