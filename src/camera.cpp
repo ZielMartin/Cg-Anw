@@ -1,5 +1,5 @@
 //camera.cpp
-#include <c++/4.8.3/iostream>
+#include <iostream>
 #include "camera.h"
 using namespace std;
 using namespace glm;
