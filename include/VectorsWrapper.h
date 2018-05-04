@@ -36,7 +36,7 @@ public:
 
 
     //Getters & Setters
-    std::vector<std::pair<std::shared_ptr<glm::vec4>, std::shared_ptr<glm::vec4>>> *getEdges();
+    std::vector<std::pair<std::shared_ptr<glm::vec4>, std::shared_ptr<glm::vec4>>> &getEdges();
 
     void setVertices(const std::vector<std::pair<std::shared_ptr<glm::vec4>, std::shared_ptr<glm::vec4>>> &edges);
 };

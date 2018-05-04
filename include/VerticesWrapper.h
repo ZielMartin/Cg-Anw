@@ -44,7 +44,7 @@ public:
 
 
     //Getters & Setters
-    std::vector<std::pair<std::shared_ptr<glm::vec4>, bool>> *getVertices();
+    std::vector<std::pair<std::shared_ptr<glm::vec4>, bool>> &getVertices();
 
     void setVertices(const std::vector<std::pair<std::shared_ptr<glm::vec4>, bool>> &vertices);
 

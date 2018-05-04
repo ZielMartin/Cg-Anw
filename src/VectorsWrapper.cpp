@@ -29,11 +29,11 @@ void VectorsWrapper::addEdge(shared_ptr<vec4> vertA, shared_ptr<vec4> vertB){
 }
 
 void VectorsWrapper::deleteEdge(shared_ptr<vec4> vert){
-    for(int j = 0; j < getEdges()->size(); j++){
-        if(getEdges()->at(j).first == vert || getEdges()->at(j).second == vert ){
-            getEdges()->at(j).first.reset();
-            getEdges()->at(j).second.reset();
-            getEdges()->erase(getEdges()->begin() + j);
+    for(int j = 0; j < getEdges().size(); j++){
+        if(getEdges().at(j).first == vert || getEdges().at(j).second == vert ){
+            getEdges().at(j).first.reset();
+            getEdges().at(j).second.reset();
+            getEdges().erase(getEdges().begin() + j);
             j--;
         }
     }
@@ -42,8 +42,8 @@ void VectorsWrapper::deleteEdge(shared_ptr<vec4> vert){
 
 
 //Getters & Setters
-vector<pair<shared_ptr<vec4>, shared_ptr<vec4>>> *VectorsWrapper::getEdges(){
-    return &edges;
+vector<pair<shared_ptr<vec4>, shared_ptr<vec4>>> &VectorsWrapper::getEdges(){
+    return edges;
 }
 
 void VectorsWrapper::setVertices(const vector<pair<shared_ptr<vec4>, shared_ptr<vec4>>> &edges){

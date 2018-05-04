@@ -22,7 +22,7 @@
 
 void keyboard(unsigned char key, int x, int y) {
 
-    //std::cout << "keyboard: " << key << std::endl;
+    std::cout << "keyboard: " << key << std::endl;
 
     switch (key) {
         case 'w':
@@ -51,8 +51,10 @@ void keyboard(unsigned char key, int x, int y) {
             break;
         case 'r':
             vw->deleteSelectedVertices();
+            break;
         case 'g':
             grid = !grid;
+            break;
         default:
             break;
     }

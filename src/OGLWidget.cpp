@@ -38,10 +38,10 @@ public:
 
 
 void drawSpheres() {
-    for (int i = 0; i < vw->getVertices()->size(); i++) {
-        shared_ptr<vec4> vertex = vw->getVertices()->at(i).first;
+    for (int i = 0; i < vw->getVertices().size(); i++) {
+        shared_ptr<vec4> vertex = vw->getVertices().at(i).first;
         glPushMatrix();
-        if (vw->getVertices()->at(i).second) {
+        if (vw->getVertices().at(i).second) {
             glColor3f(selectedSphereColor.r, selectedSphereColor.g, selectedSphereColor.b);
         } else {
             glColor3f(sphereColor.r, sphereColor.g, sphereColor.b);
@@ -107,9 +107,9 @@ void drawLines(){
     glLineWidth(4);
     glBegin(GL_LINES);
     glColor3f(gridColor.r, gridColor.g, gridColor.b);
-    for (int i = 0; i < vecW->getEdges()->size(); i++) {
-        glVertex3f(vecW->getEdges()->at(i).first->x, vecW->getEdges()->at(i).first->y, vecW->getEdges()->at(i).first->z);
-        glVertex3f(vecW->getEdges()->at(i).second->x, vecW->getEdges()->at(i).second->y, vecW->getEdges()->at(i).second->z);
+    for (int i = 0; i < vecW->getEdges().size(); i++) {
+        glVertex3f(vecW->getEdges().at(i).first->x, vecW->getEdges().at(i).first->y, vecW->getEdges().at(i).first->z);
+        glVertex3f(vecW->getEdges().at(i).second->x, vecW->getEdges().at(i).second->y, vecW->getEdges().at(i).second->z);
     }
     glEnd();
     glPopMatrix();
