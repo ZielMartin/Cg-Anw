@@ -6,7 +6,6 @@
 
 #include <iostream>
 #include <algorithm>
-#include <main.h>
 
 namespace cg {
 
@@ -56,40 +55,41 @@ namespace cg {
     }
 
     void SimpleObject::render(void) {
-        // Create mvp.
-        glm::mat4 modelview = cg::ViewProjection::view * model * rotate * center;
-        glm::mat4 mvp = cg::ViewProjection::projection * modelview;
-        glm::mat4 normalMatrix = glm::transpose(glm::inverse(modelview));
-
-        // Bind the shader program and set uniform(s).
-        programSimple.use();
-        programSimple.setUniform("mvp", mvp);
-
-        programSimple.setUniform("modelview", modelview);
-
-        programSimple.setUniform("normalMatrix", normalMatrix);
-
-        programSimple.setUniform("LightSource[0].position", lights[0].position);
-        programSimple.setUniform("LightSource[0].color", lights[0].color);
-        programSimple.setUniform("LightSource[0].intensity", lights[0].intensity);
-        programSimple.setUniform("LightSource[0].directional", lights[0].directional);
-
-        programSimple.setUniform("LightSource[1].position", lights[1].position);
-        programSimple.setUniform("LightSource[1].color", lights[1].color);
-        programSimple.setUniform("LightSource[1].intensity", lights[1].intensity);
-        programSimple.setUniform("LightSource[1].directional", lights[1].directional);
-
-
-        programSimple.setUniform("material.ka", material.ka);
-        programSimple.setUniform("material.kd", material.kd);
-        programSimple.setUniform("material.ks", material.ks);
-        programSimple.setUniform("material.shininess", material.shininess);
-
-
-        glBindVertexArray(object->vao);
-        glDrawElements(object->mode, object->indexCount, GL_UNSIGNED_INT, 0);
-
-        glBindVertexArray(0);
+        throw -1;
+//        // Create mvp.
+//        glm::mat4 modelview = cg::ViewProjection::view * model * rotate * center;
+//        glm::mat4 mvp = cg::ViewProjection::projection * modelview;
+//        glm::mat4 normalMatrix = glm::transpose(glm::inverse(modelview));
+//
+//        // Bind the shader program and set uniform(s).
+//        programSimple.use();
+//        programSimple.setUniform("mvp", mvp);
+//
+//        programSimple.setUniform("modelview", modelview);
+//
+//        programSimple.setUniform("normalMatrix", normalMatrix);
+//
+//        programSimple.setUniform("LightSource[0].position", lights[0].position);
+//        programSimple.setUniform("LightSource[0].color", lights[0].color);
+//        programSimple.setUniform("LightSource[0].intensity", lights[0].intensity);
+//        programSimple.setUniform("LightSource[0].directional", lights[0].directional);
+//
+//        programSimple.setUniform("LightSource[1].position", lights[1].position);
+//        programSimple.setUniform("LightSource[1].color", lights[1].color);
+//        programSimple.setUniform("LightSource[1].intensity", lights[1].intensity);
+//        programSimple.setUniform("LightSource[1].directional", lights[1].directional);
+//
+//
+//        programSimple.setUniform("material.ka", material.ka);
+//        programSimple.setUniform("material.kd", material.kd);
+//        programSimple.setUniform("material.ks", material.ks);
+//        programSimple.setUniform("material.shininess", material.shininess);
+//
+//
+//        glBindVertexArray(object->vao);
+//        glDrawElements(object->mode, object->indexCount, GL_UNSIGNED_INT, 0);
+//
+//        glBindVertexArray(0);
     }
 
 
