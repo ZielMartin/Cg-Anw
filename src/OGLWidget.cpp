@@ -15,8 +15,8 @@ using namespace glm;
 Camera camera;
 
 
-VerticesWrapper *vw = VerticesWrapper::getInstance();
-VectorsWrapper *vecW = VectorsWrapper::getInstance();
+OGLWVerticesWrapper *vw = OGLWVerticesWrapper::getInstance();
+OGLWEdgesWrapper *vecW = OGLWEdgesWrapper::getInstance();
 vec3 backgroundColor = vec3(0,0,0);
 vec3 gridPaneColor = vec3(0.2, 0.2, 0.2);
 vec3 selectedSphereColor = vec3(1, 0, 0);

@@ -2,33 +2,33 @@
 // Created by Johannes on 29.04.2018.
 //
 
-#include "VerticesWrapper.h"
+#include "OGLWVerticesWrapper.h"
 
 using namespace std;
 using namespace glm;
 
 /* Null, because instance will be initialized on demand. */
-VerticesWrapper *VerticesWrapper::instance = 0;
+OGLWVerticesWrapper *OGLWVerticesWrapper::instance = 0;
 
-VerticesWrapper *VerticesWrapper::getInstance() {
+OGLWVerticesWrapper *OGLWVerticesWrapper::getInstance() {
     if (instance == 0) {
-        instance = new VerticesWrapper();
+        instance = new OGLWVerticesWrapper();
     }
 
     return instance;
 }
 
-VerticesWrapper::VerticesWrapper() {}
+OGLWVerticesWrapper::OGLWVerticesWrapper() {}
 
-vector<pair<shared_ptr<vec4>, bool>> &VerticesWrapper::getVertices() {
+vector<pair<shared_ptr<vec4>, bool>> &OGLWVerticesWrapper::getVertices() {
     return vertices;
 }
 
-void VerticesWrapper::setVertices(const vector<pair<shared_ptr<vec4>, bool>> &vertices) {
-    VerticesWrapper::vertices = vertices;
+void OGLWVerticesWrapper::setVertices(const vector<pair<shared_ptr<vec4>, bool>> &vertices) {
+    OGLWVerticesWrapper::vertices = vertices;
 }
 
-shared_ptr<vec4> VerticesWrapper::selectVertex(vec3 worldCoordinates, float radius, bool markSelected) {
+shared_ptr<vec4> OGLWVerticesWrapper::selectVertex(vec3 worldCoordinates, float radius, bool markSelected) {
     for (int i = 0; i < getVertices().size(); i++) {
 
         shared_ptr<vec4> vertex = getVertices().at(i).first;
@@ -44,28 +44,28 @@ shared_ptr<vec4> VerticesWrapper::selectVertex(vec3 worldCoordinates, float radi
     return nullptr;
 }
 
-void VerticesWrapper::resetSelected() {
+void OGLWVerticesWrapper::resetSelected() {
     for (int i = 0; i < getVertices().size(); i++) {
         getVertices().at(i).second = false;
     }
 }
 
 
-shared_ptr<vec4> VerticesWrapper::addVertex(vec3 vertex, bool selected = false) {
+shared_ptr<vec4> OGLWVerticesWrapper::addVertex(vec3 vertex, bool selected = false) {
     vec4 v(vertex, 1.0);
     shared_ptr<vec4> vp = make_shared<vec4>(v);
     pair<shared_ptr<vec4>, bool> pair(vp,selected);
-    VerticesWrapper::vertices.push_back(pair);
+    OGLWVerticesWrapper::vertices.push_back(pair);
     return vp;
 }
 
 /*
  * very inefficient, find better solution!
  */
-void VerticesWrapper::deleteSelectedVertices() {
+void OGLWVerticesWrapper::deleteSelectedVertices() {
     for (int i = 0; i < getVertices().size(); i++) {
         if (getVertices().at(i).second) {
-            VectorsWrapper *vecW = VectorsWrapper::getInstance();
+            OGLWEdgesWrapper *vecW = OGLWEdgesWrapper::getInstance();
             vecW->deleteEdge(getVertices().at(i).first);
             getVertices().at(i).first.reset();
             getVertices().erase(getVertices().begin() + i);
@@ -75,7 +75,7 @@ void VerticesWrapper::deleteSelectedVertices() {
 }
 
 
-void VerticesWrapper::moveSelected(vec3 relativeMovement) {
+void OGLWVerticesWrapper::moveSelected(vec3 relativeMovement) {
     for (int i = 0; i < vertices.size(); i++) {
         {
             if (vertices[i].second) {

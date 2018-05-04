@@ -10,18 +10,18 @@
 #include <glm/vec3.hpp>
 #include <vector>
 #include <memory>
-#include "VectorsWrapper.h"
+#include "OGLWEdgesWrapper.h"
 #include <iostream>
 
 
-class VerticesWrapper {
+class OGLWVerticesWrapper {
 
 private:
     /* Here will be the instance stored. */
-    static VerticesWrapper *instance;
+    static OGLWVerticesWrapper *instance;
 
     /* Private constructor to prevent instancing. */
-    VerticesWrapper();
+    OGLWVerticesWrapper();
 
     //bool: true if selected
     std::vector<std::pair<std::shared_ptr<glm::vec4>, bool>> vertices;
@@ -30,7 +30,7 @@ private:
 
 public:
     /* Static access method. */
-    static VerticesWrapper *getInstance();
+    static OGLWVerticesWrapper *getInstance();
 
     std::shared_ptr<glm::vec4> addVertex(glm::vec3 vertex, bool selected);
 

@@ -10,7 +10,7 @@
 #include <GL/glew.h>
 #include <GL/glut.h>
 #include <vector>
-#include "VerticesWrapper.h"
+#include "OGLWVerticesWrapper.h"
 #include "camera.h"
 
 
@@ -22,8 +22,8 @@
 #define WIDOWHEIGHT 600
 
 extern Camera camera;
-extern VerticesWrapper *vw;
-extern VectorsWrapper *vecW;
+extern OGLWVerticesWrapper *vw;
+extern OGLWEdgesWrapper *vecW;
 extern glm::vec3 backgroundColor;
 extern glm::vec3 selectedSphereColor;
 extern glm::vec3 sphereColor;

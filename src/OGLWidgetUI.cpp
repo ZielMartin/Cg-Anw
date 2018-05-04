@@ -15,7 +15,7 @@
  * - draw a line between two points: alt + left-click on the points one after another
  */
 
-#include <VectorsWrapper.h>
+#include <OGLWEdgesWrapper.h>
 #include "OGLWidgetUI.h"
 #include "OGLWidget.h"
 
@@ -111,7 +111,7 @@ void mouseClicks(int button, int state, int x, int y) {
             vertB = vw->selectVertex(worldCoordinates, SPHERERADIUS, false);
 
             if (vertB.get() != vertA.get() && vertB != nullptr) {
-                VectorsWrapper *vecW = VectorsWrapper::getInstance();
+                OGLWEdgesWrapper *vecW = OGLWEdgesWrapper::getInstance();
                 vecW->addEdge(vertA, vertB);
             } else {
                 //if double click on vertex or no vertex clicked
