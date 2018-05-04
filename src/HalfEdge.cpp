@@ -4,6 +4,7 @@
 
 #include "HalfEdge.h"
 #include <algorithm>
+#include <iostream>
 
 namespace cg {
     void HE_Wrapper::clear() {
@@ -26,8 +27,8 @@ namespace cg {
         std::shared_ptr<HE_edge> currentEdge = start;
         do {
             EdgeList::iterator position = std::find(this->edges.begin(), this->edges.end(), currentEdge);
-            std::shared_ptr<HE_edge> neighborEdge = currentEdge->pair;
-            neighborEdge->pair = nullptr;
+            EdgePointer neighborEdge = currentEdge->pair;
+            if (neighborEdge != nullptr) neighborEdge->pair = nullptr;
             this->edges.erase(position);
             currentEdge = currentEdge->next;
         } while (currentEdge != start);
@@ -64,16 +65,71 @@ namespace cg {
         return newVert;
     }
 
-    FacePointer HE_Wrapper::createFace(VertList verts) {
+    FacePointer HE_Wrapper::createFace(VertList &verts) {
         FacePointer newFace = FacePointer(new HE_face);
         this->addFace(newFace);
-        EdgePointer prev = nullptr;
 
+//        try {
+//            checkOrientation(verts);
+//        } catch (std::runtime_error &ex) {
+//            std::cerr << ex.what() << std::endl;
+//        }
+        EdgeList edges = createEdgesFromVerts(verts, newFace);
+
+        for (EdgePointer currentEdge : edges) {
+            if (currentEdge->pair == nullptr) {
+                VertPointer outgoingFrom = currentEdge->vert;
+                VertPointer pointingTo = currentEdge->next->vert;
+
+                EdgePointer pairFound = nullptr;
+                std::map<VertPointer, EdgeList >::iterator it = accelerationStruct.find(pointingTo);
+                if (it != accelerationStruct.end()) {
+                    EdgeList &outgoingEdgesFromDestination = it->second;
+
+                    pairFound = findPairAndSetIt(currentEdge, outgoingEdgesFromDestination);
+                    if (pairFound) {
+                        EdgeList::iterator begin = outgoingEdgesFromDestination.begin();
+                        EdgeList::iterator end = outgoingEdgesFromDestination.end();
+                        EdgeList::iterator nowHasPair = std::find(begin, end, pairFound);
+                        outgoingEdgesFromDestination.erase(nowHasPair);
+                    }
+                }
+                if (!pairFound) {
+                    accelerationStruct[outgoingFrom].push_back(currentEdge);
+                }
+            }
+        }
+        return newFace;
+    }
+
+    void HE_Wrapper::checkOrientation(VertList &verts) {
+        bool reversedAlready = true;
+        for (VertPointer vert : verts) {
+            if (shouldReverse(vert)) {
+                if (reversedAlready)
+                    throw std::runtime_error("Error in Half-Edge-Struct");
+                //std::reverse(verts.begin(), verts.end());
+                reversedAlready = true;
+            }
+        }
+    }
+    
+    bool HE_Wrapper::shouldReverse(const std::shared_ptr<HE_vert> &vert) const {
+        EdgeList emanantingFrom = accelerationStruct.find(vert)->second;
+        for (EdgePointer edge : emanantingFrom) {
+            if (vert == edge->vert) {
+                return true;
+            }
+        }
+    }
+
+
+    EdgeList HE_Wrapper::createEdgesFromVerts(const VertList &verts, FacePointer &newFace) {
         EdgeList edges;
-
+        EdgePointer prev = nullptr;
         for (VertPointer vert : verts) {
             EdgePointer curr = EdgePointer(new HE_edge);
-            this->addEdge(curr);
+            addEdge(curr);
             edges.push_back(curr);
 
             curr->vert = vert;
@@ -90,42 +146,22 @@ namespace cg {
 
             prev = curr;
         }
-        prev->next = newFace->edge;
+        if (prev != nullptr)
+            prev->next = newFace->edge;
+        return edges;
+    }
 
-        for (EdgePointer currentEdge : edges) {
-            if (currentEdge->pair == nullptr) {
-
-                VertPointer emanatingFrom = currentEdge->vert;
-                VertPointer pointingTo = currentEdge->next->vert;
-
-                BeschleunigungsStruktur::iterator it;
-                it = beschleunigungsStruktur.find(pointingTo);
-
-                if (it != beschleunigungsStruktur.end()) {
-                    EdgeList &edgesEmanatingFromVert = (*it).second;
-                    bool matchFound = false;
-
-                    for (EdgeList::iterator iterator = edgesEmanatingFromVert.begin();
-                         iterator != edgesEmanatingFromVert.end();
-                         iterator++) {
-                        EdgePointer emanatingEdge = *iterator;
-                        if (emanatingEdge->vert == pointingTo &&
-                            emanatingFrom == emanatingEdge->next->vert) {
-                            matchFound = true;
-
-                            emanatingEdge->pair = currentEdge;
-                            currentEdge->pair = emanatingEdge;
-
-                            edgesEmanatingFromVert.erase(iterator);
-                        }
-                    }
-
-                    if (!matchFound) {
-                        beschleunigungsStruktur[emanatingFrom].push_back(currentEdge);
-                    }
-                }
+    EdgePointer HE_Wrapper::findPairAndSetIt(EdgePointer &currentEdge, EdgeList &outgoingEdgesFromDestination) {
+        VertPointer outgoingFrom = currentEdge->vert;
+        VertPointer pointingTo = currentEdge->next->vert;
+        for (EdgePointer &edgeWithoutPair : outgoingEdgesFromDestination) {
+            if (edgeWithoutPair->next->vert == outgoingFrom && edgeWithoutPair->vert == pointingTo) {
+                currentEdge->pair = edgeWithoutPair;
+                edgeWithoutPair->pair = currentEdge;
+                return edgeWithoutPair;
             }
         }
+        return nullptr;
     }
 
 }

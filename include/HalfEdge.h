@@ -23,8 +23,6 @@
 #define EdgeList std::vector<EdgePointer>
 #define FaceList std::vector<FacePointer>
 
-#define BeschleunigungsStruktur std::map<VertPointer, EdgeList>
-
 namespace cg {
     struct HE_vert {
         HE_vert(glm::vec3 pos) {
@@ -80,7 +78,7 @@ namespace cg {
         void addFace(FacePointer);
 
         VertPointer createVert(glm::vec4);
-        FacePointer createFace(VertList);
+        FacePointer createFace(VertList &);
 
         void clear(void);
 
@@ -98,7 +96,14 @@ namespace cg {
         VertList verts;
         EdgeList edges;
         FaceList faces;
-        BeschleunigungsStruktur beschleunigungsStruktur;
+        std::map<VertPointer, EdgeList> accelerationStruct;
+
+        EdgeList createEdgesFromVerts(const VertList &verts, FacePointer &newFace);
+        void checkOrientation(VertList &verts);
+
+        bool shouldReverse(const VertPointer &vert) const;
+
+        EdgePointer findPairAndSetIt(EdgePointer &currentEdge, EdgeList &outgoingEdgesFromDestination);
     };
 }
 #endif /* INCLUDE_HALFEDGE_H_ */

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.6)
 project(Cg_Anw)
 
 set(CMAKE_CXX_STANDARD 14)
-#set(CMAKE_VERBOSE_MAKEFILE TRUE)
+set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
 if (UNIX AND NOT CYGWIN)
     find_package(OpenGL REQUIRED)
@@ -49,11 +49,11 @@ file(GLOB INCLUDE_FILES
 file(GLOB TEST_FILES
         test/*.cpp)
 
-add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${INCLUDE_FILES})
-
 SET( CMAKE_EXE_LINKER_FLAGS  ${CMAKE_EXE_LINKER_FLAGS} "-static -static-libgcc -static-libstdc++" )
 
-add_executable(${PROJECT_NAME}_TEST ${TEST_FILES} src/HalfEdge.cpp src/SimpleObjParser.cpp ${GTEST_INCLUDE_DIRS})
+add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${INCLUDE_FILES})
+
+add_executable(${PROJECT_NAME}_TEST ${TEST_FILES} src/HalfEdge.cpp src/SimpleObjParser.cpp)
 
 target_link_libraries(${PROJECT_NAME} ${GLUT_LIBRARIES} ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES} ${GTEST_LIBRARIES})
 

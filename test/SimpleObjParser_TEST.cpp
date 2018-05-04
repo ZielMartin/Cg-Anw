@@ -1,24 +1,22 @@
 //
-// Created by ZielM on 30.04.2018.
+// Created by ZielM on 04.05.2018.
 //
 
 #include <SimpleObjParser.h>
-#include "HalfEdge.h"
 #include "gtest/gtest.h"
 
 namespace cg {
-
 // The fixture for testing class Foo.
-    class HE_WrapperTest : public ::testing::Test {
+    class SimpleObjParserTest : public ::testing::Test {
     protected:
         // You can remove any or all of the following functions if its body
         // is empty.
 
-        HE_WrapperTest() {
+        SimpleObjParserTest() {
             // You can do set-up work for each test here.
         }
 
-        virtual ~HE_WrapperTest() {
+        virtual ~SimpleObjParserTest() {
             // You can do clean-up work that doesn't throw exceptions here.
         }
 
@@ -64,7 +62,7 @@ namespace cg {
                     {4, 0, 2}
             };
 
-            this->he_wrapper = SimpleObjParser().create(vertsExample, faces);
+            this->he_wrapper = this->simpleObjParser.create(vertsExample, faces);
 
 
         }
@@ -75,21 +73,55 @@ namespace cg {
         }
 
         // Objects declared here can be used by all tests in the test case for Foo.
-        std::shared_ptr<HE_Wrapper> he_wrapper;
+        std::shared_ptr<HE_Wrapper> he_wrapper = nullptr;
+        SimpleObjParser simpleObjParser;
     };
 
+    TEST_F(SimpleObjParserTest, TestPairs) {
+        int failed = 0;
+        for (EdgePointer edge : he_wrapper->getEdges()) {
+            EdgePointer e = edge;
+            do {
+                ASSERT_NE(e->next, nullptr);
+                ASSERT_NE(e->pair, nullptr);
 
+                //vergleiche ziel-vertex von e mit start-vertex von seinem pair & start-vertex von e mit ziel-vertex seines pairs
+                ASSERT_EQ(e->next->vert, e->pair->vert);
+                ASSERT_EQ(e->pair->next->vert, e->vert);
 
-    TEST_F(HE_WrapperTest, DeleteFace) {
-        ASSERT_TRUE(he_wrapper->getFaces().size() > 0);
-
-        FacePointer firstFace = he_wrapper->getFaces()[0];
-        he_wrapper->deleteFace(firstFace);
+                e = e->next;
+            } while (e.get() != e.get());
+        }
     }
 
-}  // namespace
 
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+    TEST_F(SimpleObjParserTest, TestFaces) {
+        for (FacePointer f : he_wrapper->getFaces()) {
+            EdgePointer e = f->edge;
+            do {
+                ASSERT_EQ(e->vert->edge->vert.get(), e->vert.get());
+                ASSERT_EQ(e->face.get(), f.get());
+
+                e = e->next;
+            } while (e.get() != f->edge.get());
+
+        }
+        std::cout << std::endl;
+    }
+
+    TEST_F(SimpleObjParserTest, TestVertices) {
+//key: anzahl der ausgehenden kanten, val: anzahl der vertices mit dieser anzahl(key) der ausgehenden kanten
+        for (VertPointer v : he_wrapper->getVerts()) {
+
+            EdgePointer e = v->edge;
+            do {
+                ASSERT_NE(e, nullptr) << "IST NULL";
+                ASSERT_NE(e->pair, nullptr);
+                e = e->pair->next;
+            } while (e != v->edge);
+        }
+
+    }
+
+
 }
