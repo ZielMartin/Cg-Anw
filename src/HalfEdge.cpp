@@ -14,25 +14,90 @@ namespace cg {
     }
 
     void HE_Wrapper::deleteVert(VertPointer deleteMe) {
+        EdgeList l = getEdgesFromVert(deleteMe);
 
+        for(EdgePointer edge : l) {
+            if(!edge->face->isBoundary) {
+                deleteEdge(edge);
+            }
+        }
     }
 
     void HE_Wrapper::deleteEdge(EdgePointer deleteMe) {
+        FacePointer faceA = deleteMe->face;
+        FacePointer faceB = deleteMe->pair->face;
+        faceA->isBoundary = true;
+
+        if(faceA->edge == deleteMe) {
+            faceA->edge = deleteMe->next;
+        }
+
+        EdgePointer curr = deleteMe->pair;
+        do {
+            curr->face = faceA;
+            curr = curr->next;
+        } while (curr != deleteMe->pair);
+
+        EdgePointer prev = findPrevEdge(deleteMe);
+        prev->next = deleteMe->pair->next;
+        findPrevEdge(deleteMe->pair)->next = deleteMe->next;
+
+        faces.erase(std::find(faces.begin(), faces.end(), faceB));
+
+        FacePointer neighbor = findNeighborThatIsBoundary(faceA);
+        while (neighbor) {
+            this->deleteEdge(findEdgeConnectingFaces(faceA, neighbor));
+            neighbor = findNeighborThatIsBoundary(faceA);
+        }
 
     }
 
+    EdgePointer HE_Wrapper::findPrevEdge(const EdgePointer edge) const {
+        EdgePointer curr = edge->next;
+        while (curr->next != edge) curr = curr->next;
+        return curr;
+    }
+
     void HE_Wrapper::deleteFace(FacePointer deleteMe) {
-        std::shared_ptr<HE_edge> start = deleteMe->edge;
+        if (deleteMe->isBoundary)
+            throw new std::invalid_argument("Face already deleted");
+        deleteMe->isBoundary = true;
+
+        FacePointer neighborBoundary = findNeighborThatIsBoundary(deleteMe);
+        if (neighborBoundary) {
+            EdgePointer edge = findEdgeConnectingFaces(neighborBoundary, deleteMe);
+            this->deleteEdge(edge);
+            return;
+
+        }
+
+    }
+
+    EdgePointer HE_Wrapper::findEdgeConnectingFaces(const FacePointer faceA, const FacePointer faceB) const {
+        EdgePointer start = faceA->edge;
+
+        EdgePointer current = start;
+        do {
+            if (current->pair->face == faceB) {
+                return current;
+            }
+            current = current->next;
+        } while (current != start);
+        return nullptr;
+    }
+
+    FacePointer HE_Wrapper::findNeighborThatIsBoundary(const FacePointer face) const {
+        std::shared_ptr<HE_edge> start = face->edge;
 
         std::shared_ptr<HE_edge> currentEdge = start;
         do {
-            EdgeList::iterator position = std::find(this->edges.begin(), this->edges.end(), currentEdge);
-            EdgePointer neighborEdge = currentEdge->pair;
-            if (neighborEdge != nullptr) neighborEdge->pair = nullptr;
-            this->edges.erase(position);
-            currentEdge = currentEdge->next;
+            FacePointer currentNeighbor = currentEdge->pair->face;
+            if (currentNeighbor->isBoundary) {
+                return currentNeighbor;
+            }
         } while (currentEdge != start);
 
+        return nullptr;
     }
 
     void HE_Wrapper::addVert(VertPointer vert) {
@@ -113,7 +178,7 @@ namespace cg {
             }
         }
     }
-    
+
     bool HE_Wrapper::shouldReverse(const std::shared_ptr<HE_vert> &vert) const {
         EdgeList emanantingFrom = accelerationStruct.find(vert)->second;
         for (EdgePointer edge : emanantingFrom) {
@@ -164,4 +229,45 @@ namespace cg {
         return nullptr;
     }
 
+    EdgeList HE_Wrapper::getEdgesFromFace(FacePointer face) {
+        EdgePointer start = face->edge;
+        EdgeList borderingEdges;
+
+        EdgePointer currentEdge = start;
+        do {
+            borderingEdges.push_back(currentEdge);
+            currentEdge = currentEdge->pair->next;
+        } while (currentEdge != start);
+        return borderingEdges;
+    }
+
+    EdgeList HE_Wrapper::getEdgesFromVert(VertPointer vert) {
+        EdgePointer start = vert->edge;
+        EdgePointer curr = start;
+        EdgeList list;
+        do {
+            list.push_back(curr);
+            curr = curr->pair->next;
+        } while (curr != start);
+        return list;
+    }
+
+    void HE_Wrapper::forEveryOutgoingEdgeFromVert(VertPointer vert, std::function<void(EdgePointer)> &func) {
+        EdgePointer start = vert->edge;
+        EdgePointer curr = start;
+        do {
+            func(curr);
+            curr = curr->pair->next;
+        } while (curr != start);
+    }
+
+    void HE_Wrapper::forEveryEdgeAroundFace(FacePointer face, std::function<void(EdgePointer)> &func) {
+        EdgePointer start = face->edge;
+        EdgePointer curr = start;
+        do {
+            func(curr);
+            curr = curr->next;
+        } while (curr != start);
+
+    }
 }

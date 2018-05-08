@@ -79,12 +79,39 @@ namespace cg {
     };
 
 
+    TEST_F(HE_WrapperTest, DeleteFaceNumberShouldNotReduce) {
+        FacePointer anyFace = he_wrapper->getFaces()[0];
+        size_t faceCount = he_wrapper->getFaces().size();
+        he_wrapper->deleteFace(anyFace);
+        size_t newFaceCount = he_wrapper->getFaces().size();
 
-    TEST_F(HE_WrapperTest, DeleteFace) {
-        ASSERT_TRUE(he_wrapper->getFaces().size() > 0);
+        ASSERT_EQ(faceCount, newFaceCount) << "deleting a Face shouldn't reduce the count";
+    }
 
-        FacePointer firstFace = he_wrapper->getFaces()[0];
-        he_wrapper->deleteFace(firstFace);
+    TEST_F(HE_WrapperTest, DeleteFaceNumberShouldReduce) {
+        FacePointer anyFace = he_wrapper->getFaces()[0];
+        FacePointer neighborFace = anyFace->edge->pair->face;
+        size_t faceCount = he_wrapper->getFaces().size();
+        he_wrapper->deleteFace(anyFace);
+        he_wrapper->deleteFace(neighborFace);
+        size_t newFaceCount = he_wrapper->getFaces().size();
+
+        ASSERT_EQ(faceCount - 1, newFaceCount) << "deleting two adjacent Faces should reduce the count";
+    }
+
+    TEST_F(HE_WrapperTest, DeleteEdge) {
+        EdgePointer anyEdge = he_wrapper->getEdges()[0];
+        size_t faceCount = he_wrapper->getFaces().size();
+        he_wrapper->deleteEdge(anyEdge);
+        size_t newFaceCount = he_wrapper->getFaces().size();
+
+        ASSERT_EQ(faceCount - 1, newFaceCount) << "deleting a Face should reduce the count by 1";
+
+    }
+
+    TEST_F(HE_WrapperTest, DeleteVert) {
+        VertPointer anyVert = he_wrapper->getVerts()[0];
+        he_wrapper->deleteVert(anyVert);
     }
 
 }  // namespace

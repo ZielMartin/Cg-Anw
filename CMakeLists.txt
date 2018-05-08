@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.6)
 project(Cg_Anw)
 
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_VERBOSE_MAKEFILE TRUE)
+#set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
 if (UNIX AND NOT CYGWIN)
     find_package(OpenGL REQUIRED)
@@ -28,10 +28,13 @@ elseif (WIN32)
     set(GLUT_INCLUDE_DIRS ${GLUT_PATH}/include)
     set(GTEST_INCLUDE_DIRS ${GTEST_PATH}/include)
 
-    set(GLFW_STATIC_LIBRARIES ${GLFW_PATH}/lib-mingw-w64/glfw3.dll)
-    set(GLEW_LIBRARIES ${GLEW_PATH}/lib/glew32.dll)
-    set(GLUT_LIBRARIES ${GLUT_PATH}/lib/libfreeglut.dll winmm gdi32)
-    set(GTEST_LIBRARIES ${GTEST_PATH}/lib/libgmock.dll)
+    #cmake link_libraries removes .dll and .dll.a ending, but not .dll.dll wtf
+    set(GLFW_STATIC_LIBRARIES "glfw3.dll.dll")
+    set(GLEW_LIBRARIES "glew32.dll.dll")
+    set(GLUT_LIBRARIES "freeglut.dll.dll" winmm gdi32)
+    set(GTEST_LIBRARIES "gmock.dll.dll")
+
+    link_directories(${GLFW_PATH}/lib-mingw-w64 ${GLEW_PATH}/lib ${GLUT_PATH}/lib ${GTEST_PATH}/lib)
 
 else ()
     message("UNSUPPORTED OS")
@@ -49,13 +52,13 @@ file(GLOB INCLUDE_FILES
 file(GLOB TEST_FILES
         test/*.cpp)
 
-SET( CMAKE_EXE_LINKER_FLAGS  ${CMAKE_EXE_LINKER_FLAGS} "-static -static-libgcc -static-libstdc++" )
+SET(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} "-static -static-libgcc -static-libstdc++")
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${INCLUDE_FILES})
 
 add_executable(${PROJECT_NAME}_TEST ${TEST_FILES} src/HalfEdge.cpp src/SimpleObjParser.cpp)
 
-target_link_libraries(${PROJECT_NAME} ${GLUT_LIBRARIES} ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES} ${GTEST_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${GLUT_LIBRARIES} ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES})
 
 target_link_libraries(${PROJECT_NAME}_TEST ${GTEST_LIBRARIES})
 

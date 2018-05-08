@@ -69,21 +69,31 @@ namespace cg {
          * one of the half-edges bordering the face
          */
         std::shared_ptr<struct HE_edge> edge = nullptr;
+
+        /**
+         * if true the Face is only a boundary for traversing, not a real face that should be rendered
+         */
+        bool isBoundary = false;
     };
 
     class HE_Wrapper {
     public:
         void addVert(VertPointer);
+
         void addEdge(EdgePointer);
+
         void addFace(FacePointer);
 
         VertPointer createVert(glm::vec4);
+
         FacePointer createFace(VertList &);
 
         void clear(void);
 
         void deleteVert(VertPointer);
+
         void deleteEdge(EdgePointer);
+
         void deleteFace(FacePointer);
 
         const VertList &getVerts() const;
@@ -96,14 +106,28 @@ namespace cg {
         VertList verts;
         EdgeList edges;
         FaceList faces;
-        std::map<VertPointer, EdgeList> accelerationStruct;
+        std::map<VertPointer, EdgeList > accelerationStruct;
 
         EdgeList createEdgesFromVerts(const VertList &verts, FacePointer &newFace);
+
         void checkOrientation(VertList &verts);
 
         bool shouldReverse(const VertPointer &vert) const;
 
         EdgePointer findPairAndSetIt(EdgePointer &currentEdge, EdgeList &outgoingEdgesFromDestination);
+
+        FacePointer findNeighborThatIsBoundary(const FacePointer face) const;
+
+        EdgePointer findEdgeConnectingFaces(const FacePointer faceA, const FacePointer faceB) const;
+
+        EdgePointer findPrevEdge(const std::shared_ptr<HE_edge> edge) const;
+
+        EdgeList getEdgesFromFace(FacePointer face);
+        EdgeList getEdgesFromVert(VertPointer vert);
+
+        void forEveryOutgoingEdgeFromVert(VertPointer vert, std::function<void(EdgePointer)> &func);
+
+        void forEveryEdgeAroundFace(FacePointer face, std::function<void(EdgePointer)> &func);
     };
 }
 #endif /* INCLUDE_HALFEDGE_H_ */
