@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QtGUIClass</class>
+ <widget class="QMainWindow" name="QtGUIClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>600</width>
+    <height>400</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Modeler</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <widget class="QOpenGLWidget" name="openGLWidget">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>9</y>
+      <width>431</width>
+      <height>331</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>121</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Vertex</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>40</y>
+      <width>121</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Edge</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>260</y>
+      <width>16</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>X</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>290</y>
+      <width>16</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Y</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>320</y>
+      <width>16</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Z</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>260</y>
+      <width>113</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_2">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>290</y>
+      <width>113</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_3">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>320</y>
+      <width>113</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>600</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="action_ffnen"/>
+    <addaction name="actionSpeichern"/>
+    <addaction name="actionLaden"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <widget class="QMenu" name="menutest">
+     <property name="title">
+      <string>test</string>
+     </property>
+     <addaction name="actiontestSub"/>
+    </widget>
+    <addaction name="menutest"/>
+    <addaction name="actiontest_2"/>
+   </widget>
+   <widget class="QMenu" name="menuhelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actiontest_3"/>
+    <addaction name="actioncontrols"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuhelp"/>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="action_ffnen">
+   <property name="text">
+    <string>Öffnen</string>
+   </property>
+  </action>
+  <action name="actionSpeichern">
+   <property name="text">
+    <string>Speichern</string>
+   </property>
+  </action>
+  <action name="actionLaden">
+   <property name="text">
+    <string>Laden</string>
+   </property>
+  </action>
+  <action name="actiontestSub">
+   <property name="text">
+    <string>testSub</string>
+   </property>
+  </action>
+  <action name="actiontest_2">
+   <property name="text">
+    <string>test</string>
+   </property>
+  </action>
+  <action name="actiontest_3">
+   <property name="text">
+    <string>test</string>
+   </property>
+  </action>
+  <action name="actioncontrols">
+   <property name="text">
+    <string>controls</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="QtGUI.qrc"/>
+ </resources>
+ <connections/>
+</ui>
