@@ -35,6 +35,8 @@ namespace cg {
 
         glm::vec4 pos;
 
+        bool selected = true;
+
         /**
          * one of the half-edges emanting from the vertex
          */
@@ -92,9 +94,17 @@ namespace cg {
 
         void deleteVert(VertPointer);
 
+        void deleteSelectedVertices() ;
+
         void deleteEdge(EdgePointer);
 
         void deleteFace(FacePointer);
+
+        void moveSelected(glm::vec3 relativeMovement);
+
+        VertPointer selectVertex(glm::vec3 worldCoordinates, float radius, bool markSelected);
+
+        void resetSelected();
 
         const VertList &getVerts() const;
 

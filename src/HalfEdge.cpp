@@ -16,11 +16,15 @@ namespace cg {
     void HE_Wrapper::deleteVert(VertPointer deleteMe) {
         EdgeList l = getEdgesFromVert(deleteMe);
 
-        for(EdgePointer edge : l) {
-            if(!edge->face->isBoundary) {
+        for (EdgePointer edge : l) {
+            if (!edge->face->isBoundary) {
                 deleteEdge(edge);
             }
         }
+
+        verts.erase(std::find(verts.begin(), verts.end(), deleteMe));
+
+
     }
 
     void HE_Wrapper::deleteEdge(EdgePointer deleteMe) {
@@ -28,7 +32,7 @@ namespace cg {
         FacePointer faceB = deleteMe->pair->face;
         faceA->isBoundary = true;
 
-        if(faceA->edge == deleteMe) {
+        if (faceA->edge == deleteMe) {
             faceA->edge = deleteMe->next;
         }
 
@@ -98,6 +102,50 @@ namespace cg {
         } while (currentEdge != start);
 
         return nullptr;
+    }
+
+    void HE_Wrapper::moveSelected(glm::vec3 relativeMovement) {
+        for (int i = 0; i < getVerts().size(); i++) {
+            {
+                if (getVerts()[i]->selected) {
+                    VertPointer vertex = getVerts().at(i);
+                    vertex->pos.x += relativeMovement.x;
+                    vertex->pos.y += relativeMovement.y;
+                    vertex->pos.z += relativeMovement.z;
+                }
+            }
+        }
+    }
+
+    void HE_Wrapper::deleteSelectedVertices() {
+        for (int i = 0; i < getVerts().size(); i++) {
+            if (getVerts().at(i)->selected) {
+                deleteVert(getVerts().at(i));
+                i--;
+            }
+        }
+    }
+
+    VertPointer HE_Wrapper::selectVertex(glm::vec3 worldCoordinates, float radius, bool markSelected) {
+        for (int i = 0; i < getVerts().size(); i++) {
+
+            VertPointer vertex = getVerts().at(i);
+            //bool *selected = &getVertices().at(i).second;
+            if (vertex->pos.x - worldCoordinates.x < radius && vertex->pos.x - worldCoordinates.x > -radius
+                && vertex->pos.y - worldCoordinates.y < radius && vertex->pos.y - worldCoordinates.y > -radius
+                && vertex->pos.z - worldCoordinates.z < radius && vertex->pos.z - worldCoordinates.z > -radius) {
+                markSelected ? vertex->selected = !vertex->selected : 0;
+                return vertex;
+
+            }
+        }
+        return nullptr;
+    }
+
+    void HE_Wrapper::resetSelected() {
+        for (int i = 0; i < getVerts().size(); i++) {
+            getVerts().at(i)->selected = false;
+        }
     }
 
     void HE_Wrapper::addVert(VertPointer vert) {
@@ -242,14 +290,18 @@ namespace cg {
     }
 
     EdgeList HE_Wrapper::getEdgesFromVert(VertPointer vert) {
+
         EdgePointer start = vert->edge;
         EdgePointer curr = start;
         EdgeList list;
-        do {
-            list.push_back(curr);
-            curr = curr->pair->next;
-        } while (curr != start);
+        if (start != nullptr) {
+            do {
+                list.push_back(curr);
+                curr = curr->pair->next;
+            } while (curr != start);
+        }
         return list;
+
     }
 
     void HE_Wrapper::forEveryOutgoingEdgeFromVert(VertPointer vert, std::function<void(EdgePointer)> &func) {

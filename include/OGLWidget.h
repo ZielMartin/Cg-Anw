@@ -12,6 +12,7 @@
 #include <vector>
 #include "OGLWVerticesWrapper.h"
 #include "camera.h"
+#include "HalfEdge.h"
 
 
 #define SPHERERADIUS 0.1
@@ -21,27 +22,29 @@
 #define WIDOWWIDTH 1024
 #define WIDOWHEIGHT 600
 
-extern Camera camera;
-extern OGLWVerticesWrapper *vw;
-extern OGLWEdgesWrapper *vecW;
-extern glm::vec3 backgroundColor;
-extern glm::vec3 selectedSphereColor;
-extern glm::vec3 sphereColor;
-extern glm::vec3 gridColor;
-extern bool grid;
+namespace cg {
+    extern std::shared_ptr<cg::HE_Wrapper> wrapperPtr;
+    extern cg::Camera camera;
+    extern glm::vec3 backgroundColor;
+    extern glm::vec3 selectedSphereColor;
+    extern glm::vec3 sphereColor;
+    extern glm::vec3 gridColor;
+    extern bool grid;
 
 
-void initOGLWidget(int argc, char **argv);
+    void initOGLWidget(int argc, char **argv, std::shared_ptr<cg::HE_Wrapper> wrapper);
 
-glm::vec3 getWorldCoordinates(int x, int y);
+    glm::vec3 getWorldCoordinates(int x, int y);
 
-void drawSpheres();
+    void drawSpheres();
 
-void drawGridPane();
+    void drawLines();
 
-void drawGrid();
+    void drawGridPane();
 
-void display();
+    void drawGrid();
 
+    void display();
+}
 
 #endif //CG_ANW_OGLWIDGET_H
