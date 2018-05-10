@@ -7,12 +7,12 @@
  * - add point with right-click on grid
  * - select multiple points with ctrl + left-click on point
  * - move point/points arrow-keys and '+','-'
- * - remove selected point/points with r
+ * - remove selected point/points with 'r'
  *
- * - move camera with with w,a,s,d,q,e
+ * - move camera with with 'w','a','s','d','q','e'
  * - rotate camera with mouse click and drag window
  *
- * - draw a line between two points: alt + left-click on the points one after another
+ * - connect a face: mark each point with ctrl + left-click, then press 'f'
  */
 
 #include "OGLWidgetUI.h"
@@ -54,6 +54,10 @@ namespace cg {
                 break;
             case 'g':
                 grid = !grid;
+                break;
+            case 'f':
+                wrapperPtr->createFace(*wrapperPtr->getSelectedVerts());
+                wrapperPtr->resetSelected();
                 break;
             default:
                 break;

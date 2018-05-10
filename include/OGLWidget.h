@@ -38,7 +38,7 @@ namespace cg {
 
     void drawSpheres();
 
-    void drawLines();
+    void drawFaces();
 
     void drawGridPane();
 

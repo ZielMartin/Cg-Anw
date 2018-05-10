@@ -108,12 +108,13 @@ namespace cg {
         }
     }
 
-    void drawLines() {
+    void drawFaces() {
         glPushMatrix();
         glLineWidth(4);
-        glBegin(GL_LINES);
+        glBegin(GL_LINE_LOOP);
         glColor3f(gridColor.r, gridColor.g, gridColor.b);
 
+        /*
         //draws every edge two times
         for (int i = 0; i < wrapperPtr->getEdges().size(); i++) {
             VertPointer start = wrapperPtr->getEdges().at(i)->vert;
@@ -122,6 +123,16 @@ namespace cg {
                        start->pos.z);
             glVertex3f(end->pos.x, end->pos.y,
                        end->pos.z);
+        }*/
+
+        for (FacePointer fp : wrapperPtr->getFaces()) {
+            EdgePointer start = fp->edge;
+            EdgePointer curr = start;
+            do{
+                glVertex3f(curr->vert->pos.x, curr->vert->pos.y,
+                           curr->vert->pos.z);
+                curr = curr->next;
+            }while(curr != start);
         }
         glEnd();
         glPopMatrix();
@@ -146,7 +157,7 @@ namespace cg {
             drawGridPane();
         }
         drawSpheres();
-        drawLines();
+        drawFaces();
         glutSwapBuffers();
     }
 

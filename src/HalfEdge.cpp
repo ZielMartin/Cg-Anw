@@ -24,7 +24,6 @@ namespace cg {
 
         verts.erase(std::find(verts.begin(), verts.end(), deleteMe));
 
-
     }
 
     void HE_Wrapper::deleteEdge(EdgePointer deleteMe) {
@@ -130,16 +129,26 @@ namespace cg {
         for (int i = 0; i < getVerts().size(); i++) {
 
             VertPointer vertex = getVerts().at(i);
-            //bool *selected = &getVertices().at(i).second;
             if (vertex->pos.x - worldCoordinates.x < radius && vertex->pos.x - worldCoordinates.x > -radius
                 && vertex->pos.y - worldCoordinates.y < radius && vertex->pos.y - worldCoordinates.y > -radius
                 && vertex->pos.z - worldCoordinates.z < radius && vertex->pos.z - worldCoordinates.z > -radius) {
                 markSelected ? vertex->selected = !vertex->selected : 0;
                 return vertex;
-
             }
         }
         return nullptr;
+    }
+
+
+    std::shared_ptr<VertList > HE_Wrapper::getSelectedVerts() {
+        std::shared_ptr<VertList > selectedVerts(new VertList());
+        for (VertPointer vp : getVerts()) {
+            if (vp.get()->selected) {
+                selectedVerts->push_back(vp);
+            }
+        }
+        return selectedVerts;
+
     }
 
     void HE_Wrapper::resetSelected() {
