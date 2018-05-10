@@ -22,9 +22,17 @@ namespace cg {
 
     void keyboard(unsigned char key, int x, int y) {
 
+
         std::cout << "keyboard: " << key << std::endl;
 
+        VertList vl = wrapperPtr->getFaceVerts();
+
         switch (key) {
+            case 'i':
+                for(VertPointer p : wrapperPtr->getFaceVerts()){
+                    std::cout << "x:" << p->pos.x << " y:" << p->pos.y << " z:" << p->pos.z << std::endl;
+                }
+                break;
             case 'w':
                 camera.Move(FORWARD);
                 break;
@@ -51,13 +59,13 @@ namespace cg {
                 break;
             case 'r':
                 wrapperPtr->deleteSelectedVertices();
+
                 break;
             case 'g':
                 grid = !grid;
                 break;
             case 'f':
-                wrapperPtr->createFace(*wrapperPtr->getSelectedVerts());
-                wrapperPtr->resetSelected();
+                wrapperPtr->createFace(vl);
                 break;
             default:
                 break;
@@ -108,6 +116,7 @@ namespace cg {
 
 
             VertPointer vp = wrapperPtr->createVert(glm::vec4(worldCoordinates,1));
+            wrapperPtr->addFaceVert(vp);
 
 
         } else if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN &&

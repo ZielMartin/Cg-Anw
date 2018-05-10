@@ -35,7 +35,7 @@ namespace cg {
 
         glm::vec4 pos;
 
-        bool selected = true;
+        bool selected = false;
 
         /**
          * one of the half-edges emanting from the vertex
@@ -86,6 +86,8 @@ namespace cg {
 
         void addFace(FacePointer);
 
+        void addFaceVert(VertPointer vert);
+
         VertPointer createVert(glm::vec4);
 
         FacePointer createFace(VertList &);
@@ -108,6 +110,8 @@ namespace cg {
 
         const VertList &getVerts() const;
 
+        const VertList &getFaceVerts() const;
+
         std::shared_ptr<VertList> getSelectedVerts();
 
         const EdgeList &getEdges() const;
@@ -119,6 +123,7 @@ namespace cg {
         EdgeList edges;
         FaceList faces;
         std::map<VertPointer, EdgeList > accelerationStruct;
+        VertList faceVerts;
 
         EdgeList createEdgesFromVerts(const VertList &verts, FacePointer &newFace);
 

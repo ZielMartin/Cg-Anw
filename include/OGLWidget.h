@@ -10,7 +10,6 @@
 #include <GL/glew.h>
 #include <GL/glut.h>
 #include <vector>
-#include "OGLWVerticesWrapper.h"
 #include "camera.h"
 #include "HalfEdge.h"
 

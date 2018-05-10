@@ -128,11 +128,14 @@ namespace cg {
         for (FacePointer fp : wrapperPtr->getFaces()) {
             EdgePointer start = fp->edge;
             EdgePointer curr = start;
-            do{
-                glVertex3f(curr->vert->pos.x, curr->vert->pos.y,
-                           curr->vert->pos.z);
-                curr = curr->next;
-            }while(curr != start);
+            if(start != NULL){
+                do{
+                    glVertex3f(curr->vert->pos.x, curr->vert->pos.y,
+                               curr->vert->pos.z);
+                    curr = curr->next;
+                }while(curr != start);
+            }
+
         }
         glEnd();
         glPopMatrix();

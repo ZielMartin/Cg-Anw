@@ -21,7 +21,7 @@ namespace cg {
                 deleteEdge(edge);
             }
         }
-
+        resetSelected();
         verts.erase(std::find(verts.begin(), verts.end(), deleteMe));
 
     }
@@ -132,7 +132,15 @@ namespace cg {
             if (vertex->pos.x - worldCoordinates.x < radius && vertex->pos.x - worldCoordinates.x > -radius
                 && vertex->pos.y - worldCoordinates.y < radius && vertex->pos.y - worldCoordinates.y > -radius
                 && vertex->pos.z - worldCoordinates.z < radius && vertex->pos.z - worldCoordinates.z > -radius) {
-                markSelected ? vertex->selected = !vertex->selected : 0;
+                if(markSelected){
+                    if(vertex->selected){
+                        faceVerts.erase(std::find(faceVerts.begin(), faceVerts.end(), vertex));
+                        vertex->selected = false;
+                    }else{
+                        faceVerts.push_back(vertex);
+                        vertex->selected = true;
+                    }
+                }
                 return vertex;
             }
         }
@@ -155,6 +163,7 @@ namespace cg {
         for (int i = 0; i < getVerts().size(); i++) {
             getVerts().at(i)->selected = false;
         }
+        faceVerts.clear();
     }
 
     void HE_Wrapper::addVert(VertPointer vert) {
@@ -169,6 +178,11 @@ namespace cg {
         this->faces.push_back(face);
     }
 
+    void HE_Wrapper::addFaceVert(VertPointer vert) {
+        this->faceVerts.push_back(vert);
+        vert->selected = true;
+    }
+
     const VertList &HE_Wrapper::getVerts() const {
         return this->verts;
     }
@@ -180,6 +194,11 @@ namespace cg {
     const FaceList &HE_Wrapper::getFaces() const {
         return this->faces;
     }
+
+    const VertList &HE_Wrapper::getFaceVerts() const{
+        return this->faceVerts;
+    }
+
 
     VertPointer HE_Wrapper::createVert(glm::vec4 pos) {
         VertPointer newVert = VertPointer(new HE_vert(pos));
@@ -197,6 +216,7 @@ namespace cg {
 //            std::cerr << ex.what() << std::endl;
 //        }
         EdgeList edges = createEdgesFromVerts(verts, newFace);
+
 
         for (EdgePointer currentEdge : edges) {
             if (currentEdge->pair == nullptr) {
@@ -221,6 +241,7 @@ namespace cg {
                 }
             }
         }
+        resetSelected();
         return newFace;
     }
 
