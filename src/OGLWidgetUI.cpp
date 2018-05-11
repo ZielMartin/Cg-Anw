@@ -59,7 +59,6 @@ namespace cg {
                 break;
             case 'r':
                 wrapperPtr->deleteSelectedVertices();
-
                 break;
             case 'g':
                 grid = !grid;

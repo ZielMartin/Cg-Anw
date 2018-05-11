@@ -24,7 +24,14 @@ namespace cg {
     vec3 selectedSphereColor = vec3(1, 0, 0);
     vec3 sphereColor = vec3(1, 1, 1);
     vec3 gridColor = vec3(1, 1, 1);
+    vec3 faceColor = vec3(0.2, 0.4, 0.4);
     bool grid = true;
+
+    const float light0_position[4] = {0,100,0,1};
+
+    GLuint  prog_hdlr;
+    GLint location_attribute_0, location_viewport;
+
 
 
     class Window {
@@ -91,6 +98,8 @@ namespace cg {
                 glVertex3f(GRIDLENGTH / 2, 0, 0);
                 glEnd();
                 glPopMatrix();
+
+
             }
             if (i >= 0) {
                 glPushMatrix();
@@ -103,27 +112,21 @@ namespace cg {
                 glVertex3f(GRIDLENGTH / 2, 0, 0);
                 glEnd();
                 glPopMatrix();
+
             }
 
         }
+
+
     }
 
     void drawFaces() {
-        glPushMatrix();
-        glLineWidth(4);
-        glBegin(GL_LINE_LOOP);
-        glColor3f(gridColor.r, gridColor.g, gridColor.b);
 
-        /*
-        //draws every edge two times
-        for (int i = 0; i < wrapperPtr->getEdges().size(); i++) {
-            VertPointer start = wrapperPtr->getEdges().at(i)->vert;
-            VertPointer end = wrapperPtr->getEdges().at(i)->pair->vert;
-            glVertex3f(start->pos.x, start->pos.y,
-                       start->pos.z);
-            glVertex3f(end->pos.x, end->pos.y,
-                       end->pos.z);
-        }*/
+        glPushMatrix();
+        glBegin(GL_TRIANGLE_FAN);
+        glColor3f(faceColor.r, faceColor.g, faceColor.b);
+        //GLfloat cyan[] = {0.f, .8f, .8f, 1.f};
+        //glMaterialfv(GL_FRONT, GL_DIFFUSE, cyan);
 
         for (FacePointer fp : wrapperPtr->getFaces()) {
             EdgePointer start = fp->edge;
@@ -143,7 +146,6 @@ namespace cg {
 
     void display() {
 
-        glEnable(GL_DEPTH_TEST);
         glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glViewport(0, 0, window.size.x, window.size.y);
@@ -155,9 +157,14 @@ namespace cg {
         mat4 mvp = projection * view * model;    //Compute the mvp matrix
         glLoadMatrixf(value_ptr(mvp));
 
+
+
         if (grid) {
+            glDisable(GL_LIGHT0);
             drawGrid();
             drawGridPane();
+            glEnable(GL_LIGHT0);
+
         }
         drawSpheres();
         drawFaces();
@@ -192,13 +199,66 @@ namespace cg {
         camera.SetViewport(0, 0, window.size.x, window.size.y);
     }
 
+    void printInfoLog(GLuint obj) {
+        int log_size = 0;
+        int bytes_written = 0;
+        glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &log_size);
+        if (!log_size) return;
+        char *infoLog = new char[log_size];
+        glGetProgramInfoLog(obj, log_size, &bytes_written, infoLog);
+        std::cerr << infoLog << std::endl;
+        delete [] infoLog;
+    }
+
+
+    bool read_n_compile_shader(const char *filename, GLuint &hdlr, GLenum shaderType) {
+        std::ifstream is(filename, std::ios::in|std::ios::binary|std::ios::ate);
+        if (!is.is_open()) {
+            std::cerr << "Unable to open file " << filename << std::endl;
+            return false;
+        }
+        long size = is.tellg();
+        char *buffer = new char[size+1];
+        is.seekg(0, std::ios::beg);
+        is.read (buffer, size);
+        is.close();
+        buffer[size] = 0;
+
+        hdlr = glCreateShader(shaderType);
+        glShaderSource(hdlr, 1, (const GLchar**)&buffer, NULL);
+        glCompileShader(hdlr);
+        std::cerr << "info log for " << filename << std::endl;
+        printInfoLog(hdlr);
+        delete [] buffer;
+        return true;
+    }
+
+    void setShaders(GLuint &prog_hdlr, const char *vsfile, const char *fsfile, const char *gsfile) {
+        GLuint vert_hdlr, frag_hdlr, geom_hdlr;
+        read_n_compile_shader(vsfile, vert_hdlr, GL_VERTEX_SHADER);
+        read_n_compile_shader(gsfile, geom_hdlr, GL_GEOMETRY_SHADER);
+        read_n_compile_shader(fsfile, frag_hdlr, GL_FRAGMENT_SHADER);
+
+
+        prog_hdlr = glCreateProgram();
+        glAttachShader(prog_hdlr, vert_hdlr);
+        glAttachShader(prog_hdlr, geom_hdlr);
+        glAttachShader(prog_hdlr, frag_hdlr);
+
+
+
+        glLinkProgram(prog_hdlr);
+        std::cerr << "info log for the linked program" << std::endl;
+        printInfoLog(prog_hdlr);
+    }
+
 
     void initOGLWidget(int argc, char **argv, std::shared_ptr<HE_Wrapper> wrapper) {
 
         wrapperPtr = wrapper;
 
         glutInit(&argc, argv);
-        glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH);
+        glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
         glutInitWindowSize(WIDOWWIDTH, WIDOWHEIGHT);
 
         //Setup window and callbacks
@@ -213,9 +273,33 @@ namespace cg {
 
         glewExperimental = GL_TRUE;
 
+        glEnable(GL_COLOR_MATERIAL);
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_LIGHTING);
+        glEnable(GL_LIGHT0);
+
+        //glEnable(GL_DIFFUSE);
+        //glEnable(GL_AMBIENT);
+        //glEnable(GL_SPECULAR);
+
+        glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
+
         if (glewInit() != GLEW_OK) {
             cerr << "GLEW failed to initialize." << endl;
         }
+        if (GLEW_ARB_vertex_shader && GLEW_ARB_fragment_shader && GL_EXT_geometry_shader4)
+            std::cout << "Ready for GLSL - vertex, fragment, and geometry units" << std::endl;
+        else {
+            std::cout << "No GLSL support" << std::endl;
+            exit(1);
+        }
+
+        setShaders(prog_hdlr, "shader/vert_shader.glsl", "shader/frag_shader.glsl", "shader/geom_shader.glsl");
+
+        location_attribute_0   = glGetAttribLocation(prog_hdlr, "R");          // radius
+        location_viewport = glGetUniformLocation(prog_hdlr, "viewport"); // viewport
+
+        glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
         //Setup camera
         camera.SetMode(FREE);
         camera.SetPosition(vec3(20, 10, 10));

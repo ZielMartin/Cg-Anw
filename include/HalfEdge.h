@@ -112,8 +112,6 @@ namespace cg {
 
         const VertList &getFaceVerts() const;
 
-        std::shared_ptr<VertList> getSelectedVerts();
-
         const EdgeList &getEdges() const;
 
         const FaceList &getFaces() const;

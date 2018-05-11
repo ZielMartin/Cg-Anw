@@ -148,16 +148,7 @@ namespace cg {
     }
 
 
-    std::shared_ptr<VertList > HE_Wrapper::getSelectedVerts() {
-        std::shared_ptr<VertList > selectedVerts(new VertList());
-        for (VertPointer vp : getVerts()) {
-            if (vp.get()->selected) {
-                selectedVerts->push_back(vp);
-            }
-        }
-        return selectedVerts;
 
-    }
 
     void HE_Wrapper::resetSelected() {
         for (int i = 0; i < getVerts().size(); i++) {
@@ -207,6 +198,9 @@ namespace cg {
     }
 
     FacePointer HE_Wrapper::createFace(VertList &verts) {
+        if(verts.size() < 3){
+            return nullptr;
+        }
         FacePointer newFace = FacePointer(new HE_face);
         this->addFace(newFace);
 

@@ -5,7 +5,7 @@
 #ifndef CG_ANW_OGLWIDGET_H
 #define CG_ANW_OGLWIDGET_H
 
-
+#include <fstream>
 #include <iostream>
 #include <GL/glew.h>
 #include <GL/glut.h>
@@ -24,10 +24,7 @@
 namespace cg {
     extern std::shared_ptr<cg::HE_Wrapper> wrapperPtr;
     extern cg::Camera camera;
-    extern glm::vec3 backgroundColor;
-    extern glm::vec3 selectedSphereColor;
-    extern glm::vec3 sphereColor;
-    extern glm::vec3 gridColor;
+
     extern bool grid;
 
 
