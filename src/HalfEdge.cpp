@@ -197,12 +197,14 @@ namespace cg {
         return newVert;
     }
 
+
     FacePointer HE_Wrapper::createFace(VertList &verts) {
         if(verts.size() < 3){
             return nullptr;
         }
         FacePointer newFace = FacePointer(new HE_face);
         this->addFace(newFace);
+
 
 //        try {
 //            checkOrientation(verts);

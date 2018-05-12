@@ -7,15 +7,15 @@
 #include "OGLWidgetUI.h"
 
 
-
 using namespace std;
 using namespace glm;
 
 namespace cg {
-//Create the Camera
+    //Create the Camera
     Camera camera;
 
 
+    //Half-Edge structure
     std::shared_ptr<HE_Wrapper> wrapperPtr;
 
 
@@ -26,11 +26,6 @@ namespace cg {
     vec3 gridColor = vec3(1, 1, 1);
     vec3 faceColor = vec3(0.2, 0.4, 0.4);
     bool grid = true;
-
-    const float light0_position[4] = {0,100,0,1};
-
-    GLuint  prog_hdlr;
-    GLint location_attribute_0, location_viewport;
 
 
 
@@ -49,20 +44,20 @@ namespace cg {
 
     void drawSpheres() {
 
-            for (int i = 0; i < wrapperPtr->getVerts().size(); i++) {
-                shared_ptr<HE_vert> vertex =  wrapperPtr->getVerts().at(i);
-                glPushMatrix();
-                if (wrapperPtr->getVerts().at(i)->selected) {
-                    glColor3f(selectedSphereColor.r, selectedSphereColor.g, selectedSphereColor.b);
-                } else {
-                    glColor3f(sphereColor.r, sphereColor.g, sphereColor.b);
+        for (int i = 0; i < wrapperPtr->getVerts().size(); i++) {
+            shared_ptr<HE_vert> vertex = wrapperPtr->getVerts().at(i);
+            glPushMatrix();
+            if (wrapperPtr->getVerts().at(i)->selected) {
+                glColor3f(selectedSphereColor.r, selectedSphereColor.g, selectedSphereColor.b);
+            } else {
+                glColor3f(sphereColor.r, sphereColor.g, sphereColor.b);
 
-                }
-
-                glTranslatef(vertex->pos.x, vertex->pos.y, vertex->pos.z);
-                glutSolidSphere(SPHERERADIUS, SPHERESLICES, SPHERESTACKS);
-                glPopMatrix();
             }
+
+            glTranslatef(vertex->pos.x, vertex->pos.y, vertex->pos.z);
+            glutSolidSphere(SPHERERADIUS, SPHERESLICES, SPHERESTACKS);
+            glPopMatrix();
+        }
 
 
     }
@@ -98,9 +93,8 @@ namespace cg {
                 glVertex3f(GRIDLENGTH / 2, 0, 0);
                 glEnd();
                 glPopMatrix();
-
-
             }
+
             if (i >= 0) {
                 glPushMatrix();
                 glTranslatef(i - GRIDLENGTH / 2, 0, 0);
@@ -120,28 +114,45 @@ namespace cg {
 
     }
 
+    glm::vec3 calcFaceNormal(VertPointer a, VertPointer b, VertPointer c){
+        glm::vec3 vecA, vecB;
+        vecA.x = b->pos.x - a->pos.y;
+        vecA.y = b->pos.y - a->pos.y;
+        vecA.z = b->pos.z - a->pos.z;
+
+        vecB.x = c->pos.x - a->pos.y;
+        vecB.y = c->pos.y - a->pos.y;
+        vecB.z = c->pos.z - a->pos.z;
+
+        return glm::normalize(glm::cross(vecA, vecB));
+    }
+
     void drawFaces() {
 
-        glPushMatrix();
-        glBegin(GL_TRIANGLE_FAN);
-        glColor3f(faceColor.r, faceColor.g, faceColor.b);
-        //GLfloat cyan[] = {0.f, .8f, .8f, 1.f};
-        //glMaterialfv(GL_FRONT, GL_DIFFUSE, cyan);
+        glFrontFace(GL_CCW);
 
         for (FacePointer fp : wrapperPtr->getFaces()) {
             EdgePointer start = fp->edge;
             EdgePointer curr = start;
-            if(start != NULL){
-                do{
+            if (start != nullptr) {
+                glPushMatrix();
+                glBegin(GL_POLYGON);
+                glm::vec3 faceNormal = calcFaceNormal(fp->edge->vert, fp->edge->next->vert, fp->edge->next->next->vert);
+                glNormal3f(faceNormal.x, faceNormal.y, faceNormal.z);
+                glColor3f(faceColor.r, faceColor.g, faceColor.b);
+
+                do {
                     glVertex3f(curr->vert->pos.x, curr->vert->pos.y,
                                curr->vert->pos.z);
                     curr = curr->next;
-                }while(curr != start);
+                } while (curr != start);
+
+                glEnd();
+                glPopMatrix();
             }
 
         }
-        glEnd();
-        glPopMatrix();
+
     }
 
     void display() {
@@ -150,13 +161,15 @@ namespace cg {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glViewport(0, 0, window.size.x, window.size.y);
 
+        glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+
+
         mat4 model, view, projection;
         camera.Update();
         camera.GetMatricies(projection, view, model);
 
         mat4 mvp = projection * view * model;    //Compute the mvp matrix
         glLoadMatrixf(value_ptr(mvp));
-
 
 
         if (grid) {
@@ -199,59 +212,6 @@ namespace cg {
         camera.SetViewport(0, 0, window.size.x, window.size.y);
     }
 
-    void printInfoLog(GLuint obj) {
-        int log_size = 0;
-        int bytes_written = 0;
-        glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &log_size);
-        if (!log_size) return;
-        char *infoLog = new char[log_size];
-        glGetProgramInfoLog(obj, log_size, &bytes_written, infoLog);
-        std::cerr << infoLog << std::endl;
-        delete [] infoLog;
-    }
-
-
-    bool read_n_compile_shader(const char *filename, GLuint &hdlr, GLenum shaderType) {
-        std::ifstream is(filename, std::ios::in|std::ios::binary|std::ios::ate);
-        if (!is.is_open()) {
-            std::cerr << "Unable to open file " << filename << std::endl;
-            return false;
-        }
-        long size = is.tellg();
-        char *buffer = new char[size+1];
-        is.seekg(0, std::ios::beg);
-        is.read (buffer, size);
-        is.close();
-        buffer[size] = 0;
-
-        hdlr = glCreateShader(shaderType);
-        glShaderSource(hdlr, 1, (const GLchar**)&buffer, NULL);
-        glCompileShader(hdlr);
-        std::cerr << "info log for " << filename << std::endl;
-        printInfoLog(hdlr);
-        delete [] buffer;
-        return true;
-    }
-
-    void setShaders(GLuint &prog_hdlr, const char *vsfile, const char *fsfile, const char *gsfile) {
-        GLuint vert_hdlr, frag_hdlr, geom_hdlr;
-        read_n_compile_shader(vsfile, vert_hdlr, GL_VERTEX_SHADER);
-        read_n_compile_shader(gsfile, geom_hdlr, GL_GEOMETRY_SHADER);
-        read_n_compile_shader(fsfile, frag_hdlr, GL_FRAGMENT_SHADER);
-
-
-        prog_hdlr = glCreateProgram();
-        glAttachShader(prog_hdlr, vert_hdlr);
-        glAttachShader(prog_hdlr, geom_hdlr);
-        glAttachShader(prog_hdlr, frag_hdlr);
-
-
-
-        glLinkProgram(prog_hdlr);
-        std::cerr << "info log for the linked program" << std::endl;
-        printInfoLog(prog_hdlr);
-    }
-
 
     void initOGLWidget(int argc, char **argv, std::shared_ptr<HE_Wrapper> wrapper) {
 
@@ -274,15 +234,26 @@ namespace cg {
         glewExperimental = GL_TRUE;
 
         glEnable(GL_COLOR_MATERIAL);
+        glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_LIGHTING);
         glEnable(GL_LIGHT0);
 
-        //glEnable(GL_DIFFUSE);
-        //glEnable(GL_AMBIENT);
-        //glEnable(GL_SPECULAR);
+        glShadeModel(GL_SMOOTH);
 
-        glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
+        // GL_LIGHT0: the white light emitting light source
+        // Create light components for GL_LIGHT0
+        float ambientLight0[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+        float diffuseLight0[] = { 0.8f, 0.8f, 0.8f, 1.0f };
+        float specularLight0[] = { 0.5f, 0.5f, 0.5f, 1.0f };
+        GLfloat position0[] = {0.0f, 100.0f, 0.0f, 1.0f};
+        // Assign created components to GL_LIGHT0
+        glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight0);
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight0);
+        glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight0);
+        glLightfv(GL_LIGHT0, GL_POSITION, position0);
+
+
 
         if (glewInit() != GLEW_OK) {
             cerr << "GLEW failed to initialize." << endl;
@@ -294,18 +265,15 @@ namespace cg {
             exit(1);
         }
 
-        setShaders(prog_hdlr, "shader/vert_shader.glsl", "shader/frag_shader.glsl", "shader/geom_shader.glsl");
-
-        location_attribute_0   = glGetAttribLocation(prog_hdlr, "R");          // radius
-        location_viewport = glGetUniformLocation(prog_hdlr, "viewport"); // viewport
-
         glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+
         //Setup camera
         camera.SetMode(FREE);
         camera.SetPosition(vec3(20, 10, 10));
         camera.SetLookAt(vec3(0, 0, 0));
         camera.SetClipping(.1, 1000);
         camera.SetFOV(45);
+
         //Start the glut loop!
         glutMainLoop();
 
@@ -331,6 +299,8 @@ namespace cg {
         return vec3(objx, objy, objz);
 
     }
+
+
 
 
 }

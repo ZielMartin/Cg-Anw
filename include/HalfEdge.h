@@ -76,6 +76,7 @@ namespace cg {
          * if true the Face is only a boundary for traversing, not a real face that should be rendered
          */
         bool isBoundary = false;
+
     };
 
     class HE_Wrapper {
@@ -136,6 +137,7 @@ namespace cg {
         EdgePointer findEdgeConnectingFaces(const FacePointer faceA, const FacePointer faceB) const;
 
         EdgePointer findPrevEdge(const std::shared_ptr<HE_edge> edge) const;
+
 
         EdgeList getEdgesFromFace(FacePointer face);
         EdgeList getEdgesFromVert(VertPointer vert);
