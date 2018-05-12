@@ -3,8 +3,7 @@
 //
 
 #include "HalfEdge.h"
-#include <algorithm>
-#include <iostream>
+
 
 namespace cg {
     void HE_Wrapper::clear() {
@@ -111,6 +110,10 @@ namespace cg {
                     vertex->pos.x += relativeMovement.x;
                     vertex->pos.y += relativeMovement.y;
                     vertex->pos.z += relativeMovement.z;
+
+                    //currently not working
+                    //NormalsWrapper::calcNormalsOnMove(vertex);
+
                 }
             }
         }
@@ -235,8 +238,10 @@ namespace cg {
                 if (!pairFound) {
                     accelerationStruct[outgoingFrom].push_back(currentEdge);
                 }
+
             }
         }
+        //NormalsWrapper::calcFaceNormal(newFace);
         resetSelected();
         return newFace;
     }
@@ -348,4 +353,6 @@ namespace cg {
         } while (curr != start);
 
     }
+
+
 }

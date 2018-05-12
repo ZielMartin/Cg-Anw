@@ -114,18 +114,8 @@ namespace cg {
 
     }
 
-    glm::vec3 calcFaceNormal(VertPointer a, VertPointer b, VertPointer c){
-        glm::vec3 vecA, vecB;
-        vecA.x = b->pos.x - a->pos.y;
-        vecA.y = b->pos.y - a->pos.y;
-        vecA.z = b->pos.z - a->pos.z;
 
-        vecB.x = c->pos.x - a->pos.y;
-        vecB.y = c->pos.y - a->pos.y;
-        vecB.z = c->pos.z - a->pos.z;
-
-        return glm::normalize(glm::cross(vecA, vecB));
-    }
+    void showNormals();
 
     void drawFaces() {
 
@@ -137,11 +127,13 @@ namespace cg {
             if (start != nullptr) {
                 glPushMatrix();
                 glBegin(GL_POLYGON);
-                glm::vec3 faceNormal = calcFaceNormal(fp->edge->vert, fp->edge->next->vert, fp->edge->next->next->vert);
-                glNormal3f(faceNormal.x, faceNormal.y, faceNormal.z);
+                glm::vec3 faceNormal = fp->faceNormal;
+                //glNormal3f(faceNormal.x, faceNormal.y, faceNormal.z);
                 glColor3f(faceColor.r, faceColor.g, faceColor.b);
 
                 do {
+                    glm::vec3 vertNormal = curr->vert->vertNormal;
+                    glNormal3f(vertNormal.x, vertNormal.y, vertNormal.z);
                     glVertex3f(curr->vert->pos.x, curr->vert->pos.y,
                                curr->vert->pos.z);
                     curr = curr->next;
@@ -153,6 +145,35 @@ namespace cg {
 
         }
 
+
+
+
+    }
+
+    void showNormals() {
+        for(VertPointer vp : wrapperPtr->getVerts()){
+            glPushMatrix();
+            glBegin(GL_LINES);
+            glLineWidth(2);
+            glColor3f(gridColor.r, gridColor.g, gridColor.b);
+            glVertex3f(vp->pos.x, vp->pos.y, vp->pos.z);
+            glVertex3f(vp->pos.x + vp->vertNormal.x, vp->pos.y + vp->vertNormal.y, vp->pos.z + vp->vertNormal.z);
+            glEnd();
+            glPopMatrix();
+        }
+
+
+        for(FacePointer fpp : wrapperPtr->getFaces()){
+            VertPointer vvp = fpp->edge->vert;
+            glPushMatrix();
+            glBegin(GL_LINES);
+            glLineWidth(2);
+            glColor3f(1.0, 0.0, 0.0);
+            glVertex3f(vvp->pos.x, vvp->pos.y, vvp->pos.z);
+            glVertex3f(vvp->pos.x + fpp->faceNormal.x, vvp->pos.y + fpp->faceNormal.y, vvp->pos.z + fpp->faceNormal.z);
+            glEnd();
+            glPopMatrix();
+        }
     }
 
     void display() {
@@ -238,6 +259,8 @@ namespace cg {
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_LIGHTING);
         glEnable(GL_LIGHT0);
+
+
 
         glShadeModel(GL_SMOOTH);
 

@@ -14,6 +14,9 @@
 #include <memory>
 #include <map>
 #include <vector>
+#include <algorithm>
+#include <iostream>
+#include "NormalCalculation.h"
 
 #define VertPointer std::shared_ptr<HE_vert>
 #define EdgePointer std::shared_ptr<HE_edge>
@@ -36,6 +39,8 @@ namespace cg {
         glm::vec4 pos;
 
         bool selected = false;
+
+        glm::vec3 vertNormal;
 
         /**
          * one of the half-edges emanting from the vertex
@@ -76,6 +81,8 @@ namespace cg {
          * if true the Face is only a boundary for traversing, not a real face that should be rendered
          */
         bool isBoundary = false;
+
+        glm::vec3 faceNormal;
 
     };
 
