@@ -10,6 +10,7 @@
 #include <GL/glew.h>
 #include <GL/glut.h>
 #include <vector>
+#include <c++/4.8.3/memory>
 #include "camera.h"
 #include "HalfEdge.h"
 
@@ -41,6 +42,9 @@ namespace cg {
     void drawGrid();
 
     void display();
+
+    void drawNormals();
+
 }
 
 #endif //CG_ANW_OGLWIDGET_H

@@ -4,9 +4,11 @@
 
 #include "NormalCalculation.h"
 
+
 namespace cg {
 
-    void calcFaceNormal(FacePointer face) {
+
+    void NormalCalculation::calcFaceNormal(FacePointer face) {
         VertPointer a, b, c;
         a = face->edge->vert;
         b = face->edge->next->vert;
@@ -22,9 +24,14 @@ namespace cg {
         vecB.z = c->pos.z - a->pos.z;
 
         face->faceNormal = glm::normalize(glm::cross(vecA, vecB));
+
+        //std::cout << "VertA: x:" << a->pos.x << " y:" << a->pos.y << " z:" << a->pos.z << std::endl;
+        //std::cout << "VertB: x:" << b->pos.x << " y:" << b->pos.y << " z:" << b->pos.z << std::endl;
+        //std::cout << "VertC: x:" << c->pos.x << " y:" << c->pos.y << " z:" << c->pos.z << std::endl;
+
     }
 
-    void calcVertexNormal(VertPointer vert) {
+    void NormalCalculation::calcVertexNormal(VertPointer vert) {
         glm::vec3 vertexNormal;
         int counter = 0;
 
@@ -44,35 +51,26 @@ namespace cg {
         vertexNormal.y = vertexNormal.y / counter;
         vertexNormal.z = vertexNormal.z / counter;
 
-        std::cout << counter << std::endl;
+        //std::cout << counter << std::endl;
 
         vert->vertNormal = glm::normalize(vertexNormal);
     }
 
 
-    void calcNormalsOnMove(VertPointer vert) {
-        EdgePointer start = vert->edge;
-        EdgePointer curr = start;
-        if (curr != nullptr) {
-            do {
-                if (!curr->face->isBoundary) {
-                    calcFaceNormal(curr->face);
+    void NormalCalculation::recalcNormalsAroundVertex(std::map<FacePointer,EdgeList> neighborhood) {
+        for (std::pair<FacePointer,EdgeList> face : neighborhood) {
+            calcFaceNormal(face.first);
+        }
 
-                    EdgePointer start = curr->face->edge;
-                    EdgePointer curr2 = start;
-                    do {
-                        calcVertexNormal(curr2->vert);
-                        curr2 = curr2->next;
-                    } while (curr2 != start);
-
-                }
-
-                curr = curr->pair->next;
-            } while (curr != start);
-
+        for (std::pair<FacePointer,EdgeList> face : neighborhood) {
+            for(EdgePointer edge : face.second){
+                calcVertexNormal(edge->vert);
+            }
         }
 
     }
 
-
 }
+
+
+

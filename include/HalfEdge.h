@@ -18,6 +18,8 @@
 #include <iostream>
 #include "NormalCalculation.h"
 
+
+
 #define VertPointer std::shared_ptr<HE_vert>
 #define EdgePointer std::shared_ptr<HE_edge>
 #define FacePointer std::shared_ptr<HE_face>
@@ -110,7 +112,7 @@ namespace cg {
 
         void deleteFace(FacePointer);
 
-        void moveSelected(glm::vec3 relativeMovement);
+        void moveSelectedVertices(glm::vec3 relativeMovement);
 
         VertPointer selectVertex(glm::vec3 worldCoordinates, float radius, bool markSelected);
 
@@ -152,6 +154,12 @@ namespace cg {
         void forEveryOutgoingEdgeFromVert(VertPointer vert, std::function<void(EdgePointer)> &func);
 
         void forEveryEdgeAroundFace(FacePointer face, std::function<void(EdgePointer)> &func);
+
+        void createBoundaryEdges();
+
+        FaceList getFacesAroundVertex(VertPointer vertex);
+
+        std::map<FacePointer,EdgeList> getNeighborhood(VertPointer vert);
     };
 }
 #endif /* INCLUDE_HALFEDGE_H_ */

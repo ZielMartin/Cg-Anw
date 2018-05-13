@@ -5,6 +5,7 @@
 #include "HalfEdge.h"
 
 
+
 namespace cg {
     void HE_Wrapper::clear() {
         verts.clear();
@@ -102,7 +103,7 @@ namespace cg {
         return nullptr;
     }
 
-    void HE_Wrapper::moveSelected(glm::vec3 relativeMovement) {
+    void HE_Wrapper::moveSelectedVertices(glm::vec3 relativeMovement) {
         for (int i = 0; i < getVerts().size(); i++) {
             {
                 if (getVerts()[i]->selected) {
@@ -112,13 +113,14 @@ namespace cg {
                     vertex->pos.z += relativeMovement.z;
 
                     //currently not working
-                    //NormalsWrapper::calcNormalsOnMove(vertex);
+                    //NormalCalculation::recalcNormalsAroundVertex(getNeighborhood(vertex));
 
                 }
             }
         }
     }
 
+    //TODO: add handle to delete edges and face / merge them
     void HE_Wrapper::deleteSelectedVertices() {
         for (int i = 0; i < getVerts().size(); i++) {
             if (getVerts().at(i)->selected) {
@@ -201,6 +203,12 @@ namespace cg {
     }
 
 
+    void HE_Wrapper::createBoundaryEdges() {
+
+
+
+    }
+
     FacePointer HE_Wrapper::createFace(VertList &verts) {
         if(verts.size() < 3){
             return nullptr;
@@ -241,7 +249,10 @@ namespace cg {
 
             }
         }
-        //NormalsWrapper::calcFaceNormal(newFace);
+
+        //createBoundaryEdges();
+        //NormalCalculation::recalcNormalsAroundVertex(getNeighborhood(newFace->edge->vert));
+
         resetSelected();
         return newFace;
     }
@@ -308,6 +319,23 @@ namespace cg {
         return nullptr;
     }
 
+    /**
+     * returns map with all faces surrounding an vertex and all edges of these faces
+     * @param vertex
+     * @return
+     */
+    std::map<FacePointer,EdgeList> HE_Wrapper::getNeighborhood(VertPointer vertex){
+        std::map<FacePointer,EdgeList> neighborMap;
+        std::map<FacePointer,EdgeList>::iterator it = neighborMap.begin();
+
+        FaceList faceList = getFacesAroundVertex(vertex);
+        for(FacePointer face : faceList){
+            neighborMap.insert (it, std::pair<FacePointer,EdgeList>(face,getEdgesFromFace(face)));
+            it++;
+        }
+        return neighborMap;
+    }
+
     EdgeList HE_Wrapper::getEdgesFromFace(FacePointer face) {
         EdgePointer start = face->edge;
         EdgeList borderingEdges;
@@ -333,6 +361,23 @@ namespace cg {
         }
         return list;
 
+    }
+
+    FaceList HE_Wrapper::getFacesAroundVertex(VertPointer vertex){
+        FaceList faceList;
+        EdgePointer start = vertex->edge;
+        EdgePointer curr = start;
+        if(start != nullptr) {
+            do {
+                if (!curr->face->isBoundary) {
+                    if (std::find(faceList.begin(), faceList.end(), curr->face) == faceList.end()) {
+                        faceList.push_back(curr->face);
+                    }
+                }
+                curr = curr->pair->next;
+            } while (curr != start);
+        }
+        return faceList;
     }
 
     void HE_Wrapper::forEveryOutgoingEdgeFromVert(VertPointer vert, std::function<void(EdgePointer)> &func) {

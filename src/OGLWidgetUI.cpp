@@ -23,7 +23,7 @@ namespace cg {
     void keyboard(unsigned char key, int x, int y) {
 
 
-        std::cout << "keyboard: " << key << std::endl;
+        //std::cout << "keyboard: " << key << std::endl;
 
         VertList vl = wrapperPtr->getFaceVerts();
 
@@ -52,10 +52,10 @@ namespace cg {
                 camera.Move(RIGHT);
                 break;
             case '-':            //DOWN
-                wrapperPtr->moveSelected(glm::vec3(0.0, -MOVESTEPSIZE, 0.0));
+                wrapperPtr->moveSelectedVertices(glm::vec3(0.0, -MOVESTEPSIZE, 0.0));
                 break;
             case '+':            //UP
-                wrapperPtr->moveSelected(glm::vec3(0.0, MOVESTEPSIZE, 0.0));
+                wrapperPtr->moveSelectedVertices(glm::vec3(0.0, MOVESTEPSIZE, 0.0));
                 break;
             case 'r':
                 wrapperPtr->deleteSelectedVertices();
@@ -77,16 +77,16 @@ namespace cg {
         //std::cout << "specialKeyboard: " << key << std::endl;
         switch (key) {
             case 101:              //UP ARROW
-                wrapperPtr->moveSelected(glm::vec3(-MOVESTEPSIZE, 0.0, 0.0));
+                wrapperPtr->moveSelectedVertices(glm::vec3(-MOVESTEPSIZE, 0.0, 0.0));
                 break;
             case 100:            //LEFT ARROW
-                wrapperPtr->moveSelected(glm::vec3(0.0, 0.0, MOVESTEPSIZE));
+                wrapperPtr->moveSelectedVertices(glm::vec3(0.0, 0.0, MOVESTEPSIZE));
                 break;
             case 103:            //DOWN ARROW
-                wrapperPtr->moveSelected(glm::vec3(MOVESTEPSIZE, 0.0, 0.0));
+                wrapperPtr->moveSelectedVertices(glm::vec3(MOVESTEPSIZE, 0.0, 0.0));
                 break;
             case 102:            //RIGHT ARROW
-                wrapperPtr->moveSelected(glm::vec3(0.0, 0.0, -MOVESTEPSIZE));
+                wrapperPtr->moveSelectedVertices(glm::vec3(0.0, 0.0, -MOVESTEPSIZE));
                 break;
             default:
                 break;

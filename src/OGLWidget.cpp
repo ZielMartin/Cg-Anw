@@ -115,7 +115,6 @@ namespace cg {
     }
 
 
-    void showNormals();
 
     void drawFaces() {
 
@@ -127,7 +126,7 @@ namespace cg {
             if (start != nullptr) {
                 glPushMatrix();
                 glBegin(GL_POLYGON);
-                glm::vec3 faceNormal = fp->faceNormal;
+                //glm::vec3 faceNormal = fp->faceNormal;
                 //glNormal3f(faceNormal.x, faceNormal.y, faceNormal.z);
                 glColor3f(faceColor.r, faceColor.g, faceColor.b);
 
@@ -150,7 +149,8 @@ namespace cg {
 
     }
 
-    void showNormals() {
+    void drawNormals() {
+
         for(VertPointer vp : wrapperPtr->getVerts()){
             glPushMatrix();
             glBegin(GL_LINES);
@@ -161,6 +161,7 @@ namespace cg {
             glEnd();
             glPopMatrix();
         }
+
 
 
         for(FacePointer fpp : wrapperPtr->getFaces()){
@@ -202,6 +203,9 @@ namespace cg {
         }
         drawSpheres();
         drawFaces();
+
+        drawNormals();
+
         glutSwapBuffers();
     }
 
@@ -280,12 +284,6 @@ namespace cg {
 
         if (glewInit() != GLEW_OK) {
             cerr << "GLEW failed to initialize." << endl;
-        }
-        if (GLEW_ARB_vertex_shader && GLEW_ARB_fragment_shader && GL_EXT_geometry_shader4)
-            std::cout << "Ready for GLSL - vertex, fragment, and geometry units" << std::endl;
-        else {
-            std::cout << "No GLSL support" << std::endl;
-            exit(1);
         }
 
         glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
