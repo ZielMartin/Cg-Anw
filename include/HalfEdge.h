@@ -149,13 +149,12 @@ namespace cg {
 
 
         EdgeList getEdgesFromFace(FacePointer face);
+
         EdgeList getEdgesFromVert(VertPointer vert);
 
         void forEveryOutgoingEdgeFromVert(VertPointer vert, std::function<void(EdgePointer)> &func);
 
         void forEveryEdgeAroundFace(FacePointer face, std::function<void(EdgePointer)> &func);
-
-        void createBoundaryEdges();
 
         FaceList getFacesAroundVertex(VertPointer vertex);
 

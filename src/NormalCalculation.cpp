@@ -39,11 +39,15 @@ namespace cg {
         EdgePointer curr = start;
         do {
             if (!curr->face->isBoundary) {
-                //calcFaceNormal(edge->face);
                 vertexNormal += curr->face->faceNormal;
                 counter++;
             }
-            curr = curr->pair->next;
+            if(curr->pair != nullptr){
+                curr = curr->pair->next;
+            }else{
+                curr = start;
+            }
+
         } while (curr != start);
 
 
