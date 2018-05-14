@@ -5,7 +5,7 @@
 #ifndef CG_ANW_OGLWIDGETUI_H
 #define CG_ANW_OGLWIDGETUI_H
 
-#define MOVESTEPSIZE 0.1
+#define MOVESTEPSIZE SPHERERADIUS
 
 
 namespace cg {

@@ -395,5 +395,9 @@ namespace cg {
 
     }
 
+    std::map<std::shared_ptr<HE_vert>, std::vector<std::shared_ptr<HE_edge>>> &HE_Wrapper::getAccelerationStruct() {
+        return accelerationStruct;
+    }
+
 
 }

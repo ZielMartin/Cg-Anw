@@ -10,14 +10,14 @@
 #include <GL/glew.h>
 #include <GL/glut.h>
 #include <vector>
-#include <c++/4.8.3/memory>
+#include <memory>
 #include "camera.h"
 #include "HalfEdge.h"
 
 
-#define SPHERERADIUS 0.1
-#define SPHERESLICES 100
-#define SPHERESTACKS 50
+#define SPHERERADIUS 0.01
+#define SPHERESLICES SPHERERADIUS*1000
+#define SPHERESTACKS SPHERESLICES/2
 #define GRIDLENGTH 50
 #define WIDOWWIDTH 1024
 #define WIDOWHEIGHT 600
@@ -29,7 +29,7 @@ namespace cg {
     extern bool grid;
 
 
-    void initOGLWidget(int argc, char **argv, std::shared_ptr<cg::HE_Wrapper> wrapper);
+    void initOGLWidget(int argc, char **argv, const std::shared_ptr<cg::HE_Wrapper> wrapper);
 
     glm::vec3 getWorldCoordinates(int x, int y);
 

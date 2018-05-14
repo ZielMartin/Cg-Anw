@@ -163,7 +163,7 @@ namespace cg {
         }
 
 
-
+/*
         for(FacePointer fpp : wrapperPtr->getFaces()){
             VertPointer vvp = fpp->edge->vert;
             glPushMatrix();
@@ -175,6 +175,7 @@ namespace cg {
             glEnd();
             glPopMatrix();
         }
+        */
     }
 
     void display() {
@@ -204,7 +205,7 @@ namespace cg {
         drawSpheres();
         drawFaces();
 
-        drawNormals();
+        //drawNormals();
 
         glutSwapBuffers();
     }
@@ -238,7 +239,7 @@ namespace cg {
     }
 
 
-    void initOGLWidget(int argc, char **argv, std::shared_ptr<HE_Wrapper> wrapper) {
+    void initOGLWidget(int argc, char **argv, const std::shared_ptr<HE_Wrapper> wrapper) {
 
         wrapperPtr = wrapper;
 

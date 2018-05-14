@@ -13,12 +13,12 @@
 namespace cg {
 
     struct FacePos {
-        int first;
-        int second;
-        int third;
+        int vertIndex;
+        int texturIndex;
+        int normalIndex;
 
         friend std::ostream &operator<<(std::ostream &os, const FacePos &pos) {
-            os << "first: " << pos.first << " second: " << pos.second << " third: " << pos.third;
+            os << "vertIndex: " << pos.vertIndex << " texturIndex: " << pos.texturIndex << " normalIndex: " << pos.normalIndex;
             return os;
         }
     };
@@ -31,7 +31,7 @@ namespace cg {
 
         void readFile(std::string filename);
 
-        const HalfEdgeStruct &getHalfEdgeStruct() const;
+        HE_Wrapper &getHalfEdgeStruct();
 
         const std::vector<std::shared_ptr<glm::vec3>> getVertices() const;
 
@@ -71,7 +71,7 @@ namespace cg {
         std::vector<std::shared_ptr<glm::vec3>> vnListe;
         std::vector<std::shared_ptr<glm::vec2>> vtListe;
         std::vector<std::vector<std::shared_ptr<FacePos>>> fListe;
-        HalfEdgeStruct halfEdgeStruct;
+        HE_Wrapper halfEdgeStruct;
         std::string type;
         unsigned int deg = 0;
 

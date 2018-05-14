@@ -6,7 +6,7 @@
 
 This project isn't limited to *GLSL* features. An extension system, based on the *GLSL* extension conventions, provides extended capabilities: matrix transformations, quaternions, data packing, random numbers, noise, etc...
 
-This library works perfectly with *[OpenGL](https://www.opengl.org)* but it also ensures interoperability with other third party libraries and SDK. It is a good candidate for software rendering (raytracing / rasterisation), image processing, physic simulations and any development context that requires a simple and convenient mathematics library.
+This library works perfectly with *[OpenGL](https://www.opengl.org)* but it also ensures interoperability with other normalIndex party libraries and SDK. It is a good candidate for software rendering (raytracing / rasterisation), image processing, physic simulations and any development context that requires a simple and convenient mathematics library.
 
 *GLM* is written in C++98 but can take advantage of C++11 when supported by the compiler. It is a platform independent library with no dependence and it officially supports the following compilers:
 - [Apple Clang 4.0](https://developer.apple.com/library/mac/documentation/CompilerTools/Conceptual/LLVMCompilerOverview/index.html) and higher
@@ -381,7 +381,7 @@ glm::mat4 camera(float Translate, glm::vec2 const & Rotate)
 - Fixed GLM_GTX_matrix_interpolation
 - Fixed isnan and isinf on Android with Clang
 - Autodetected C++ version using __cplusplus value
-- Fixed mix for bool and bvec* third parameter
+- Fixed mix for bool and bvec* normalIndex parameter
 
 --------------------------------------------------------------------------------
 #### GLM 0.9.4.2 - 2013-02-14
@@ -793,7 +793,7 @@ generation distribution
 --------------------------------------------------------------------------------
 #### GLM 0.4.0 - 2006-05-17
 - Added missing operators to vec* and mat*
-- Added first GLSL 1.2 features
+- Added vertIndex GLSL 1.2 features
 - Fixed windows.h before glm.h when windows.h required
 
 --------------------------------------------------------------------------------

@@ -126,6 +126,8 @@ namespace cg {
 
         const FaceList &getFaces() const;
 
+        std::map<std::shared_ptr<HE_vert>, std::vector<std::shared_ptr<HE_edge>>> &getAccelerationStruct();
+
     private:
         VertList verts;
         EdgeList edges;

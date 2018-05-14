@@ -121,7 +121,7 @@ namespace cg {
         } else if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN &&
                    glutGetModifiers() == GLUT_ACTIVE_ALT) {     //add Edge mode
 
-            //first define vertA
+            //vertIndex define vertA
             if (vertA == nullptr) {
                 //vertA = vw->selectVertex(worldCoordinates, SPHERERADIUS, false);
 
