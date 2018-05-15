@@ -5,17 +5,33 @@
 #ifndef CG_ANW_OGLWIDGETUI_H
 #define CG_ANW_OGLWIDGETUI_H
 
-#define MOVESTEPSIZE SPHERERADIUS
+#include "HalfEdge.h"
+#include "camera.h"
 
 
 namespace cg {
 
+    class OGLWidget;
 
-    void keyboard(unsigned char key, int x, int y);
+    class OGLWidgetUI{
+    public:
+        OGLWidgetUI(OGLWidget *caller);
 
-    void mouseClicks(int button, int state, int x, int y);
+        void keyboard(unsigned char key, int x, int y);
 
-    void specialKeyboard(int key, int x, int y);
+        void mouseClicks(int button, int state, int x, int y);
+
+        void specialKeyboard(int key, int x, int y);
+
+    private:
+        OGLWidget *caller;
+
+
+
+    };
+
+
+
 
 }
 #endif //CG_ANW_OGLWIDGETUI_H

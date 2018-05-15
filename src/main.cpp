@@ -8,10 +8,12 @@ int main(int argc, char** argv) {
     objLoader->readFile("../obj/suzanne.obj");
     std::shared_ptr<cg::HE_Wrapper> wrapperPtr(&objLoader->getHalfEdgeStruct());
 
+
     //cg::HE_Wrapper *wrapper = new cg::HE_Wrapper();
     //std::shared_ptr<cg::HE_Wrapper> wrapperPtr(wrapper);
 
-    initOGLWidget(argc, argv, wrapperPtr);
+    cg::OGLWidget *widget = new cg::OGLWidget();
+    widget->initOGLWidget(argc, argv, wrapperPtr);
     return 0;
 }
 

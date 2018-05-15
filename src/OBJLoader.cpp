@@ -31,8 +31,6 @@ namespace cg {
 
         if(infile.fail()){
             std::cout << "COULD NOT OPEN FILE" << std::endl;
-        }else{
-            std::cout << "OPEN FILE: " << infile.is_open() << std::endl;
         }
 
         while (std::getline(infile, line)) {

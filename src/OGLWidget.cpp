@@ -7,16 +7,58 @@
 #include "OGLWidgetUI.h"
 
 
+
 using namespace std;
 using namespace glm;
 
+class Window {
+public:
+    Window() {
+        this->interval = 1000 / 60;        //60 FPS
+        this->window_handle = -1;
+    }
+
+    int window_handle, interval;
+    glm::ivec2 size;
+    float window_aspect;
+} window;
+
+cg::OGLWidget* currentInstance;
+
+cg::OGLWidgetUI* currentInstanceUI;
+
+extern "C"
+void displayCallback()
+{
+    ::currentInstance->display();
+}
+void timerFuncCallback(int value){
+    ::currentInstance->timerFunc(value);
+}
+void motionFuncCallback(int x, int y){
+    ::currentInstance->motionFunc(x, y);
+}
+void ReshapeFuncCallback(int w, int h){
+    ::currentInstance->ReshapeFunc(w, h);
+}
+void keyboardCallback(unsigned char key, int x, int y){
+    ::currentInstanceUI->keyboard(key, x, y);
+}
+void mouseClicksCallback(int button, int state, int x, int y){
+    ::currentInstanceUI->mouseClicks(button, state, x, y);
+}
+void specialKeyboardCallback(int key, int x, int y){
+    ::currentInstanceUI->specialKeyboard(key, x, y);
+}
+
+
+
+
+
 namespace cg {
-    //Create the Camera
-    Camera camera;
 
 
-    //Half-Edge structure
-    std::shared_ptr<HE_Wrapper> wrapperPtr;
+
 
 
     vec3 backgroundColor = vec3(0, 0, 0);
@@ -25,24 +67,27 @@ namespace cg {
     vec3 sphereColor = vec3(1, 1, 1);
     vec3 gridColor = vec3(1, 1, 1);
     vec3 faceColor = vec3(0.2, 0.4, 0.4);
-    bool grid = true;
+
+
+    OGLWidget::OGLWidget(){
+
+        sphere_radius = 0.01;
+        sphere_slices = sphere_radius*1000;
+        sphere_stacks = sphere_slices/2;
+        move_step_Size = sphere_radius;
+        grid_lenght = 50;
+
+        grid = true;
+
+        camera = new Camera();
+
+    }
 
 
 
-    class Window {
-    public:
-        Window() {
-            this->interval = 1000 / 60;        //60 FPS
-            this->window_handle = -1;
-        }
-
-        int window_handle, interval;
-        ivec2 size;
-        float window_aspect;
-    } window;
 
 
-    void drawSpheres() {
+    void OGLWidget::drawSpheres() {
 
         for (int i = 0; i < wrapperPtr->getVerts().size(); i++) {
             shared_ptr<HE_vert> vertex = wrapperPtr->getVerts().at(i);
@@ -55,7 +100,7 @@ namespace cg {
             }
 
             glTranslatef(vertex->pos.x, vertex->pos.y, vertex->pos.z);
-            glutSolidSphere(SPHERERADIUS, SPHERESLICES, SPHERESTACKS);
+            glutSolidSphere(sphere_radius, sphere_slices, sphere_stacks);
             glPopMatrix();
         }
 
@@ -67,43 +112,43 @@ namespace cg {
  * necessary because mouse position is only correct detected while clicking on objects
  */
 //TODO: make invisible
-    void drawGridPane() {
+    void OGLWidget::drawGridPane() {
         glPushMatrix();
         glColor3f(gridPaneColor.r, gridPaneColor.g, gridPaneColor.b);
         glBegin(GL_POLYGON);
-        glVertex3f(-GRIDLENGTH / 2, -0.1, -GRIDLENGTH / 2);
-        glVertex3f(GRIDLENGTH / 2, -0.1, -GRIDLENGTH / 2);
-        glVertex3f(GRIDLENGTH / 2, -0.1, GRIDLENGTH / 2);
-        glVertex3f(-GRIDLENGTH / 2, -0.1, GRIDLENGTH / 2);
+        glVertex3f(-grid_lenght / 2, -0.1, -grid_lenght / 2);
+        glVertex3f(grid_lenght / 2, -0.1, -grid_lenght / 2);
+        glVertex3f(grid_lenght / 2, -0.1, grid_lenght / 2);
+        glVertex3f(-grid_lenght / 2, -0.1, grid_lenght / 2);
         glEnd();
         glPopMatrix();
 
     }
 
-    void drawGrid() {
+    void OGLWidget::drawGrid() {
         int i;
-        for (i = -GRIDLENGTH; i <= GRIDLENGTH; i++) {
+        for (i = -grid_lenght; i <= grid_lenght; i++) {
             if (i <= 0) {
                 glPushMatrix();
-                glTranslatef(0, 0, i + GRIDLENGTH / 2);
+                glTranslatef(0, 0, i + grid_lenght / 2);
                 glLineWidth(1);
                 glBegin(GL_LINES);
                 glColor3f(gridColor.r, gridColor.g, gridColor.b);
-                glVertex3f(-GRIDLENGTH / 2, 0, 0);
-                glVertex3f(GRIDLENGTH / 2, 0, 0);
+                glVertex3f(-grid_lenght / 2, 0, 0);
+                glVertex3f(grid_lenght / 2, 0, 0);
                 glEnd();
                 glPopMatrix();
             }
 
             if (i >= 0) {
                 glPushMatrix();
-                glTranslatef(i - GRIDLENGTH / 2, 0, 0);
+                glTranslatef(i - grid_lenght / 2, 0, 0);
                 glRotatef(-90, 0, 1, 0);
                 glLineWidth(1);
                 glBegin(GL_LINES);
                 glColor3f(gridColor.r, gridColor.g, gridColor.b);
-                glVertex3f(-GRIDLENGTH / 2, 0, 0);
-                glVertex3f(GRIDLENGTH / 2, 0, 0);
+                glVertex3f(-grid_lenght / 2, 0, 0);
+                glVertex3f(grid_lenght / 2, 0, 0);
                 glEnd();
                 glPopMatrix();
 
@@ -116,7 +161,7 @@ namespace cg {
 
 
 
-    void drawFaces() {
+    void OGLWidget::drawFaces() {
 
         glFrontFace(GL_CCW);
 
@@ -149,7 +194,7 @@ namespace cg {
 
     }
 
-    void drawNormals() {
+    void OGLWidget::drawNormals() {
 
         for(VertPointer vp : wrapperPtr->getVerts()){
             glPushMatrix();
@@ -178,7 +223,7 @@ namespace cg {
         */
     }
 
-    void display() {
+    void OGLWidget::display() {
 
         glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -188,8 +233,8 @@ namespace cg {
 
 
         mat4 model, view, projection;
-        camera.Update();
-        camera.GetMatricies(projection, view, model);
+        camera->Update();
+        camera->GetMatricies(projection, view, model);
 
         mat4 mvp = projection * view * model;    //Compute the mvp matrix
         glLoadMatrixf(value_ptr(mvp));
@@ -211,37 +256,42 @@ namespace cg {
     }
 
 //Used when person drags mouse around
-    void CallBackMotionFunc(int x, int y) {
-        camera.Move2D(x, y);
+    void OGLWidget::motionFunc(int x, int y) {
+        camera->Move2D(x, y);
     }
 
 //Redraw based on fps set for window
-    void TimerFunc(int value) {
+    void OGLWidget::timerFunc(int value) {
         if (window.window_handle != -1) {
-            glutTimerFunc(window.interval, TimerFunc, value);
+            glutTimerFunc(window.interval, ::timerFuncCallback, value);
             glutPostRedisplay();
         }
     }
 
 
 //Invalidate the window handle when window is closed
-    void CloseFunc() {
+    void OGLWidget::CloseFunc() {
         window.window_handle = -1;
     }
 
 //Resize the window and properly update the camera viewport
-    void ReshapeFunc(int w, int h) {
+    void OGLWidget::ReshapeFunc(int w, int h) {
         if (h > 0) {
             window.size = ivec2(w, h);
             window.window_aspect = float(w) / float(h);
         }
-        camera.SetViewport(0, 0, window.size.x, window.size.y);
+        camera->SetViewport(0, 0, window.size.x, window.size.y);
     }
 
 
-    void initOGLWidget(int argc, char **argv, const std::shared_ptr<HE_Wrapper> wrapper) {
+
+    void OGLWidget::initOGLWidget(int argc, char **argv, const std::shared_ptr<HE_Wrapper> wrapper) {
 
         wrapperPtr = wrapper;
+
+        ::currentInstance = this;
+        ::currentInstanceUI = new OGLWidgetUI(this);
+
 
         glutInit(&argc, argv);
         glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
@@ -249,13 +299,15 @@ namespace cg {
 
         //Setup window and callbacks
         window.window_handle = glutCreateWindow("modeller");
-        glutReshapeFunc(ReshapeFunc);
-        glutDisplayFunc(display);
-        glutKeyboardFunc(keyboard);
-        glutSpecialFunc(specialKeyboard);
-        glutMouseFunc(mouseClicks);
-        glutMotionFunc(CallBackMotionFunc);
-        glutTimerFunc(window.interval, TimerFunc, 0);
+        glutReshapeFunc(::ReshapeFuncCallback);
+        glutDisplayFunc(::displayCallback);
+
+        glutKeyboardFunc(::keyboardCallback);
+        glutSpecialFunc(::specialKeyboardCallback);
+        glutMouseFunc(::mouseClicksCallback);
+
+        glutMotionFunc(::motionFuncCallback);
+        glutTimerFunc(window.interval, ::timerFuncCallback, 0);
 
         glewExperimental = GL_TRUE;
 
@@ -290,11 +342,11 @@ namespace cg {
         glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
         //Setup camera
-        camera.SetMode(FREE);
-        camera.SetPosition(vec3(20, 10, 10));
-        camera.SetLookAt(vec3(0, 0, 0));
-        camera.SetClipping(.1, 1000);
-        camera.SetFOV(45);
+        camera->SetMode(FREE);
+        camera->SetPosition(vec3(20, 10, 10));
+        camera->SetLookAt(vec3(0, 0, 0));
+        camera->SetClipping(.1, 1000);
+        camera->SetFOV(45);
 
         //Start the glut loop!
         glutMainLoop();
@@ -302,7 +354,7 @@ namespace cg {
     }
 
 
-    vec3 getWorldCoordinates(int x, int y) {
+    vec3 OGLWidget::getWorldCoordinates(int x, int y) {
         double objx, objy, objz;
         GLint viewport[4];
         GLdouble modelview[16];
@@ -323,9 +375,68 @@ namespace cg {
     }
 
 
+    float OGLWidget::getSphere_radius() const {
+        return sphere_radius;
+    }
+
+    void OGLWidget::setSphere_radius(float sphere_radius) {
+        OGLWidget::sphere_radius = sphere_radius;
+    }
+
+    float OGLWidget::getSphere_slices() const {
+        return sphere_slices;
+    }
+
+    void OGLWidget::setSphere_slices(float sphere_slices) {
+        OGLWidget::sphere_slices = sphere_slices;
+    }
+
+    float OGLWidget::getSphere_stacks() const {
+        return sphere_stacks;
+    }
+
+    void OGLWidget::setSphere_stacks(float sphere_stacks) {
+        OGLWidget::sphere_stacks = sphere_stacks;
+    }
+
+    int OGLWidget::getGrid_lenght() const {
+        return grid_lenght;
+    }
+
+    void OGLWidget::setGrid_lenght(int grid_lenght) {
+        OGLWidget::grid_lenght = grid_lenght;
+    }
+
+    const shared_ptr<HE_Wrapper> OGLWidget::getWrapperPtr() const {
+        return wrapperPtr;
+    }
+
+    void OGLWidget::setWrapperPtr(const shared_ptr<HE_Wrapper> wrapperPtr) {
+        OGLWidget::wrapperPtr = wrapperPtr;
+    }
+
+    Camera *OGLWidget::getCamera() const {
+        return camera;
+    }
 
 
+    bool OGLWidget::isGrid() const {
+        return grid;
+    }
+
+    void OGLWidget::setGrid(bool grid) {
+        OGLWidget::grid = grid;
+    }
+
+    float OGLWidget::getMove_step_Size() const {
+        return move_step_Size;
+    }
+
+    void OGLWidget::setMove_step_Size(float move_step_Size) {
+        OGLWidget::move_step_Size = move_step_Size;
+    }
 }
+
 
 
 

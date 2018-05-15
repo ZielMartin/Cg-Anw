@@ -13,58 +13,67 @@
  * - rotate camera with mouse click and drag window
  *
  * - connect a face: mark each point with ctrl + left-click, then press 'f'
+ *
+ * - enable/disable grid with *g*
  */
 
-#include "OGLWidgetUI.h"
 #include "OGLWidget.h"
+#include "OGLWidgetUI.h"
 
 namespace cg {
 
-    void keyboard(unsigned char key, int x, int y) {
+
+    OGLWidgetUI::OGLWidgetUI(OGLWidget *caller){
+        this->caller = caller;
+    }
+
+
+
+    void OGLWidgetUI::keyboard(unsigned char key, int x, int y) {
 
 
         //std::cout << "keyboard: " << key << std::endl;
 
-        VertList vl = wrapperPtr->getFaceVerts();
+        VertList vl = caller->getWrapperPtr()->getFaceVerts();
 
         switch (key) {
             case 'i':
-                for(VertPointer p : wrapperPtr->getFaceVerts()){
+                for(VertPointer p : caller->getWrapperPtr()->getFaceVerts()){
                     std::cout << "x:" << p->pos.x << " y:" << p->pos.y << " z:" << p->pos.z << std::endl;
                 }
                 break;
             case 'w':
-                camera.Move(FORWARD);
+                caller->getCamera()->Move(FORWARD);
                 break;
             case 's':
-                camera.Move(BACK);
+                caller->getCamera()->Move(BACK);
                 break;
             case 'e':
-                camera.Move(UP);
+                caller->getCamera()->Move(UP);
                 break;
             case 'a':
-                camera.Move(LEFT);
+                caller->getCamera()->Move(LEFT);
                 break;
             case 'q':
-                camera.Move(DOWN);
+                caller->getCamera()->Move(DOWN);
                 break;
             case 'd':
-                camera.Move(RIGHT);
+                caller->getCamera()->Move(RIGHT);
                 break;
             case '-':            //DOWN
-                wrapperPtr->moveSelectedVertices(glm::vec3(0.0, -MOVESTEPSIZE, 0.0));
+                caller->getWrapperPtr()->moveSelectedVertices(glm::vec3(0.0, -caller->getMove_step_Size(), 0.0));
                 break;
             case '+':            //UP
-                wrapperPtr->moveSelectedVertices(glm::vec3(0.0, MOVESTEPSIZE, 0.0));
+                caller->getWrapperPtr()->moveSelectedVertices(glm::vec3(0.0, caller->getMove_step_Size(), 0.0));
                 break;
             case 'r':
-                wrapperPtr->deleteSelectedVertices();
+                caller->getWrapperPtr()->deleteSelectedVertices();
                 break;
             case 'g':
-                grid = !grid;
+                caller->setGrid(!caller->isGrid());
                 break;
             case 'f':
-                wrapperPtr->createFace(vl);
+                caller->getWrapperPtr()->createFace(vl);
                 break;
             default:
                 break;
@@ -73,20 +82,20 @@ namespace cg {
         glutPostRedisplay();
     }
 
-    void specialKeyboard(int key, int x, int y) {
+    void OGLWidgetUI::specialKeyboard(int key, int x, int y) {
         //std::cout << "specialKeyboard: " << key << std::endl;
         switch (key) {
             case 101:              //UP ARROW
-                wrapperPtr->moveSelectedVertices(glm::vec3(-MOVESTEPSIZE, 0.0, 0.0));
+                caller->getWrapperPtr()->moveSelectedVertices(glm::vec3(-caller->getMove_step_Size(), 0.0, 0.0));
                 break;
             case 100:            //LEFT ARROW
-                wrapperPtr->moveSelectedVertices(glm::vec3(0.0, 0.0, MOVESTEPSIZE));
+                caller->getWrapperPtr()->moveSelectedVertices(glm::vec3(0.0, 0.0, caller->getMove_step_Size()));
                 break;
             case 103:            //DOWN ARROW
-                wrapperPtr->moveSelectedVertices(glm::vec3(MOVESTEPSIZE, 0.0, 0.0));
+                caller->getWrapperPtr()->moveSelectedVertices(glm::vec3(caller->getMove_step_Size(), 0.0, 0.0));
                 break;
             case 102:            //RIGHT ARROW
-                wrapperPtr->moveSelectedVertices(glm::vec3(0.0, 0.0, -MOVESTEPSIZE));
+                caller->getWrapperPtr()->moveSelectedVertices(glm::vec3(0.0, 0.0, -caller->getMove_step_Size()));
                 break;
             default:
                 break;
@@ -95,9 +104,9 @@ namespace cg {
         glutPostRedisplay();
     }
 
-    void mouseClicks(int button, int state, int x, int y) {
-        camera.SetPos(button, state, x, y);
-        glm::vec3 worldCoordinates = getWorldCoordinates(x, y);
+    void OGLWidgetUI::mouseClicks(int button, int state, int x, int y) {
+        caller->getCamera()->SetPos(button, state, x, y);
+        glm::vec3 worldCoordinates = caller->getWorldCoordinates(x, y);
 
         static std::shared_ptr<glm::vec4> vertA;
         static std::shared_ptr<glm::vec4> vertB;
@@ -106,16 +115,16 @@ namespace cg {
             glutGetModifiers() == GLUT_ACTIVE_CTRL) {     //selecting mode
 
 
-            wrapperPtr->selectVertex(worldCoordinates, SPHERERADIUS, true);
+            caller->getWrapperPtr()->selectVertex(worldCoordinates, caller->getSphere_radius(), true);
 
         } else if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN &&
                    glutGetModifiers() != GLUT_ACTIVE_ALT) {    //add Vertex mode
 
-            wrapperPtr->resetSelected();
+            caller->getWrapperPtr()->resetSelected();
 
 
-            VertPointer vp = wrapperPtr->createVert(glm::vec4(worldCoordinates,1));
-            wrapperPtr->addFaceVert(vp);
+            VertPointer vp = caller->getWrapperPtr()->createVert(glm::vec4(worldCoordinates,1));
+            caller->getWrapperPtr()->addFaceVert(vp);
 
 
         } else if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN &&
@@ -123,10 +132,10 @@ namespace cg {
 
             //vertIndex define vertA
             if (vertA == nullptr) {
-                //vertA = vw->selectVertex(worldCoordinates, SPHERERADIUS, false);
+                //vertA = vw->selectVertex(worldCoordinates, sphere_radius, false);
 
             } else if (vertB == nullptr) {  //then vertB
-                //vertB = vw->selectVertex(worldCoordinates, SPHERERADIUS, false);
+                //vertB = vw->selectVertex(worldCoordinates, sphere_radius, false);
 
                 if (vertB.get() != vertA.get() && vertB != nullptr) {
                     //OGLWEdgesWrapper *vecW = OGLWEdgesWrapper::getInstance();
@@ -137,7 +146,7 @@ namespace cg {
                     vertA = nullptr;
                 }
             } else {
-                //vertA = vw->selectVertex(worldCoordinates, SPHERERADIUS, false);
+                //vertA = vw->selectVertex(worldCoordinates, sphere_radius, false);
                 //vertB = nullptr;
             }
 
