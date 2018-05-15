@@ -13,7 +13,7 @@
 #include <memory>
 #include "camera.h"
 #include "HalfEdge.h"
-
+#include "OBJDimensions.h"
 
 #define WIDOWWIDTH 1024
 #define WIDOWHEIGHT 600
@@ -26,45 +26,19 @@ namespace cg {
 
     class OGLWidget{
     public:
-        OGLWidget();
+        OGLWidget(const OBJDimensions &dimensions);
 
         void initOGLWidget(int argc, char **argv, const std::shared_ptr<cg::HE_Wrapper> wrapper);
 
         glm::vec3 getWorldCoordinates(int x, int y);
 
-
-
-
-        float getSphere_radius() const;
-
-        void setSphere_radius(float sphere_radius);
-
-        float getSphere_slices() const;
-
-        void setSphere_slices(float sphere_slices);
-
-        float getSphere_stacks() const;
-
-        void setSphere_stacks(float sphere_stacks);
-
-        int getGrid_lenght() const;
-
-        void setGrid_lenght(int grid_lenght);
-
         const std::shared_ptr<HE_Wrapper> getWrapperPtr() const;
 
-        void setWrapperPtr(const std::shared_ptr<HE_Wrapper> wrapperPtr);
-
         Camera *getCamera() const;
-
 
         bool isGrid() const;
 
         void setGrid(bool grid);
-
-        float getMove_step_Size() const;
-
-        void setMove_step_Size(float move_step_Size);
 
         void display();
 
@@ -76,20 +50,23 @@ namespace cg {
 
         void ReshapeFunc(int w, int h);
 
+        const OBJDimensions &getDimensions() const;
+
     private:
-        float sphere_radius;
-        float sphere_slices;
-        float sphere_stacks;
-        int grid_lenght;
-        float move_step_Size;
+
+        glm::vec3 backgroundColor;
+        glm::vec3 gridPaneColor;
+        glm::vec3 selectedSphereColor;
+        glm::vec3 sphereColor;
+        glm::vec3 gridColor;
+        glm::vec3 faceColor;
 
 
         std::shared_ptr<cg::HE_Wrapper> wrapperPtr;
         cg::Camera *camera;
         bool grid;
 
-
-
+        OBJDimensions dimensions;
 
 
         void drawSpheres();

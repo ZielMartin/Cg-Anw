@@ -134,6 +134,8 @@ namespace cg {
 
         for (std::shared_ptr<glm::vec3> vert : vListe) {
             halfEdgeStruct.createVert(glm::vec4(*vert, 1.0));
+
+            updateDimensions(vert);
         }
 
 
@@ -154,6 +156,17 @@ namespace cg {
 
     }
 
+    void OBJLoader::updateDimensions(std::shared_ptr<glm::vec3> &vert) {
+        dimensions.incrementVertexCounter();
+
+        if(vert->x < dimensions.getMinXValue()){ dimensions.setMinXValue(vert->x);}
+        if(vert->y < dimensions.getMinYValue()){ dimensions.setMinYValue(vert->y);}
+        if(vert->z < dimensions.getMinZValue()){ dimensions.setMinZValue(vert->z);}
+
+        if(vert->x > dimensions.getMaxXValue()){ dimensions.setMaxXValue(vert->x);}
+        if(vert->y > dimensions.getMaxYValue()){ dimensions.setMaxYValue(vert->y);}
+        if(vert->z > dimensions.getMaxZValue()){ dimensions.setMaxZValue(vert->z);}
+    }
 
 
     std::ostream &operator<<(std::ostream &os, const cg::OBJLoader &loader) {
@@ -239,6 +252,10 @@ namespace cg {
 
     unsigned int OBJLoader::getDeg() const {
         return deg;
+    }
+
+    const OBJDimensions &OBJLoader::getDimensions() const {
+        return dimensions;
     }
 
     std::vector<GLuint> lineIndices(GLuint vecSize) {

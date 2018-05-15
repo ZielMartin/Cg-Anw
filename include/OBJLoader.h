@@ -9,6 +9,7 @@
 #include <vector>
 #include <ostream>
 #include "HalfEdge.h"
+#include "OBJDimensions.h"
 
 namespace cg {
 
@@ -47,6 +48,8 @@ namespace cg {
 
         unsigned int getDeg() const;
 
+        const OBJDimensions &getDimensions() const;
+
     private:
 
         void createHE_STRUCT();
@@ -75,9 +78,16 @@ namespace cg {
         std::string type;
         unsigned int deg = 0;
 
+        OBJDimensions dimensions;
+
+
+    private:
+
         void initFields();
 
         void readLine(const std::string &line);
+
+        void updateDimensions(std::shared_ptr<glm::vec3> &vert);
     };
 
     std::vector<GLuint> lineIndices(GLuint vecSize);

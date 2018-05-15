@@ -31,6 +31,7 @@ namespace cg {
 
     void OGLWidgetUI::keyboard(unsigned char key, int x, int y) {
 
+        float moveStepSize = caller->getDimensions().getMoveStepSize();
 
         //std::cout << "keyboard: " << key << std::endl;
 
@@ -61,10 +62,10 @@ namespace cg {
                 caller->getCamera()->Move(RIGHT);
                 break;
             case '-':            //DOWN
-                caller->getWrapperPtr()->moveSelectedVertices(glm::vec3(0.0, -caller->getMove_step_Size(), 0.0));
+                caller->getWrapperPtr()->moveSelectedVertices(glm::vec3(0.0, -moveStepSize, 0.0));
                 break;
             case '+':            //UP
-                caller->getWrapperPtr()->moveSelectedVertices(glm::vec3(0.0, caller->getMove_step_Size(), 0.0));
+                caller->getWrapperPtr()->moveSelectedVertices(glm::vec3(0.0, moveStepSize, 0.0));
                 break;
             case 'r':
                 caller->getWrapperPtr()->deleteSelectedVertices();
@@ -83,19 +84,20 @@ namespace cg {
     }
 
     void OGLWidgetUI::specialKeyboard(int key, int x, int y) {
+        float moveStepSize = caller->getDimensions().getMoveStepSize();
         //std::cout << "specialKeyboard: " << key << std::endl;
         switch (key) {
             case 101:              //UP ARROW
-                caller->getWrapperPtr()->moveSelectedVertices(glm::vec3(-caller->getMove_step_Size(), 0.0, 0.0));
+                caller->getWrapperPtr()->moveSelectedVertices(glm::vec3(-moveStepSize, 0.0, 0.0));
                 break;
             case 100:            //LEFT ARROW
-                caller->getWrapperPtr()->moveSelectedVertices(glm::vec3(0.0, 0.0, caller->getMove_step_Size()));
+                caller->getWrapperPtr()->moveSelectedVertices(glm::vec3(0.0, 0.0, moveStepSize));
                 break;
             case 103:            //DOWN ARROW
-                caller->getWrapperPtr()->moveSelectedVertices(glm::vec3(caller->getMove_step_Size(), 0.0, 0.0));
+                caller->getWrapperPtr()->moveSelectedVertices(glm::vec3(moveStepSize, 0.0, 0.0));
                 break;
             case 102:            //RIGHT ARROW
-                caller->getWrapperPtr()->moveSelectedVertices(glm::vec3(0.0, 0.0, -caller->getMove_step_Size()));
+                caller->getWrapperPtr()->moveSelectedVertices(glm::vec3(0.0, 0.0, -moveStepSize));
                 break;
             default:
                 break;
@@ -115,7 +117,7 @@ namespace cg {
             glutGetModifiers() == GLUT_ACTIVE_CTRL) {     //selecting mode
 
 
-            caller->getWrapperPtr()->selectVertex(worldCoordinates, caller->getSphere_radius(), true);
+            caller->getWrapperPtr()->selectVertex(worldCoordinates, caller->getDimensions().getSphereRadius(), true);
 
         } else if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN &&
                    glutGetModifiers() != GLUT_ACTIVE_ALT) {    //add Vertex mode

@@ -12,7 +12,7 @@ int main(int argc, char** argv) {
     //cg::HE_Wrapper *wrapper = new cg::HE_Wrapper();
     //std::shared_ptr<cg::HE_Wrapper> wrapperPtr(wrapper);
 
-    cg::OGLWidget *widget = new cg::OGLWidget();
+    cg::OGLWidget *widget = new cg::OGLWidget(objLoader->getDimensions());
     widget->initOGLWidget(argc, argv, wrapperPtr);
     return 0;
 }

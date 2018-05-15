@@ -55,27 +55,24 @@ void specialKeyboardCallback(int key, int x, int y){
 
 
 
+
+
 namespace cg {
 
 
 
+    OGLWidget::OGLWidget(const OBJDimensions &dimensions){
 
+        this->dimensions = dimensions;
+        this->dimensions.initData();
 
-    vec3 backgroundColor = vec3(0, 0, 0);
-    vec3 gridPaneColor = vec3(0.2, 0.2, 0.2);
-    vec3 selectedSphereColor = vec3(1, 0, 0);
-    vec3 sphereColor = vec3(1, 1, 1);
-    vec3 gridColor = vec3(1, 1, 1);
-    vec3 faceColor = vec3(0.2, 0.4, 0.4);
+        backgroundColor = vec3(0, 0, 0);
+        gridPaneColor = vec3(0.2, 0.2, 0.2);
+        selectedSphereColor = vec3(1, 0, 0);
+        sphereColor = vec3(1, 1, 1);
+        gridColor = vec3(1, 1, 1);
+        faceColor = vec3(0.2, 0.4, 0.4);
 
-
-    OGLWidget::OGLWidget(){
-
-        sphere_radius = 0.01;
-        sphere_slices = sphere_radius*1000;
-        sphere_stacks = sphere_slices/2;
-        move_step_Size = sphere_radius;
-        grid_lenght = 50;
 
         grid = true;
 
@@ -100,7 +97,7 @@ namespace cg {
             }
 
             glTranslatef(vertex->pos.x, vertex->pos.y, vertex->pos.z);
-            glutSolidSphere(sphere_radius, sphere_slices, sphere_stacks);
+            glutSolidSphere(dimensions.getSphereRadius(), dimensions.getSphereSlices(), dimensions.getSphereStacks());
             glPopMatrix();
         }
 
@@ -113,19 +110,27 @@ namespace cg {
  */
 //TODO: make invisible
     void OGLWidget::drawGridPane() {
+        float grid_lenght = dimensions.getGridSize();
+        glm::vec3 gridPosition = dimensions.getGridPosition();
+
         glPushMatrix();
         glColor3f(gridPaneColor.r, gridPaneColor.g, gridPaneColor.b);
         glBegin(GL_POLYGON);
-        glVertex3f(-grid_lenght / 2, -0.1, -grid_lenght / 2);
-        glVertex3f(grid_lenght / 2, -0.1, -grid_lenght / 2);
-        glVertex3f(grid_lenght / 2, -0.1, grid_lenght / 2);
-        glVertex3f(-grid_lenght / 2, -0.1, grid_lenght / 2);
+        glVertex3f(-grid_lenght / 2, gridPosition.y - 0.1, -grid_lenght / 2);
+        glVertex3f(grid_lenght / 2, gridPosition.y - 0.1, -grid_lenght / 2);
+        glVertex3f(grid_lenght / 2, gridPosition.y - 0.1, grid_lenght / 2);
+        glVertex3f(-grid_lenght / 2, gridPosition.y - 0.1, grid_lenght / 2);
         glEnd();
         glPopMatrix();
 
     }
 
     void OGLWidget::drawGrid() {
+
+        float grid_lenght = dimensions.getGridSize();
+
+        //TODO integrate gridPosition
+        glm::vec3 gridPosition = dimensions.getGridPosition();
         int i;
         for (i = -grid_lenght; i <= grid_lenght; i++) {
             if (i <= 0) {
@@ -134,8 +139,8 @@ namespace cg {
                 glLineWidth(1);
                 glBegin(GL_LINES);
                 glColor3f(gridColor.r, gridColor.g, gridColor.b);
-                glVertex3f(-grid_lenght / 2, 0, 0);
-                glVertex3f(grid_lenght / 2, 0, 0);
+                glVertex3f(-grid_lenght / 2, gridPosition.y, 0);
+                glVertex3f(grid_lenght / 2, gridPosition.y, 0);
                 glEnd();
                 glPopMatrix();
             }
@@ -147,8 +152,8 @@ namespace cg {
                 glLineWidth(1);
                 glBegin(GL_LINES);
                 glColor3f(gridColor.r, gridColor.g, gridColor.b);
-                glVertex3f(-grid_lenght / 2, 0, 0);
-                glVertex3f(grid_lenght / 2, 0, 0);
+                glVertex3f(-grid_lenght / 2, gridPosition.y, 0);
+                glVertex3f(grid_lenght / 2, gridPosition.y, 0);
                 glEnd();
                 glPopMatrix();
 
@@ -326,7 +331,8 @@ namespace cg {
         float ambientLight0[] = { 0.2f, 0.2f, 0.2f, 1.0f };
         float diffuseLight0[] = { 0.8f, 0.8f, 0.8f, 1.0f };
         float specularLight0[] = { 0.5f, 0.5f, 0.5f, 1.0f };
-        GLfloat position0[] = {0.0f, 100.0f, 0.0f, 1.0f};
+        glm::vec3 lightPosition = dimensions.getLightPosition();
+        GLfloat position0[] = {lightPosition.x, lightPosition.y, lightPosition.z, 1.0f};
         // Assign created components to GL_LIGHT0
         glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight0);
         glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight0);
@@ -375,45 +381,12 @@ namespace cg {
     }
 
 
-    float OGLWidget::getSphere_radius() const {
-        return sphere_radius;
-    }
-
-    void OGLWidget::setSphere_radius(float sphere_radius) {
-        OGLWidget::sphere_radius = sphere_radius;
-    }
-
-    float OGLWidget::getSphere_slices() const {
-        return sphere_slices;
-    }
-
-    void OGLWidget::setSphere_slices(float sphere_slices) {
-        OGLWidget::sphere_slices = sphere_slices;
-    }
-
-    float OGLWidget::getSphere_stacks() const {
-        return sphere_stacks;
-    }
-
-    void OGLWidget::setSphere_stacks(float sphere_stacks) {
-        OGLWidget::sphere_stacks = sphere_stacks;
-    }
-
-    int OGLWidget::getGrid_lenght() const {
-        return grid_lenght;
-    }
-
-    void OGLWidget::setGrid_lenght(int grid_lenght) {
-        OGLWidget::grid_lenght = grid_lenght;
-    }
 
     const shared_ptr<HE_Wrapper> OGLWidget::getWrapperPtr() const {
         return wrapperPtr;
     }
 
-    void OGLWidget::setWrapperPtr(const shared_ptr<HE_Wrapper> wrapperPtr) {
-        OGLWidget::wrapperPtr = wrapperPtr;
-    }
+
 
     Camera *OGLWidget::getCamera() const {
         return camera;
@@ -428,13 +401,11 @@ namespace cg {
         OGLWidget::grid = grid;
     }
 
-    float OGLWidget::getMove_step_Size() const {
-        return move_step_Size;
+    const OBJDimensions &OGLWidget::getDimensions() const {
+        return dimensions;
     }
 
-    void OGLWidget::setMove_step_Size(float move_step_Size) {
-        OGLWidget::move_step_Size = move_step_Size;
-    }
+
 }
 
 
