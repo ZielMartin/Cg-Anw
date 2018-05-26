@@ -10,6 +10,10 @@ class QtGUI : public QMainWindow
 public:
 	QtGUI(QWidget *parent = Q_NULLPTR);
 
+//list all your custom SLOTS here
+public slots:
+        void mySlot();
+
 private:
 	Ui::QtGUIClass ui;
 };
