@@ -1,29 +1,24 @@
-#include "OGLWidget.h"
-#include "OBJLoader.h"
+// main.cpp
 
-int main(int argc, char** argv) {
+#include <QApplication>
+#include <QDesktopWidget>
 
+#include "window.h"
 
-    cg::OBJLoader *objLoader = new cg::OBJLoader();
-    objLoader->readFile("../obj/suzanne.obj");
-    std::shared_ptr<cg::HE_Wrapper> wrapperPtr(&objLoader->getHalfEdgeStruct());
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+    Window window;
+    window.resize(window.sizeHint());
+    int desktopArea = QApplication::desktop()->width() *
+                     QApplication::desktop()->height();
+    int widgetArea = window.width() * window.height();
 
+    window.setWindowTitle("OpenGL with Qt");
 
-    //cg::HE_Wrapper *wrapper = new cg::HE_Wrapper();
-    //std::shared_ptr<cg::HE_Wrapper> wrapperPtr(wrapper);
-
-    cg::OGLWidget *widget = new cg::OGLWidget(objLoader->getDimensions());
-    widget->initOGLWidget(argc, argv, wrapperPtr);
-    return 0;
+    if (((float)widgetArea / (float)desktopArea) < 0.75f)
+        window.show();
+    else
+        window.showMaximized();
+    return app.exec();
 }
-
-
-
-
-
-
-
-
-
-
-

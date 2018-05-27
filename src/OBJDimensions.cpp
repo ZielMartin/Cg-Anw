@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <algorithm>
 #include "OBJDimensions.h"
 
 namespace cg {
@@ -14,7 +15,7 @@ namespace cg {
 
 
         lightPosition = glm::vec3(0.0, maxYValue + 100, 0.0);
-        gridPosition = glm::vec3(0.0, minYValue-1, 0.0);
+        gridPosition = glm::vec3(0.0, minYValue, 0.0);
 
         if(vertexCounter < 100){
             sphereRadius = 0.1;
@@ -30,7 +31,12 @@ namespace cg {
         sphereStacks = sphereSlices/2;
         moveStepSize = sphereRadius;
 
-        gridSize = 50;
+        gridSize = std::max(maxXValue-minXValue, maxYValue-minYValue) * 3;
+
+        cameraPosition = glm::vec3(gridSize/2, gridSize/4, gridSize/4);
+
+
+
 
     }
 
@@ -113,6 +119,10 @@ namespace cg {
 
     int OBJDimensions::getGridSize() const {
         return gridSize;
+    }
+
+    const glm::vec3 &OBJDimensions::getCameraPosition() const {
+        return cameraPosition;
     }
 
 

@@ -6,11 +6,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#ifdef __APPLE__
-#include <GLUT/glut.h>
-#else
-#include <GL/freeglut.h>
-#endif
+
 
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
@@ -19,6 +15,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
+#include <QtGui/QMouseEvent>
 
 namespace cg {
 
@@ -77,7 +74,7 @@ namespace cg {
 
 		void SetDistance(double cam_dist);
 
-		void SetPos(int button, int state, int x, int y);
+		void SetPos(QMouseEvent *event);
 
 		//Getting Functions
 		CameraType GetMode();

@@ -58,6 +58,9 @@ namespace cg {
 
         int getGridSize() const;
 
+        const glm::vec3 &getCameraPosition() const;
+
+
 
     private:
         float minXValue;
@@ -76,6 +79,8 @@ namespace cg {
         float moveStepSize;
         glm::vec3 lightPosition;
         glm::vec3 gridPosition;
+        glm::vec3 cameraPosition;
+
 
         int gridSize;
 

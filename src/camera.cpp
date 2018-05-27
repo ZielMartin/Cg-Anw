@@ -1,5 +1,6 @@
 //camera.cpp
 #include <iostream>
+#include <GL/gl.h>
 #include "camera.h"
 using namespace std;
 using namespace glm;
@@ -169,18 +170,9 @@ namespace cg {
 
 	}
 
-	void Camera::SetPos(int button, int state, int x, int y) {
-		/*if (button == 3 && state == GLUT_DOWN) {
-            camera_position_delta += camera_up * .05f;
-        } else if (button == 4 && state == GLUT_DOWN) {
-            camera_position_delta -= camera_up * .05f;
-        } else*/
-		if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-			move_camera = true;
-		} else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
-			move_camera = false;
-		}
-		mouse_position = vec3(x, y, 0);
+	void Camera::SetPos(QMouseEvent *event) {
+
+		mouse_position = vec3(event->pos().x(), event->pos().y(), 0);
 
 	}
 

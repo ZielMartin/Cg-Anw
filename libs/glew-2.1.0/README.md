@@ -29,7 +29,7 @@ Snapshots may contain new features, bug-fixes or new OpenGL extensions ahead of 
 
 It is highly recommended to build from a tgz or zip release snapshot.
 The code generation workflow is a complex brew of gnu make, perl and python, that works best on Linux or Mac.
-For most end-users of GLEW the official releases are the best choice, with vertIndex class support.
+For most end-users of GLEW the official releases are the best choice, with first class support.
 
 ### Linux and Mac
 
@@ -170,7 +170,7 @@ with bug fixes, new OpenGL extension support and new releases.
 
 GLEW was developed by [Milan Ikits](http://www.cs.utah.edu/~ikits/)
 and [Marcelo Magallon](http://wwwvis.informatik.uni-stuttgart.de/~magallon/).
-Aaron Lefohn, Joe Kniss, and Chris Wyman were the vertIndex users and also
+Aaron Lefohn, Joe Kniss, and Chris Wyman were the first users and also
 assisted with the design and debugging process.  
 
 The acronym GLEW originates from Aaron Lefohn.
