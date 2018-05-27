@@ -4,6 +4,8 @@ project(Cg_Anw)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
+
+
 if (UNIX AND NOT CYGWIN)
     find_package(OpenGL REQUIRED)
     find_package(GLEW REQUIRED)
@@ -16,6 +18,8 @@ if (UNIX AND NOT CYGWIN)
 elseif (WIN32)
     find_package(OPENGL REQUIRED)
 
+
+
     set(GLEW_PATH ${PROJECT_SOURCE_DIR}/libs/glew-2.1.0)
     set(GLM_PATH ${PROJECT_SOURCE_DIR}/libs/glm-0.9.7.2)
     set(GLUT_PATH ${PROJECT_SOURCE_DIR}/libs/freeglut-3.0.0)
@@ -27,9 +31,11 @@ elseif (WIN32)
     set(GLUT_INCLUDE_DIRS ${GLUT_PATH}/include)
     set(GTEST_INCLUDE_DIRS ${GTEST_PATH}/include)
 
-    set(GLEW_LIBRARIES ${GLEW_PATH}/lib/libglew32.dll.a)
-    set(GLUT_LIBRARIES ${GLUT_PATH}/lib/libfreeglut.dll.a winmm gdi32)
-    set(GTEST_LIBRARIES ${GTEST_PATH}/lib/libgmock.dll.a)
+    #cmake link_libraries removes .dll and .dll.a ending, but not .dll.dll wtf
+    set(GLFW_STATIC_LIBRARIES glfw3)
+    set(GLEW_LIBRARIES glew32)
+    set(GLUT_LIBRARIES freeglut winmm gdi32)
+    set(GTEST_LIBRARIES mock)
 
     link_directories(${GLFW_PATH}/lib-mingw-w64 ${GLEW_PATH}/lib ${GLUT_PATH}/lib ${GTEST_PATH}/lib)
 
@@ -53,8 +59,10 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 
 
-include_directories(include ui C:/Qt/5.11.0/mingw53_32/include ${GLEW_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIRS} ${GLM_INCLUDE_DIRS} ${GTEST_INCLUDE_DIRS})
+include_directories(include ui C:/Qt/5.11.0/mingw53_32/include ${GLUT_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIRS} ${GLM_INCLUDE_DIRS} ${GTEST_INCLUDE_DIRS} )
 include_directories(.)
+
+
 
 file(GLOB SOURCE_FILES
         src/*.cpp)
@@ -79,7 +87,7 @@ add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${UI_FILES} ${INCLUDE_FILES})
 
 #add_executable(${PROJECT_NAME}_TEST ${TEST_FILES} src/HalfEdge.cpp src/SimpleObjParser.cpp)
 
-target_link_libraries(${PROJECT_NAME} Qt5::Core Qt5::Widgets Qt5::OpenGL ${GLUT_LIBRARIES} ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} Qt5::Core Qt5::Widgets Qt5::OpenGL ${GLUT_LIBRARIES}  ${OPENGL_LIBRARIES} )
 
 #target_link_libraries(${PROJECT_NAME}_TEST ${GTEST_LIBRARIES})
 
@@ -93,7 +101,6 @@ if (WIN32)
     add_custom_command(
             TARGET ${PROJECT_NAME} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy
-            ${GLEW_PATH}/lib/glew32.dll
             ${GLUT_PATH}/lib/libfreeglut.dll
             ${GTEST_PATH}/lib/libgmock.dll
             ${QT_PATH}/Qt5Cored.dll

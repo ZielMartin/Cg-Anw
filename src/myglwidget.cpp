@@ -1,189 +1,14 @@
 // myglwidget.cpp
 
+#define GLEW_STATIC
+#include "glew.c"
 
-#include <QtWidgets>
-#include <QtOpenGL>
-#include <include/glextload.h>
 #include "myglwidget.h"
-//#include "glextload.h"
 
 using namespace cg;
 using namespace glm;
 using namespace std;
 
-const char* vertex_shader =
-        "attribute vec3 aCoords;"
-        "attribute vec3 aColor;"
-        "uniform mat4 umvMat;"
-        "uniform mat4 upMat;"
-        "varying vec3 vColor;"
-        "void main () {"
-        "gl_Position = upMat * umvMat * vec4(aCoords, 1.0);"
-        "vColor = aColor;"
-        "}";
-
-const char* fragment_shader =
-        "varying vec3 vColor;"
-        "void main () {"
-        "gl_FragColor = vec4 (vColor, 1.0);"
-        "}";
-
-
-GLuint* vboIds = NULL;
-GLuint* vaoIds = NULL;
-GLuint program = 0;
-GLuint VERTEX_ATTR_COORDS = 1;
-GLuint VERTEX_ATTR_COLOR = 2;
-
-const int nCoordsComponents = 3;
-const int nColorComponents = 3;
-const int nLines = 3;
-const int nVerticesPerLine = 2;
-const int nFaces = 6;
-const int nVerticesPerFace = 3;
-
-
-float av[] = { 0.0, 0.0, 0.0,    // origin
-               2.0, 0.0, 0.0,    // x-axis
-               0.0, 2.0, 0.0,    // y-axis
-               0.0, 0.0, 2.0 };  // z-axis
-
-GLubyte avi[] = { 0, 1,
-                  0, 2,
-                  0, 3 };
-
-float ac[] = { 1.0, 0.0, 0.0,    // red   x-axis
-               0.0, 1.0, 0.0,    // green y-axis
-               0.0, 0.0, 1.0 };  // blue  z-axis
-
-GLubyte aci[] = { 0, 0,
-                  1, 1,
-                  2, 2 };
-
-float ave[nLines*nVerticesPerLine*nCoordsComponents];
-void expandAxesVertices()
-{
-    for (int i=0; i<6; i++)
-    {
-        ave[i*3+0] = av[avi[i]*3+0];
-        ave[i*3+1] = av[avi[i]*3+1];
-        ave[i*3+2] = av[avi[i]*3+2];
-    }
-}
-
-float ace[nLines*nVerticesPerLine*nColorComponents];
-void expandAxesColors()
-{
-    for (int i=0; i<6; i++)
-    {
-        ace[i*3+0] = ac[aci[i]*3+0];
-        ace[i*3+1] = ac[aci[i]*3+1];
-        ace[i*3+2] = ac[aci[i]*3+2];
-    }
-}
-
-// =========== Pyramid Data =================================================
-
-//  (3,4,5)          (6,7,8)
-//     1----------------2
-//     | \            / |
-//     |   \        /   |
-//     |     \    /     |
-//     |        4       | (12,13,14)
-//     |     /    \     |
-//     |   /        \   |
-//     | /            \ |
-//     0 ---------------3
-//  (0,1,2)          (9,10,11)
-
-float pv[] = { 0.5, 0.5, 0.5,    // 0
-               0.5, 1.5, 0.5,    // 1
-               1.5, 1.5, 0.5,    // 2
-               1.5, 0.5, 0.5,    // 3
-               1.0, 1.0, 1.5 };  // 4
-
-GLubyte pvi[] = {0, 1, 2,
-                 2, 3, 0,
-                 0, 3, 4,
-                 3, 2, 4,
-                 2, 1, 4,
-                 1, 0, 4};
-
-float pve[nFaces*nVerticesPerFace*nCoordsComponents];
-void expandPyramidVertices()
-{
-    for (int i=0; i<nFaces; i++)
-    {
-        for (int j=0; j<nVerticesPerFace; j++)
-        {
-            for (int k=0; k<nCoordsComponents; k++)
-            {
-                pve[(i*3+j)*3+k] = pv[pvi[i*3+j]*3+k];
-            }
-        }
-    }
-}
-
-float pc[] = { 0.3f, 0.30f, 0.3f,
-               1.0f, 0.70f, 0.0f,
-               1.0f, 0.62f, 0.0f,
-               1.0f, 0.40f, 0.0f,
-               1.0f, 0.48f, 0.0f};
-
-GLubyte pci[] = { 0, 0, 0,
-                  0, 0, 0,
-                  1, 1, 1,
-                  2, 2, 2,
-                  3, 3, 3,
-                  4, 4, 4 };
-
-float pce[nFaces*nVerticesPerFace*nColorComponents];
-void expandPyramidColors()
-{
-    for (int i=0; i<nFaces; i++)
-    {
-        for (int j=0; j<nVerticesPerFace; j++)
-        {
-            for (int k=0; k<nColorComponents; k++)
-            {
-                pce[(i*3+j)*3+k] = pc[pci[i*3+j]*3+k];
-            }
-        }
-    }
-}
-
-float n[nFaces*nVerticesPerFace*nCoordsComponents];
-
-// ===========================================================================
-
-bool double_equal(double a, double b)
-{
-    if (fabs(a-b) < 1e-3)
-        return true;
-    return false;
-}
-
-void MyGLWidget::initShaders()
-{
-    GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource (vs, 1, &vertex_shader, NULL);
-    glCompileShader (vs);
-
-    GLuint fs = glCreateShader (GL_FRAGMENT_SHADER);
-    glShaderSource (fs, 1, &fragment_shader, NULL);
-    glCompileShader (fs);
-
-    program = glCreateProgram();
-    glAttachShader (program, fs);
-    glAttachShader (program, vs);
-
-    glBindAttribLocation(program, VERTEX_ATTR_COORDS, "aCoords");
-    glBindAttribLocation(program, VERTEX_ATTR_COLOR, "aColor");
-
-    glLinkProgram (program);
-
-    glUseProgram (program);
-}
 
 
 
@@ -247,35 +72,65 @@ void MyGLWidget::setZRotation(int angle) {
 }
 
 void MyGLWidget::initializeGL() {
+
+    char *model_path = (( char *)"../obj/teapot.obj");
+    char *vertexshader_path = ( char *) "../shader/simpleShader.vert";
+    char *fragmentshader_path = ( char *) "../shader/simpleShader.frag";
+
     qglClearColor(Qt::black);
+
+
+    // to properly initialize all available OpenGL function pointers
+    glewExperimental = GL_TRUE;
+    // place this in initializeGL()
+    glewInit();
 
     //glEnable(GL_COLOR_MATERIAL);
     //glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-    glShadeModel(GL_SMOOTH);
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-
-    static GLfloat lightPosition[4] = {0, 10, 0, 1.0};
-    glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
 
 
-    expandAxesVertices();
-    expandAxesColors();
-    expandPyramidVertices();
-    expandPyramidColors();
-
+    // create shader, prepare data for OpenGL
+    trig.LoadFile(model_path);
+    shader.Init(vertexshader_path, fragmentshader_path);
+    setup_vertex_position_buffer_object();
+    setup_vertex_uv_buffer_object();
+    setup_vertex_normal_buffer_object(true);
+    // set up camera and object transformation matrices
+    //projectionMatrix = get_default_projectionMatrix();
+    //viewMatrix = get_default_viewMatrix();
+    //modelMatrix = get_default_modelMatrix();
+    normalMatrix = get_default_normalMatrix();
 
 
     //Setup camera
     camera->SetMode(FREE);
     //camera->SetPosition(dimensions.getCameraPosition());
-    camera->SetPosition(vec3(0, 0, 2));
+    camera->SetPosition(vec3(0, 100, 200));
     camera->SetLookAt(vec3(0, 0, 0));
     camera->SetClipping(.1, 1000);
     camera->SetFOV(45);
 }
+
+glm::mat3 MyGLWidget::get_default_normalMatrix(void) {
+    return glm::transpose(glm::inverse(glm::mat3(viewMatrix * modelMatrix)));
+}
+
+glm::mat4 MyGLWidget::get_default_viewMatrix(void) {
+    return glm::translate(glm::mat4(1.0f), glm::vec3(-50.0f, -50.0f, -300.0f));
+}
+glm::mat4 MyGLWidget::get_default_modelMatrix(void) {
+    return glm::translate(glm::mat4(1.0f), glm::vec3(0.0f));
+}
+glm::mat4 MyGLWidget::get_default_projectionMatrix(void) {
+    return glm::ortho(-windowX * 0.5f,
+                      windowX * 0.5f,
+                      -windowY * 0.5f,
+                      windowY * 0.5f,
+                      -1.0f, 400.0f);
+}
+
 
 void MyGLWidget::paintGL() {
 
@@ -289,14 +144,90 @@ void MyGLWidget::paintGL() {
     glRotatef(zRot / 16.0, 0.0, 0.0, 1.0);
 
 
-    mat4 model, view, projection;
-    camera->Update();
-    camera->GetMatricies(projection, view, model);
 
-    mat4 mvp = projection * view * model;    //Compute the mvp matrix
+    camera->Update();
+    camera->GetMatricies(projectionMatrix, viewMatrix, modelMatrix);
+
+    mat4 mvp = projectionMatrix * viewMatrix * modelMatrix;    //Compute the mvp matrix
     glMatrixMode(GL_PROJECTION);
     glLoadMatrixf(value_ptr(mvp));
     glMatrixMode(GL_MODELVIEW);
+
+
+    shader.Bind();
+
+    // pass uniform variables to shader
+    GLint projectionMatrix_location    = glGetUniformLocation(shader.ID(), "projectionMatrix");
+    GLint viewMatrix_location          = glGetUniformLocation(shader.ID(), "viewMatrix");
+    GLint modelMatrix_location         = glGetUniformLocation(shader.ID(), "modelMatrix");
+    GLint normalMatrix_location        = glGetUniformLocation(shader.ID(), "normalMatrix");
+    GLint materialAmbient_location     = glGetUniformLocation(shader.ID(), "materialAmbient");
+    GLint materialDiffuse_location     = glGetUniformLocation(shader.ID(), "materialDiffuse");
+    GLint materialSpecular_location    = glGetUniformLocation(shader.ID(), "materialSpecular");
+    GLint lightPosition_location       = glGetUniformLocation(shader.ID(), "lightPosition");
+    GLint lightAmbient_location        = glGetUniformLocation(shader.ID(), "lightAmbient");
+    GLint lightDiffuse_location        = glGetUniformLocation(shader.ID(), "lightDiffuse");
+    GLint lightSpecular_location       = glGetUniformLocation(shader.ID(), "lightSpecular");
+    GLint lightGlobal_location         = glGetUniformLocation(shader.ID(), "lightGlobal");
+    GLint materialShininess_location   = glGetUniformLocation(shader.ID(), "materialShininess");
+    GLint constantAttenuation_location = glGetUniformLocation(shader.ID(), "constantAttenuation");
+    GLint linearAttenuation_location   = glGetUniformLocation(shader.ID(), "linearAttenuation");
+    GLint useTexture_location          = glGetUniformLocation(shader.ID(), "useTexture");
+    glUniformMatrix4fv( projectionMatrix_location, 1, GL_FALSE, &projectionMatrix[0][0]);
+    glUniformMatrix4fv( viewMatrix_location,       1, GL_FALSE, &viewMatrix[0][0]);
+    glUniformMatrix4fv( modelMatrix_location,      1, GL_FALSE, &modelMatrix[0][0]);
+    glUniformMatrix3fv( normalMatrix_location,     1, GL_FALSE, &normalMatrix[0][0]);
+    glUniform3fv(       materialAmbient_location,  1, materialAmbient);
+    glUniform3fv(       materialDiffuse_location,  1, materialDiffuse);
+    glUniform3fv(       materialSpecular_location, 1, materialSpecular);
+    glUniform3fv(       lightPosition_location,    1, lightPosition);
+    glUniform3fv(       lightAmbient_location,     1, lightAmbient);
+    glUniform3fv(       lightDiffuse_location,     1, lightDiffuse);
+    glUniform3fv(       lightSpecular_location,    1, lightSpecular);
+    glUniform3fv(       lightGlobal_location,      1, lightGlobal);
+    glUniform1f(        materialShininess_location,   materialShininess);
+    glUniform1f(        constantAttenuation_location, constantAttenuation);
+    glUniform1f(        linearAttenuation_location,   linearAttenuation);
+    glUniform1i(        useTexture_location,          0);
+
+    /*
+    // bind texture to shader
+    GLint texture0_location = glGetAttribLocation(shader.ID(), "texture0");
+    if (texture0_location != -1) {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        glUniform1i(texture0_location, 0);
+    }
+     */
+
+    // bind vertex uv coordinates to shader
+    GLint uv_location = glGetAttribLocation(shader.ID(), "vertex_uv");
+    if (uv_location != -1) {
+        glEnableVertexAttribArray(uv_location);
+        glBindBuffer(GL_ARRAY_BUFFER, vertex_uv_buffer);
+        glVertexAttribPointer(uv_location, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    }
+    // bind vertex positions to shader
+    GLint position_location = glGetAttribLocation(shader.ID(), "vertex_position");
+    if (position_location != -1) {
+        glEnableVertexAttribArray(position_location);
+        glBindBuffer(GL_ARRAY_BUFFER, vertex_position_buffer);
+        glVertexAttribPointer(position_location, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    }
+    // bind vertex normals to shader
+    GLint normal_location = glGetAttribLocation(shader.ID(), "vertex_normal");
+    if (normal_location != -1) {
+        glEnableVertexAttribArray(normal_location);
+        glBindBuffer(GL_ARRAY_BUFFER, vertex_normal_buffer);
+        glVertexAttribPointer(normal_location, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    }
+
+    // draw the scene
+    glDrawArrays(GL_TRIANGLES, 0, trig.VertexCount());
+    glDisableVertexAttribArray(position_location);
+    glDisableVertexAttribArray(uv_location);
+    glDisableVertexAttribArray(normal_location);
+    shader.Unbind();
 
 
     draw();
@@ -354,87 +285,85 @@ void MyGLWidget::keyPressEvent(QKeyEvent *event) {
 
 }
 
+
+void MyGLWidget::setup_vertex_position_buffer_object(void) {
+    glGenBuffers(1, &vertex_position_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertex_position_buffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * trig.VertexCount(),
+                 &trig.Vertices()[0], GL_STATIC_DRAW);
+}
+void MyGLWidget::setup_vertex_uv_buffer_object(void) {
+    glGenBuffers(1, &vertex_uv_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertex_uv_buffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * trig.UVs().size(),
+                 &trig.UVs()[0], GL_STATIC_DRAW);
+}
+void MyGLWidget::setup_vertex_normal_buffer_object(bool smoothed) {
+    std::vector<glm::vec3> vertices = trig.Vertices();
+    std::vector<glm::vec3> normals;
+    if (smoothed) {
+        // initialize map of normals to zero
+        // note that we store readily hashable vector<double> types instead of
+        // vec3s and convert between the two as required
+        // ...avoids some of the pain using <map> without much C++ knowledge
+        std::map< std::vector<double>, std::vector<double> > normal_map;
+        for (int i = 0; i < vertices.size(); i++) {
+            std::vector<double> zeros;
+            zeros.push_back(0.0);
+            zeros.push_back(0.0);
+            zeros.push_back(0.0);
+            normal_map[to_vector(vertices[i])] = zeros;
+        }
+        for (int i = 0; i < vertices.size(); i += 3) {
+            // get vertices of the current triangle
+            glm::vec3 v1 = vertices[i];
+            glm::vec3 v2 = vertices[i + 1];
+            glm::vec3 v3 = vertices[i + 2];
+            std::vector<double> v1_key = to_vector(v1);
+            std::vector<double> v2_key = to_vector(v2);
+            std::vector<double> v3_key = to_vector(v3);
+            // compute face normal
+            glm::vec3 face_normal = glm::cross(v3 - v2, v1 - v2);
+            // get the old vertex normal
+            glm::vec3 v1_old = to_vec3(normal_map[v1_key]);
+            glm::vec3 v2_old = to_vec3(normal_map[v2_key]);
+            glm::vec3 v3_old = to_vec3(normal_map[v3_key]);
+            // replace the old value with the new value
+            normal_map.erase(v1_key);
+            normal_map.erase(v2_key);
+            normal_map.erase(v3_key);
+            normal_map[v1_key] = to_vector(glm::normalize(v1_old + face_normal));
+            normal_map[v2_key] = to_vector(glm::normalize(v2_old + face_normal));
+            normal_map[v3_key] = to_vector(glm::normalize(v3_old + face_normal));
+        }
+        // convert the map of normals to a vector of normals
+        for (int i = 0; i < vertices.size(); i++) {
+            normals.push_back(to_vec3(normal_map[to_vector(vertices[i])]));
+        }
+    } else {
+        for (int i = 0; i < vertices.size(); i += 3) {
+            // get vertices of this triangle
+            glm::vec3 v1 = vertices[i];
+            glm::vec3 v2 = vertices[i + 1];
+            glm::vec3 v3 = vertices[i + 2];
+            // compute face normal
+            glm::vec3 face_normal = glm::cross(v3 - v2, v1 - v2);
+            normals.push_back(glm::normalize(face_normal));
+            normals.push_back(glm::normalize(face_normal));
+            normals.push_back(glm::normalize(face_normal));
+        }
+    }
+    glGenBuffers(1, &vertex_normal_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertex_normal_buffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * normals.size(),
+                 &normals[0], GL_STATIC_DRAW);
+}
+
+
 void MyGLWidget::draw() {
 
 
-    drawShaderWithVertexArrayObject();
 
 
-}
 
-void MyGLWidget::defineVAO(){
-    vaoIds = new GLuint[2];
-    glGenVertexArrays(2, vaoIds);
-
-    vboIds = new GLuint[4];
-    glGenBuffers(4, vboIds);
-
-    GLint vertexAttribCoords = glGetAttribLocation(program, "aCoords");
-    GLint vertexAttribColor = glGetAttribLocation(program, "aColor");
-
-    // Bind VAO (set current) to define axes data
-    glBindVertexArray(vaoIds[0]);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vboIds[0]);  // coordinates
-    glBufferData(GL_ARRAY_BUFFER, sizeof(ave), ave, GL_STATIC_DRAW);
-    glVertexAttribPointer(vertexAttribCoords, nCoordsComponents, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(vertexAttribCoords);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vboIds[1]);  // color
-    glBufferData(GL_ARRAY_BUFFER, sizeof(ace), ace, GL_STATIC_DRAW);
-    glVertexAttribPointer(vertexAttribColor, nColorComponents, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(vertexAttribColor);
-
-    // Bind VAO (set current) to define pyramid data
-    glBindVertexArray(vaoIds[1]);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vboIds[2]);  // coordinates
-    glBufferData(GL_ARRAY_BUFFER, sizeof(pve), pve, GL_STATIC_DRAW);
-    glVertexAttribPointer(vertexAttribCoords, nCoordsComponents, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(vertexAttribCoords);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vboIds[3]);  // color
-    glBufferData(GL_ARRAY_BUFFER, sizeof(pce), pce, GL_STATIC_DRAW);
-    glVertexAttribPointer(vertexAttribColor, nColorComponents, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(vertexAttribColor);
-
-    // Disable VAO
-    glBindVertexArray(0);
-}
-
-void MyGLWidget::drawShaderWithVertexArrayObject()
-{
-    LoadGLExtensions();
-
-    initShaders();
-    defineVAO();
-
-    // Get the variables from the shader to which data will be passed
-    GLint mvloc = glGetUniformLocation(program, "umvMat");
-    GLint ploc = glGetUniformLocation(program, "upMat");
-
-    // Pass the model-view matrix to the shader
-    GLfloat mvMat[16];
-    glGetFloatv(GL_MODELVIEW_MATRIX, mvMat);
-    glUniformMatrix4fv(mvloc, 1, false, mvMat);
-
-    // Pass the projection matrix to the shader
-    GLfloat pMat[16];
-    glGetFloatv(GL_PROJECTION_MATRIX, pMat);
-    glUniformMatrix4fv(ploc, 1, false, pMat);
-
-    // Enable VAO to set axes data
-    glBindVertexArray(vaoIds[0]);
-
-    // Draw axes
-    glDrawArrays(GL_LINES, 0, nLines*nVerticesPerLine);
-
-    // Enable VAO to set pyramid data
-    glBindVertexArray(vaoIds[1]);
-
-    // Draw pyramid
-    glDrawArrays(GL_TRIANGLES, 0, nFaces*nVerticesPerFace);
-
-    // Disable VAO
-    glBindVertexArray(0);
 }

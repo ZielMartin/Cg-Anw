@@ -3,7 +3,7 @@
 */
 #include <fstream>
 #include <sstream>
-#include <GL/glew.h>
+#include "glew.h"
 #include <algorithm>
 #include <iostream>
 #include "OBJLoader.h"

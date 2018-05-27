@@ -1,10 +1,11 @@
 // window.cpp
 
+
 #include <QtWidgets>
 #include "window.h"
 #include "../ui/ui_window.h"
-
 #include "myglwidget.h"
+
 
 Window::Window(QWidget *parent) :
     QWidget(parent),

@@ -8,6 +8,12 @@
 #include "camera.h"
 
 
+#include "TriangleMesh.h"    // model loading
+#include "Shader.h"          // compiling shaders
+#include "utils.h"           // generic helper functions
+#include "scene_constants.h" // material and light properties
+
+
 
 class MyGLWidget : public QGLWidget
 {
@@ -46,14 +52,33 @@ signals:
 
 private:
     void draw();
-    void drawShaderWithVertexArrayObject();
-    void defineVAO();
-    void initShaders();
 
+    void setup_vertex_position_buffer_object(void);
+
+    void setup_vertex_uv_buffer_object(void);
+
+    void setup_vertex_normal_buffer_object(bool smoothed);
+
+    glm::mat3 get_default_normalMatrix(void);
+
+    glm::mat4 get_default_viewMatrix(void);
+
+    glm::mat4 get_default_modelMatrix(void);
+
+    glm::mat4 get_default_projectionMatrix(void);
 
 
 
     cg::Camera *camera;
+
+    glm::mat4 projectionMatrix, viewMatrix, modelMatrix;
+    glm::mat3 normalMatrix;
+
+    GLuint vertex_position_buffer, vertex_normal_buffer, vertex_uv_buffer;
+
+
+    TriangleMesh trig;
+    Shader shader;
 
 
     int xRot;
