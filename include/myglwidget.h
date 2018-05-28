@@ -91,17 +91,31 @@ private:
 
     void initMesh(char *model_path);
 
+    glm::vec3 getWorldCoordinates(int x, int y);
 
-    cg::Camera *camera;
+
+
+
+        cg::Camera *camera;
 
     glm::mat4 projectionMatrix, viewMatrix, modelMatrix;
     glm::mat3 normalMatrix;
 
-    Object mesh, grid;
+    Object mesh, grid, meshPoints;
+    std::vector<Object> spheres;
+
 
 
     TriangleMesh trig;
     Shader shader;
+
+
+    glm::vec3 backgroundColor;
+    glm::vec3 gridPaneColor;
+    glm::vec3 selectedPointsColor;
+    glm::vec3 pointsColor;
+    glm::vec3 gridColor;
+    glm::vec3 faceColor;
 
 
     int xRot;

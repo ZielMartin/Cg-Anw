@@ -1,6 +1,7 @@
 // myglwidget.cpp
 
 #define GLEW_STATIC
+
 #include "glew.c"
 
 #include "myglwidget.h"
@@ -8,7 +9,6 @@
 using namespace cg;
 using namespace glm;
 using namespace std;
-
 
 
 MyGLWidget::MyGLWidget(QWidget *parent)
@@ -21,6 +21,13 @@ MyGLWidget::MyGLWidget(QWidget *parent)
     xRot = 0;
     yRot = 0;
     zRot = 0;
+
+    backgroundColor = vec3(0, 0, 0);
+    gridPaneColor = vec3(0.2, 0.2, 0.2);
+    selectedPointsColor = vec3(1, 0, 0);
+    pointsColor = vec3(0.7, 0.7, 0.7);
+    gridColor = vec3(1, 1, 1);
+    faceColor = vec3(0.2, 0.4, 0.4);
 }
 
 MyGLWidget::~MyGLWidget() {
@@ -70,12 +77,11 @@ void MyGLWidget::setZRotation(int angle) {
 
 void MyGLWidget::initializeGL() {
 
-    char *model_path = (( char *)"../obj/teapot.obj");
-    char *vertexshader_path = ( char *) "../shader/simpleShader.vert";
-    char *fragmentshader_path = ( char *) "../shader/simpleShader.frag";
+    char *model_path = ((char *) "../obj/teapot.obj");
+    char *vertexshader_path = (char *) "../shader/simpleShader.vert";
+    char *fragmentshader_path = (char *) "../shader/simpleShader.frag";
 
-    qglClearColor(Qt::black);
-
+    glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, 1);
 
     // to properly initialize all available OpenGL function pointers
     glewExperimental = GL_TRUE;
@@ -106,17 +112,19 @@ void MyGLWidget::initializeGL() {
 }
 
 void MyGLWidget::initGrid() {
-    vec3 color = vec3(1,1,1);
+    vec3 color = gridColor;
 
     float grid_lenght = 200;//dimensions.getGridSize();
 
-    glm::vec3 gridPosition = glm::vec3(0,0,0); //dimensions.getGridPosition();
-    float stepsize = grid_lenght/50;
+    glm::vec3 gridPosition = glm::vec3(0, 0, 0); //dimensions.getGridPosition();
+    float stepsize = grid_lenght / 50;
     float i;
-    for (i = -grid_lenght; i <= grid_lenght; i += stepsize ) {
+    for (i = -grid_lenght; i <= grid_lenght; i += stepsize) {
         if (i <= 0) {
-            grid.vertices.push_back(glm::vec3(gridPosition.x - grid_lenght / 2, gridPosition.y, gridPosition.z + (i + grid_lenght / 2)));
-            grid.vertices.push_back(glm::vec3(gridPosition.x + grid_lenght / 2, gridPosition.y, gridPosition.z + (i + grid_lenght / 2)));
+            grid.vertices.push_back(glm::vec3(gridPosition.x - grid_lenght / 2, gridPosition.y,
+                                              gridPosition.z + (i + grid_lenght / 2)));
+            grid.vertices.push_back(glm::vec3(gridPosition.x + grid_lenght / 2, gridPosition.y,
+                                              gridPosition.z + (i + grid_lenght / 2)));
 
             grid.colors.push_back(color);
             grid.colors.push_back(color);
@@ -125,15 +133,15 @@ void MyGLWidget::initGrid() {
 
         if (i >= 0) {
 
-            glRotatef(-90, 0, 1, 0);
+            //glRotatef(-90, 0, 1, 0);
 
             glm::vec3 vert1 = glm::vec3((gridPosition.x - grid_lenght / 2), gridPosition.y, gridPosition.z);
             glm::vec3 vert2 = glm::vec3((gridPosition.x + grid_lenght / 2), gridPosition.y, gridPosition.z);
 
             //1,5708
             GLfloat tempX = vert1.x;
-            vert1.x = (cos(1.5708) * vert1.x + sin(1.5708) * vert1.z)  + (i - grid_lenght / 2);
-            vert1.z = (-sin(1.5708) * tempX + cos(1.5708) * vert1.z)  ;
+            vert1.x = (cos(1.5708) * vert1.x + sin(1.5708) * vert1.z) + (i - grid_lenght / 2);
+            vert1.z = (-sin(1.5708) * tempX + cos(1.5708) * vert1.z);
 
             tempX = vert2.x;
             vert2.x = (cos(1.5708) * vert2.x + sin(1.5708) * vert2.z) + (i - grid_lenght / 2);
@@ -157,16 +165,26 @@ void MyGLWidget::initGrid() {
 
 }
 
+
 void MyGLWidget::initMesh(char *model_path) {
     trig.LoadFile(model_path);
     mesh.vertices = trig.Vertices();
-    glm::vec3 color = glm::vec3(0.1,0.2,0.2);
-    for(glm::vec3 vert : mesh.vertices){
-        mesh.colors.push_back(color);
+    for (glm::vec3 vert : mesh.vertices) {
+        mesh.colors.push_back(faceColor);
     }
+
     setup_vertex_position_buffer_object(mesh);
     setup_vertex_normal_buffer_object_tri(mesh, true);
     setup_vertex_color_buffer_object(mesh);
+
+    meshPoints.vertices = trig.Vertices();
+    for (glm::vec3 vert : meshPoints.vertices) {
+        meshPoints.colors.push_back(pointsColor);
+    }
+
+    setup_vertex_position_buffer_object(meshPoints);
+    setup_vertex_normal_buffer_object_tri(meshPoints, true);
+    setup_vertex_color_buffer_object(meshPoints);
 
 }
 
@@ -174,7 +192,6 @@ void MyGLWidget::initMesh(char *model_path) {
 void MyGLWidget::paintGL() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 
 
     camera->Update();
@@ -191,19 +208,25 @@ void MyGLWidget::paintGL() {
     passUniformToShader();
 
 
+    render(meshPoints, GL_POINTS);
     render(mesh, GL_TRIANGLES);
     render(grid, GL_LINES);
+
 
 
     shader.Unbind();
 
 
-
-
-
 }
 
 void MyGLWidget::render(Object &object, int gl_draw_type) {
+
+
+    //compute model-matrix of object
+    GLint modelMatrix_location = glGetUniformLocation(shader.ID(), "modelMatrix");
+    glUniformMatrix4fv(modelMatrix_location, 1, GL_FALSE, &object.model[0][0]);
+
+
     // bind vertex positions to shader
     GLint position_location = glGetAttribLocation(shader.ID(), "vertex_position");
     if (position_location != -1) {
@@ -226,6 +249,7 @@ void MyGLWidget::render(Object &object, int gl_draw_type) {
         glVertexAttribPointer(color_location, 3, GL_FLOAT, GL_FALSE, 0, 0);
     }
 
+    glPointSize(10); //dimensions
 
     glDrawArrays(gl_draw_type, 0, object.vertices.size());
     glDisableVertexAttribArray(position_location);
@@ -235,40 +259,39 @@ void MyGLWidget::render(Object &object, int gl_draw_type) {
 }
 
 
-
-void MyGLWidget::passUniformToShader()  {
-    GLint projectionMatrix_location    = glGetUniformLocation(shader.ID(), "projectionMatrix");
-    GLint viewMatrix_location          = glGetUniformLocation(shader.ID(), "viewMatrix");
-    GLint modelMatrix_location         = glGetUniformLocation(shader.ID(), "modelMatrix");
-    GLint normalMatrix_location        = glGetUniformLocation(shader.ID(), "normalMatrix");
-    GLint materialAmbient_location     = glGetUniformLocation(shader.ID(), "materialAmbient");
-    GLint materialDiffuse_location     = glGetUniformLocation(shader.ID(), "materialDiffuse");
-    GLint materialSpecular_location    = glGetUniformLocation(shader.ID(), "materialSpecular");
-    GLint lightPosition_location       = glGetUniformLocation(shader.ID(), "lightPosition");
-    GLint lightAmbient_location        = glGetUniformLocation(shader.ID(), "lightAmbient");
-    GLint lightDiffuse_location        = glGetUniformLocation(shader.ID(), "lightDiffuse");
-    GLint lightSpecular_location       = glGetUniformLocation(shader.ID(), "lightSpecular");
-    GLint lightGlobal_location         = glGetUniformLocation(shader.ID(), "lightGlobal");
-    GLint materialShininess_location   = glGetUniformLocation(shader.ID(), "materialShininess");
+void MyGLWidget::passUniformToShader() {
+    GLint projectionMatrix_location = glGetUniformLocation(shader.ID(), "projectionMatrix");
+    GLint viewMatrix_location = glGetUniformLocation(shader.ID(), "viewMatrix");
+    GLint modelMatrix_location = glGetUniformLocation(shader.ID(), "modelMatrix");
+    GLint normalMatrix_location = glGetUniformLocation(shader.ID(), "normalMatrix");
+    GLint materialAmbient_location = glGetUniformLocation(shader.ID(), "materialAmbient");
+    GLint materialDiffuse_location = glGetUniformLocation(shader.ID(), "materialDiffuse");
+    GLint materialSpecular_location = glGetUniformLocation(shader.ID(), "materialSpecular");
+    GLint lightPosition_location = glGetUniformLocation(shader.ID(), "lightPosition");
+    GLint lightAmbient_location = glGetUniformLocation(shader.ID(), "lightAmbient");
+    GLint lightDiffuse_location = glGetUniformLocation(shader.ID(), "lightDiffuse");
+    GLint lightSpecular_location = glGetUniformLocation(shader.ID(), "lightSpecular");
+    GLint lightGlobal_location = glGetUniformLocation(shader.ID(), "lightGlobal");
+    GLint materialShininess_location = glGetUniformLocation(shader.ID(), "materialShininess");
     GLint constantAttenuation_location = glGetUniformLocation(shader.ID(), "constantAttenuation");
-    GLint linearAttenuation_location   = glGetUniformLocation(shader.ID(), "linearAttenuation");
-    GLint useTexture_location          = glGetUniformLocation(shader.ID(), "useTexture");
-    glUniformMatrix4fv( projectionMatrix_location, 1, GL_FALSE, &projectionMatrix[0][0]);
-    glUniformMatrix4fv( viewMatrix_location,       1, GL_FALSE, &viewMatrix[0][0]);
-    glUniformMatrix4fv( modelMatrix_location,      1, GL_FALSE, &modelMatrix[0][0]);
-    glUniformMatrix3fv( normalMatrix_location,     1, GL_FALSE, &normalMatrix[0][0]);
-    glUniform3fv(       materialAmbient_location,  1, materialAmbient);
-    glUniform3fv(       materialDiffuse_location,  1, materialDiffuse);
-    glUniform3fv(       materialSpecular_location, 1, materialSpecular);
-    glUniform3fv(       lightPosition_location,    1, lightPosition);
-    glUniform3fv(       lightAmbient_location,     1, lightAmbient);
-    glUniform3fv(       lightDiffuse_location,     1, lightDiffuse);
-    glUniform3fv(       lightSpecular_location,    1, lightSpecular);
-    glUniform3fv(       lightGlobal_location,      1, lightGlobal);
-    glUniform1f(        materialShininess_location,   materialShininess);
-    glUniform1f(        constantAttenuation_location, constantAttenuation);
-    glUniform1f(        linearAttenuation_location,   linearAttenuation);
-    glUniform1i(        useTexture_location,          0);
+    GLint linearAttenuation_location = glGetUniformLocation(shader.ID(), "linearAttenuation");
+    GLint useTexture_location = glGetUniformLocation(shader.ID(), "useTexture");
+    glUniformMatrix4fv(projectionMatrix_location, 1, GL_FALSE, &projectionMatrix[0][0]);
+    glUniformMatrix4fv(viewMatrix_location, 1, GL_FALSE, &viewMatrix[0][0]);
+    glUniformMatrix4fv(modelMatrix_location, 1, GL_FALSE, &modelMatrix[0][0]);
+    glUniformMatrix3fv(normalMatrix_location, 1, GL_FALSE, &normalMatrix[0][0]);
+    glUniform3fv(materialAmbient_location, 1, materialAmbient);
+    glUniform3fv(materialDiffuse_location, 1, materialDiffuse);
+    glUniform3fv(materialSpecular_location, 1, materialSpecular);
+    glUniform3fv(lightPosition_location, 1, lightPosition);
+    glUniform3fv(lightAmbient_location, 1, lightAmbient);
+    glUniform3fv(lightDiffuse_location, 1, lightDiffuse);
+    glUniform3fv(lightSpecular_location, 1, lightSpecular);
+    glUniform3fv(lightGlobal_location, 1, lightGlobal);
+    glUniform1f(materialShininess_location, materialShininess);
+    glUniform1f(constantAttenuation_location, constantAttenuation);
+    glUniform1f(linearAttenuation_location, linearAttenuation);
+    glUniform1i(useTexture_location, 0);
 }
 
 void MyGLWidget::resizeGL(int width, int height) {
@@ -281,7 +304,13 @@ void MyGLWidget::resizeGL(int width, int height) {
 void MyGLWidget::mousePressEvent(QMouseEvent *event) {
     camera->SetPos(event);
 
+    if(event->modifiers().testFlag(Qt::ControlModifier)){
+        //selectVertex(getWorldCoordinates(event->x(), event->x()), 1, true); //dimensions radius
+        cout << "x: " << getWorldCoordinates(event->x(), event->x()).x << " y: " << getWorldCoordinates(event->x(), event->x()).y << " z: " << getWorldCoordinates(event->x(), event->x()).z << endl;
+    }
+
 }
+
 
 void MyGLWidget::mouseMoveEvent(QMouseEvent *event) {
     if (event->buttons() & Qt::LeftButton) {
@@ -294,7 +323,7 @@ void MyGLWidget::mouseMoveEvent(QMouseEvent *event) {
 
 void MyGLWidget::keyPressEvent(QKeyEvent *event) {
 
-    switch(event->key()){
+    switch (event->key()) {
         case Qt::Key_Escape:
             close();
             break;
@@ -347,7 +376,7 @@ void MyGLWidget::setup_vertex_normal_buffer_object_tri(Object &object, bool smoo
         // note that we store readily hashable vector<double> types instead of
         // vec3s and convert between the two as required
         // ...avoids some of the pain using <map> without much C++ knowledge
-        std::map< std::vector<double>, std::vector<double> > normal_map;
+        std::map<std::vector<double>, std::vector<double> > normal_map;
         for (int i = 0; i < object.vertices.size(); i++) {
             std::vector<double> zeros;
             zeros.push_back(0.0);
@@ -398,6 +427,26 @@ void MyGLWidget::setup_vertex_normal_buffer_object_tri(Object &object, bool smoo
     glBindBuffer(GL_ARRAY_BUFFER, object.vertex_normal_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * normals.size(),
                  &normals[0], GL_STATIC_DRAW);
+}
+
+vec3 MyGLWidget::getWorldCoordinates(int x, int y) {
+    double objx, objy, objz;
+    GLint viewport[4];
+    GLdouble modelview[16];
+    GLdouble projection[16];
+    GLfloat winX, winY, winZ;
+    glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+    glGetDoublev(GL_PROJECTION_MATRIX, projection);
+    glGetIntegerv(GL_VIEWPORT, viewport);
+    winX = (float) x;
+    winY = (float) viewport[3] - (float) y;
+    glReadPixels(x, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
+    gluUnProject(winX, winY, winZ, modelview, projection, viewport, &objx, &objy, &objz);
+
+    //cout << objx << " , " << objy << " , " << objz << "\n";
+
+    return vec3(objx, objy, objz);
+
 }
 
 

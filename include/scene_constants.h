@@ -11,7 +11,7 @@ const float constantAttenuation = 0.1f;
 const float linearAttenuation   = 0.9f;
 
 // properties of the light
-const float lightPosition[3]    = {0.00f, 0.00f, 2.00f};
+const float lightPosition[3]    = {0.00f, 100.00f, 0.00f};
 const float lightAmbient[3]     = {0.01f, 0.01f, 0.01f};
 const float lightDiffuse[3]     = {0.33f, 0.33f, 0.33f};
 const float lightSpecular[3]    = {0.50f, 0.50f, 0.50f};
