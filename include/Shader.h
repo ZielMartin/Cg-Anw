@@ -1,6 +1,7 @@
 #pragma once
 
 
+#include <libs/glm-0.9.7.2/glm/detail/type_mat.hpp>
 
 //A basic class for handling OpenGL (GLSL) shaders
 class Shader {
@@ -21,7 +22,10 @@ public:
 	//The ID used by OpenGL to recognise the shader program.  Used mainly to find uniform variable locations in the program
 	unsigned int ID();
 
-private:
+	void passUniformToShader(glm::mat4 &modelMatrix,glm::mat4 &viewMatrix,glm::mat4 &projectionMatrix,glm::mat3 &normalMatrix);
+
+
+	private:
 	//Utility function to load in a text file
 	const char *LoadTextFile(const char *filename);
 

@@ -1,11 +1,15 @@
 #include <fstream>
 #include <iostream>
 #include <stdlib.h>
+#include <libs/glm-0.9.7.2/glm/gtc/type_ptr.hpp>
 
 #define GLEW_STATIC
 #include "glew.h"
 
 #include "Shader.h"
+
+#include "scene_constants.h" // material and light properties
+
 
 //Default constructor
 Shader::Shader():
@@ -115,6 +119,41 @@ void Shader::Init(const char *vertexShaderFile, const char *fragmentShaderFile)
 	}
 }
 
+
+void Shader::passUniformToShader(glm::mat4 &modelMatrix, glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix, glm::mat3 &normalMatrix) {
+    GLint projectionMatrix_location = glGetUniformLocation(this->ID(), "projectionMatrix");
+    GLint viewMatrix_location = glGetUniformLocation(this->ID(), "viewMatrix");
+    GLint modelMatrix_location = glGetUniformLocation(this->ID(), "modelMatrix");
+    GLint normalMatrix_location = glGetUniformLocation(this->ID(), "normalMatrix");
+    GLint materialAmbient_location = glGetUniformLocation(this->ID(), "materialAmbient");
+    GLint materialDiffuse_location = glGetUniformLocation(this->ID(), "materialDiffuse");
+    GLint materialSpecular_location = glGetUniformLocation(this->ID(), "materialSpecular");
+    GLint lightPosition_location = glGetUniformLocation(this->ID(), "lightPosition");
+    GLint lightAmbient_location = glGetUniformLocation(this->ID(), "lightAmbient");
+    GLint lightDiffuse_location = glGetUniformLocation(this->ID(), "lightDiffuse");
+    GLint lightSpecular_location = glGetUniformLocation(this->ID(), "lightSpecular");
+    GLint lightGlobal_location = glGetUniformLocation(this->ID(), "lightGlobal");
+    GLint materialShininess_location = glGetUniformLocation(this->ID(), "materialShininess");
+    GLint constantAttenuation_location = glGetUniformLocation(this->ID(), "constantAttenuation");
+    GLint linearAttenuation_location = glGetUniformLocation(this->ID(), "linearAttenuation");
+    GLint useTexture_location = glGetUniformLocation(this->ID(), "useTexture");
+    glUniformMatrix4fv(projectionMatrix_location, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+    glUniformMatrix4fv(viewMatrix_location, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+    glUniformMatrix4fv(modelMatrix_location, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+    glUniformMatrix3fv(normalMatrix_location, 1, GL_FALSE, glm::value_ptr(normalMatrix));
+    glUniform3fv(materialAmbient_location, 1, materialAmbient);
+    glUniform3fv(materialDiffuse_location, 1, materialDiffuse);
+    glUniform3fv(materialSpecular_location, 1, materialSpecular);
+    glUniform3fv(lightPosition_location, 1, lightPosition);
+    glUniform3fv(lightAmbient_location, 1, lightAmbient);
+    glUniform3fv(lightDiffuse_location, 1, lightDiffuse);
+    glUniform3fv(lightSpecular_location, 1, lightSpecular);
+    glUniform3fv(lightGlobal_location, 1, lightGlobal);
+    glUniform1f(materialShininess_location, materialShininess);
+    glUniform1f(constantAttenuation_location, constantAttenuation);
+    glUniform1f(linearAttenuation_location, linearAttenuation);
+    glUniform1i(useTexture_location, 0);
+}
 unsigned int Shader::ID()
 {
 	return m_shaderID;
