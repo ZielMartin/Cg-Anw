@@ -23,11 +23,13 @@ MyGLWidget::MyGLWidget(QWidget *parent)
     zRot = 0;
 
     backgroundColor = vec3(0, 0, 0);
-    gridPaneColor = vec3(0.2, 0.2, 0.2);
+    gridPaneColor = vec3(0, 0, 0);
     selectedPointsColor = vec3(1, 0, 0);
     pointsColor = vec3(0.7, 0.7, 0.7);
     gridColor = vec3(1, 1, 1);
     faceColor = vec3(0.2, 0.4, 0.4);
+
+    drawGrid = true;
 }
 
 MyGLWidget::~MyGLWidget() {
@@ -99,6 +101,7 @@ void MyGLWidget::initializeGL() {
     //prepare data for OpenGL
     initMesh(model_path);
     initGrid();
+    initGridUnderlayingPane();
 
 
 
@@ -113,10 +116,9 @@ void MyGLWidget::initializeGL() {
 
 void MyGLWidget::initGrid() {
     vec3 color = gridColor;
-
     float grid_lenght = 200;//dimensions.getGridSize();
-
     glm::vec3 gridPosition = glm::vec3(0, 0, 0); //dimensions.getGridPosition();
+
     float stepsize = grid_lenght / 50;
     float i;
     for (i = -grid_lenght; i <= grid_lenght; i += stepsize) {
@@ -165,6 +167,34 @@ void MyGLWidget::initGrid() {
 
 }
 
+void MyGLWidget::initGridUnderlayingPane(){
+    float grid_lenght = 200;//dimensions.getGridSize();
+    glm::vec3 gridPosition = glm::vec3(0, 0, 0); //dimensions.getGridPosition();
+
+
+
+    gridUnderlayingPane.vertices.push_back(vec3(gridPosition.x - grid_lenght / 2, gridPosition.y - 0.1, gridPosition.z - grid_lenght / 2));
+    gridUnderlayingPane.vertices.push_back(vec3(gridPosition.x - grid_lenght / 2, gridPosition.y - 0.1, gridPosition.z + grid_lenght / 2));
+    gridUnderlayingPane.vertices.push_back(vec3(gridPosition.x + grid_lenght / 2, gridPosition.y - 0.1, gridPosition.z + grid_lenght / 2));
+
+    gridUnderlayingPane.vertices.push_back(vec3(gridPosition.x + grid_lenght / 2, gridPosition.y - 0.1, gridPosition.z + grid_lenght / 2));
+    gridUnderlayingPane.vertices.push_back(vec3(gridPosition.x + grid_lenght / 2, gridPosition.y - 0.1, gridPosition.z - grid_lenght / 2));
+    gridUnderlayingPane.vertices.push_back(vec3(gridPosition.x - grid_lenght / 2, gridPosition.y - 0.1, gridPosition.z - grid_lenght / 2));
+
+    gridUnderlayingPane.colors.push_back(gridPaneColor);
+    gridUnderlayingPane.colors.push_back(gridPaneColor);
+    gridUnderlayingPane.colors.push_back(gridPaneColor);
+    gridUnderlayingPane.colors.push_back(gridPaneColor);
+    gridUnderlayingPane.colors.push_back(gridPaneColor);
+    gridUnderlayingPane.colors.push_back(gridPaneColor);
+
+
+    setup_vertex_position_buffer_object(gridUnderlayingPane);
+    setup_vertex_color_buffer_object(gridUnderlayingPane);
+    setup_vertex_normal_buffer_object_tri(gridUnderlayingPane, true);
+}
+
+
 
 void MyGLWidget::initMesh(char *model_path) {
     trig.LoadFile(model_path);
@@ -210,8 +240,11 @@ void MyGLWidget::paintGL() {
 
     render(meshPoints, GL_POINTS);
     render(mesh, GL_TRIANGLES);
-    render(grid, GL_LINES);
 
+    if(drawGrid) {
+        render(grid, GL_LINES);
+        render(gridUnderlayingPane, GL_TRIANGLES);
+    }
 
 
     shader.Unbind();
@@ -345,6 +378,8 @@ void MyGLWidget::keyPressEvent(QKeyEvent *event) {
         case Qt::Key_E:
             camera->Move(UP);
             break;
+        case Qt::Key_G:
+            drawGrid = !drawGrid;
         default:
             break;
     }

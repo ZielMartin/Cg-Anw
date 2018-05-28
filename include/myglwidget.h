@@ -1,4 +1,22 @@
 // myglwidget.h
+//
+// Created by Johannes on 30.04.2018.
+//
+
+/**
+ * User-Interaction-Interface
+ * - add point with right-click on grid
+ * - select multiple points with ctrl + left-click on point
+ * - move point/points arrow-keys and '+','-'
+ * - remove selected point/points with 'r'
+ *
+ * - move camera with with 'w','a','s','d','q','e'
+ * - rotate camera with mouse click and drag window
+ *
+ * - connect a face: mark each point with ctrl + left-click, then press 'f'
+ *
+ * - enable/disable grid with *g*
+ */
 
 #ifndef MYGLWIDGET_H
 #define MYGLWIDGET_H
@@ -89,19 +107,20 @@ private:
 
     void initGrid();
 
+    void initGridUnderlayingPane();
+
     void initMesh(char *model_path);
 
     glm::vec3 getWorldCoordinates(int x, int y);
 
 
-
-
-        cg::Camera *camera;
+    bool drawGrid;
+    cg::Camera *camera;
 
     glm::mat4 projectionMatrix, viewMatrix, modelMatrix;
     glm::mat3 normalMatrix;
 
-    Object mesh, grid, meshPoints;
+    Object mesh, grid, meshPoints, gridUnderlayingPane;
     std::vector<Object> spheres;
 
 
