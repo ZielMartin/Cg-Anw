@@ -7,7 +7,7 @@ uniform vec3 materialAmbient, materialDiffuse, materialSpecular;
 uniform vec3 lightAmbient, lightDiffuse, lightSpecular, lightPosition, lightGlobal;
 uniform float materialShininess, constantAttenuation, linearAttenuation;
 
-attribute vec3 vertex_position, vertex_normal;
+attribute vec3 vertex_position, vertex_normal, v_color;
 attribute vec2 vertex_uv;
 
 varying vec3 vertex_color;
@@ -43,7 +43,7 @@ void main(void) {
 
     // pass variables
     uv = vertex_uv;
-    vertex_color = color;
+    vertex_color = color + v_color;
 
     // set vertex position in OpenGL
     gl_Position = projectionMatrix * viewMatrix * modelMatrix * vertex;

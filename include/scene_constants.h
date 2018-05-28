@@ -1,12 +1,10 @@
-// properties of the application window
-const float windowX = 640.0f;
-const float windowY = 480.0f;
+
 
 // properties of the model
-const float materialAmbient[3]  = {1.00f, 0.50f, 0.00f};
+const float materialAmbient[3]  = {0.50f, 0.50f, 0.50f};
 const float materialDiffuse[3]  = {0.55f, 0.55f, 0.55f};
 const float materialSpecular[3] = {0.99f, 0.99f, 0.99f};
-const float materialShininess   = 10.0f;
+const float materialShininess   = 5.0f;
 
 // properties of the room
 const float constantAttenuation = 0.1f;

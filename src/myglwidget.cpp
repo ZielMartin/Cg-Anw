@@ -11,9 +11,6 @@ using namespace std;
 
 
 
-
-
-
 MyGLWidget::MyGLWidget(QWidget *parent)
         : QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
 
@@ -85,23 +82,18 @@ void MyGLWidget::initializeGL() {
     // place this in initializeGL()
     glewInit();
 
-    //glEnable(GL_COLOR_MATERIAL);
-    //glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 
 
-    // create shader, prepare data for OpenGL
-    trig.LoadFile(model_path);
+    //// create shader
     shader.Init(vertexshader_path, fragmentshader_path);
-    setup_vertex_position_buffer_object();
-    setup_vertex_uv_buffer_object();
-    setup_vertex_normal_buffer_object(true);
-    // set up camera and object transformation matrices
-    //projectionMatrix = get_default_projectionMatrix();
-    //viewMatrix = get_default_viewMatrix();
-    //modelMatrix = get_default_modelMatrix();
-    normalMatrix = get_default_normalMatrix();
+
+    //prepare data for OpenGL
+    initMesh(model_path);
+    initGrid();
+
 
 
     //Setup camera
@@ -113,35 +105,75 @@ void MyGLWidget::initializeGL() {
     camera->SetFOV(45);
 }
 
-glm::mat3 MyGLWidget::get_default_normalMatrix(void) {
-    return glm::transpose(glm::inverse(glm::mat3(viewMatrix * modelMatrix)));
+void MyGLWidget::initGrid() {
+    vec3 color = vec3(1,1,1);
+
+    float grid_lenght = 200;//dimensions.getGridSize();
+
+    glm::vec3 gridPosition = glm::vec3(0,0,0); //dimensions.getGridPosition();
+    float stepsize = grid_lenght/50;
+    float i;
+    for (i = -grid_lenght; i <= grid_lenght; i += stepsize ) {
+        if (i <= 0) {
+            grid.vertices.push_back(glm::vec3(gridPosition.x - grid_lenght / 2, gridPosition.y, gridPosition.z + (i + grid_lenght / 2)));
+            grid.vertices.push_back(glm::vec3(gridPosition.x + grid_lenght / 2, gridPosition.y, gridPosition.z + (i + grid_lenght / 2)));
+
+            grid.colors.push_back(color);
+            grid.colors.push_back(color);
+
+        }
+
+        if (i >= 0) {
+
+            glRotatef(-90, 0, 1, 0);
+
+            glm::vec3 vert1 = glm::vec3((gridPosition.x - grid_lenght / 2), gridPosition.y, gridPosition.z);
+            glm::vec3 vert2 = glm::vec3((gridPosition.x + grid_lenght / 2), gridPosition.y, gridPosition.z);
+
+            //1,5708
+            GLfloat tempX = vert1.x;
+            vert1.x = (cos(1.5708) * vert1.x + sin(1.5708) * vert1.z)  + (i - grid_lenght / 2);
+            vert1.z = (-sin(1.5708) * tempX + cos(1.5708) * vert1.z)  ;
+
+            tempX = vert2.x;
+            vert2.x = (cos(1.5708) * vert2.x + sin(1.5708) * vert2.z) + (i - grid_lenght / 2);
+            vert2.z = -sin(1.5708) * tempX + cos(1.5708) * vert2.z;
+
+            grid.vertices.push_back(vert1);
+            grid.vertices.push_back(vert2);
+
+            grid.colors.push_back(color);
+            grid.colors.push_back(color);
+
+
+        }
+
+    }
+
+    setup_vertex_position_buffer_object(grid);
+    setup_vertex_color_buffer_object(grid);
+    //setup_vertex_normal_buffer_object_tri(grid, true);
+
+
 }
 
-glm::mat4 MyGLWidget::get_default_viewMatrix(void) {
-    return glm::translate(glm::mat4(1.0f), glm::vec3(-50.0f, -50.0f, -300.0f));
-}
-glm::mat4 MyGLWidget::get_default_modelMatrix(void) {
-    return glm::translate(glm::mat4(1.0f), glm::vec3(0.0f));
-}
-glm::mat4 MyGLWidget::get_default_projectionMatrix(void) {
-    return glm::ortho(-windowX * 0.5f,
-                      windowX * 0.5f,
-                      -windowY * 0.5f,
-                      windowY * 0.5f,
-                      -1.0f, 400.0f);
+void MyGLWidget::initMesh(char *model_path) {
+    trig.LoadFile(model_path);
+    mesh.vertices = trig.Vertices();
+    glm::vec3 color = glm::vec3(0.1,0.2,0.2);
+    for(glm::vec3 vert : mesh.vertices){
+        mesh.colors.push_back(color);
+    }
+    setup_vertex_position_buffer_object(mesh);
+    setup_vertex_normal_buffer_object_tri(mesh, true);
+    setup_vertex_color_buffer_object(mesh);
+
 }
 
 
 void MyGLWidget::paintGL() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-
-    glLoadIdentity();
-    glTranslatef(0.0, 0.0, -10.0);
-    glRotatef(xRot / 16.0, 1.0, 0.0, 0.0);
-    glRotatef(yRot / 16.0, 0.0, 1.0, 0.0);
-    glRotatef(zRot / 16.0, 0.0, 0.0, 1.0);
 
 
 
@@ -155,8 +187,56 @@ void MyGLWidget::paintGL() {
 
 
     shader.Bind();
-
     // pass uniform variables to shader
+    passUniformToShader();
+
+
+    render(mesh, GL_TRIANGLES);
+    render(grid, GL_LINES);
+
+
+    shader.Unbind();
+
+
+
+
+
+}
+
+void MyGLWidget::render(Object &object, int gl_draw_type) {
+    // bind vertex positions to shader
+    GLint position_location = glGetAttribLocation(shader.ID(), "vertex_position");
+    if (position_location != -1) {
+        glEnableVertexAttribArray(position_location);
+        glBindBuffer(GL_ARRAY_BUFFER, object.vertex_position_buffer);
+        glVertexAttribPointer(position_location, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    }
+    // bind vertex normals to shader
+    GLint normal_location = glGetAttribLocation(shader.ID(), "vertex_normal");
+    if (normal_location != -1) {
+        glEnableVertexAttribArray(normal_location);
+        glBindBuffer(GL_ARRAY_BUFFER, object.vertex_normal_buffer);
+        glVertexAttribPointer(normal_location, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    }
+    // bind color to shader
+    GLint color_location = glGetAttribLocation(shader.ID(), "v_color");
+    if (color_location != -1) {
+        glEnableVertexAttribArray(color_location);
+        glBindBuffer(GL_ARRAY_BUFFER, object.vertex_color_buffer);
+        glVertexAttribPointer(color_location, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    }
+
+
+    glDrawArrays(gl_draw_type, 0, object.vertices.size());
+    glDisableVertexAttribArray(position_location);
+    glDisableVertexAttribArray(normal_location);
+    glDisableVertexAttribArray(color_location);
+
+}
+
+
+
+void MyGLWidget::passUniformToShader()  {
     GLint projectionMatrix_location    = glGetUniformLocation(shader.ID(), "projectionMatrix");
     GLint viewMatrix_location          = glGetUniformLocation(shader.ID(), "viewMatrix");
     GLint modelMatrix_location         = glGetUniformLocation(shader.ID(), "modelMatrix");
@@ -189,48 +269,6 @@ void MyGLWidget::paintGL() {
     glUniform1f(        constantAttenuation_location, constantAttenuation);
     glUniform1f(        linearAttenuation_location,   linearAttenuation);
     glUniform1i(        useTexture_location,          0);
-
-    /*
-    // bind texture to shader
-    GLint texture0_location = glGetAttribLocation(shader.ID(), "texture0");
-    if (texture0_location != -1) {
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, textureID);
-        glUniform1i(texture0_location, 0);
-    }
-     */
-
-    // bind vertex uv coordinates to shader
-    GLint uv_location = glGetAttribLocation(shader.ID(), "vertex_uv");
-    if (uv_location != -1) {
-        glEnableVertexAttribArray(uv_location);
-        glBindBuffer(GL_ARRAY_BUFFER, vertex_uv_buffer);
-        glVertexAttribPointer(uv_location, 2, GL_FLOAT, GL_FALSE, 0, 0);
-    }
-    // bind vertex positions to shader
-    GLint position_location = glGetAttribLocation(shader.ID(), "vertex_position");
-    if (position_location != -1) {
-        glEnableVertexAttribArray(position_location);
-        glBindBuffer(GL_ARRAY_BUFFER, vertex_position_buffer);
-        glVertexAttribPointer(position_location, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    }
-    // bind vertex normals to shader
-    GLint normal_location = glGetAttribLocation(shader.ID(), "vertex_normal");
-    if (normal_location != -1) {
-        glEnableVertexAttribArray(normal_location);
-        glBindBuffer(GL_ARRAY_BUFFER, vertex_normal_buffer);
-        glVertexAttribPointer(normal_location, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    }
-
-    // draw the scene
-    glDrawArrays(GL_TRIANGLES, 0, trig.VertexCount());
-    glDisableVertexAttribArray(position_location);
-    glDisableVertexAttribArray(uv_location);
-    glDisableVertexAttribArray(normal_location);
-    shader.Unbind();
-
-
-    draw();
 }
 
 void MyGLWidget::resizeGL(int width, int height) {
@@ -242,6 +280,7 @@ void MyGLWidget::resizeGL(int width, int height) {
 
 void MyGLWidget::mousePressEvent(QMouseEvent *event) {
     camera->SetPos(event);
+
 }
 
 void MyGLWidget::mouseMoveEvent(QMouseEvent *event) {
@@ -286,20 +325,22 @@ void MyGLWidget::keyPressEvent(QKeyEvent *event) {
 }
 
 
-void MyGLWidget::setup_vertex_position_buffer_object(void) {
-    glGenBuffers(1, &vertex_position_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_position_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * trig.VertexCount(),
-                 &trig.Vertices()[0], GL_STATIC_DRAW);
+void MyGLWidget::setup_vertex_position_buffer_object(Object &object) {
+    glGenBuffers(1, &object.vertex_position_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, object.vertex_position_buffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * object.vertices.size(),
+                 &object.vertices.at(0), GL_STATIC_DRAW);
 }
-void MyGLWidget::setup_vertex_uv_buffer_object(void) {
-    glGenBuffers(1, &vertex_uv_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_uv_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * trig.UVs().size(),
-                 &trig.UVs()[0], GL_STATIC_DRAW);
+
+void MyGLWidget::setup_vertex_color_buffer_object(Object &object) {
+    glGenBuffers(1, &object.vertex_color_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, object.vertex_color_buffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * object.colors.size(),
+                 &object.colors.at(0), GL_STATIC_DRAW);
 }
-void MyGLWidget::setup_vertex_normal_buffer_object(bool smoothed) {
-    std::vector<glm::vec3> vertices = trig.Vertices();
+
+void MyGLWidget::setup_vertex_normal_buffer_object_tri(Object &object, bool smoothed) {
+
     std::vector<glm::vec3> normals;
     if (smoothed) {
         // initialize map of normals to zero
@@ -307,18 +348,18 @@ void MyGLWidget::setup_vertex_normal_buffer_object(bool smoothed) {
         // vec3s and convert between the two as required
         // ...avoids some of the pain using <map> without much C++ knowledge
         std::map< std::vector<double>, std::vector<double> > normal_map;
-        for (int i = 0; i < vertices.size(); i++) {
+        for (int i = 0; i < object.vertices.size(); i++) {
             std::vector<double> zeros;
             zeros.push_back(0.0);
             zeros.push_back(0.0);
             zeros.push_back(0.0);
-            normal_map[to_vector(vertices[i])] = zeros;
+            normal_map[to_vector(object.vertices[i])] = zeros;
         }
-        for (int i = 0; i < vertices.size(); i += 3) {
+        for (int i = 0; i < object.vertices.size(); i += 3) {
             // get vertices of the current triangle
-            glm::vec3 v1 = vertices[i];
-            glm::vec3 v2 = vertices[i + 1];
-            glm::vec3 v3 = vertices[i + 2];
+            glm::vec3 v1 = object.vertices[i];
+            glm::vec3 v2 = object.vertices[i + 1];
+            glm::vec3 v3 = object.vertices[i + 2];
             std::vector<double> v1_key = to_vector(v1);
             std::vector<double> v2_key = to_vector(v2);
             std::vector<double> v3_key = to_vector(v3);
@@ -337,15 +378,15 @@ void MyGLWidget::setup_vertex_normal_buffer_object(bool smoothed) {
             normal_map[v3_key] = to_vector(glm::normalize(v3_old + face_normal));
         }
         // convert the map of normals to a vector of normals
-        for (int i = 0; i < vertices.size(); i++) {
-            normals.push_back(to_vec3(normal_map[to_vector(vertices[i])]));
+        for (int i = 0; i < object.vertices.size(); i++) {
+            normals.push_back(to_vec3(normal_map[to_vector(object.vertices[i])]));
         }
     } else {
-        for (int i = 0; i < vertices.size(); i += 3) {
+        for (int i = 0; i < object.vertices.size(); i += 3) {
             // get vertices of this triangle
-            glm::vec3 v1 = vertices[i];
-            glm::vec3 v2 = vertices[i + 1];
-            glm::vec3 v3 = vertices[i + 2];
+            glm::vec3 v1 = object.vertices[i];
+            glm::vec3 v2 = object.vertices[i + 1];
+            glm::vec3 v3 = object.vertices[i + 2];
             // compute face normal
             glm::vec3 face_normal = glm::cross(v3 - v2, v1 - v2);
             normals.push_back(glm::normalize(face_normal));
@@ -353,17 +394,11 @@ void MyGLWidget::setup_vertex_normal_buffer_object(bool smoothed) {
             normals.push_back(glm::normalize(face_normal));
         }
     }
-    glGenBuffers(1, &vertex_normal_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_normal_buffer);
+    glGenBuffers(1, &object.vertex_normal_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, object.vertex_normal_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * normals.size(),
                  &normals[0], GL_STATIC_DRAW);
 }
 
 
-void MyGLWidget::draw() {
 
-
-
-
-
-}
