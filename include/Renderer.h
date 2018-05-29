@@ -24,9 +24,12 @@ struct Object {
     uint32_t vertex_position_buffer;
     uint32_t vertex_normal_buffer;
     uint32_t vertex_color_buffer;
+    uint32_t vertex_radius_buffer;
+
 
     std::vector<glm::vec3> vertices;
     std::vector<glm::vec3> colors;
+    std::vector<float> radius;
 
     /* Model matrix */
     glm::mat4x4 model;
@@ -63,6 +66,8 @@ private:
     void setup_vertex_color_buffer_object(Object &object);
 
     void setup_vertex_position_buffer_object(Object &object);
+
+    void setup_vertex_radius_buffer_object(Object &object);
 
 
 

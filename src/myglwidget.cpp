@@ -88,6 +88,10 @@ void MyGLWidget::initializeGL() {
     glEnable(GL_CULL_FACE);
 
 
+    //enable vertex radius in shader
+    glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+
+
     //// create shader
     shader.Init(vertexshader_path, fragmentshader_path);
 
@@ -123,8 +127,13 @@ void MyGLWidget::paintGL() {
 
 
     shader.Bind();
+
+    int loc_x, loc_y, width, height;
+    camera->GetViewport(loc_x, loc_y, width, height);
+    glm::vec4 viewPort(loc_x, loc_y, width, height);
+
     // pass uniform variables to shader
-    shader.passUniformToShader(modelMatrix, viewMatrix, projectionMatrix, normalMatrix);
+    shader.passUniformToShader(modelMatrix, viewMatrix, projectionMatrix, normalMatrix, viewPort);
 
 
     renderer.render(shader);

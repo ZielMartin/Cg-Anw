@@ -4,14 +4,14 @@
 const float materialAmbient[3]  = {0.50f, 0.50f, 0.50f};
 const float materialDiffuse[3]  = {0.55f, 0.55f, 0.55f};
 const float materialSpecular[3] = {0.99f, 0.99f, 0.99f};
-const float materialShininess   = 50.0f;
+const float materialShininess   = 40.0f;
 
 // properties of the room
 const float constantAttenuation = 0.1f;
 const float linearAttenuation   = 0.9f;
 
 // properties of the light
-const float lightPosition[3]    = {0.00f, 200.00f, 0.00f};
+const float lightPosition[3]    = {0.00f, 100.00f, 0.00f};
 const float lightAmbient[3]     = {0.01f, 0.01f, 0.01f};
 const float lightDiffuse[3]     = {0.33f, 0.33f, 0.33f};
 const float lightSpecular[3]    = {0.50f, 0.50f, 0.50f};

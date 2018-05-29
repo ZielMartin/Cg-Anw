@@ -81,6 +81,8 @@ file(GLOB RES_FILES
 file(GLOB TEST_FILES
         test/*.cpp)
 
+#set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+
 #SET(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} "-static -static-libgcc -static-libstdc++")
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${UI_FILES} ${INCLUDE_FILES})

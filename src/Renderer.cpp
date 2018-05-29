@@ -56,10 +56,9 @@ void Renderer::renderObject(Object &object, int gl_draw_type, Shader &shader) {
     glUniformMatrix4fv(modelMatrix_location, 1, GL_FALSE, &object.model[0][0]);
 
 
-
     glBindVertexArray(object.vaoID);
-    glPointSize(10); //dimensions
     glDrawArrays(gl_draw_type, 0, object.vertices.size());
+
 
 
 }
@@ -80,6 +79,10 @@ void Renderer::initGrid(Shader &shader) {
 
             grid.colors.push_back(color);
             grid.colors.push_back(color);
+
+            grid.radius.push_back(0);
+            grid.radius.push_back(0);
+
 
         }
 
@@ -104,6 +107,10 @@ void Renderer::initGrid(Shader &shader) {
 
             grid.colors.push_back(color);
             grid.colors.push_back(color);
+
+            grid.radius.push_back(0);
+            grid.radius.push_back(0);
+
 
         }
 
@@ -145,9 +152,21 @@ void Renderer::initGridPane(Shader &shader) {
     gridPane.colors.push_back(gridPaneColor);
     gridPane.colors.push_back(gridPaneColor);
 
+    gridPane.radius.push_back(0);
+    gridPane.radius.push_back(0);
+    gridPane.radius.push_back(0);
+    gridPane.radius.push_back(0);
+    gridPane.radius.push_back(0);
+    gridPane.radius.push_back(0);
+
+
+
+
+
+
     setup_vertex_position_buffer_object(gridPane);
     setup_vertex_color_buffer_object(gridPane);
-    //setup_vertex_normal_buffer_object_tri(gridPane, true);
+    setup_vertex_normal_buffer_object_tri(gridPane, true);
     setup_vao(gridPane, shader);
 }
 
@@ -157,6 +176,9 @@ void Renderer::initMesh(Shader &shader) {
     mesh.vertices = trig.Vertices();
     for (glm::vec3 vert : mesh.vertices) {
         mesh.colors.push_back(faceColor);
+        mesh.radius.push_back(0);
+
+
     }
 
     setup_vertex_position_buffer_object(mesh);
@@ -166,12 +188,14 @@ void Renderer::initMesh(Shader &shader) {
 
     meshPoints.vertices = trig.Vertices();
     for (glm::vec3 vert : meshPoints.vertices) {
-        meshPoints.colors.push_back(pointsColor);
+        meshPoints.colors.push_back(faceColor+glm::vec3(0.1,0.1,0.1));
+        meshPoints.radius.push_back(20.0);
     }
 
     setup_vertex_position_buffer_object(meshPoints);
     setup_vertex_color_buffer_object(meshPoints);
     setup_vertex_normal_buffer_object_tri(meshPoints, true);
+    setup_vertex_radius_buffer_object(meshPoints);
     setup_vao(meshPoints, shader);
 
 }
@@ -206,6 +230,14 @@ void Renderer::setup_vao(Object &object, Shader &shader) {
         glVertexAttribPointer(color_location, 3, GL_FLOAT, GL_FALSE, 0, 0);
     }
 
+    // bind radius to shader
+    GLint radius_location = glGetAttribLocation(shader.ID(), "radius_attr");
+    if (radius_location != -1) {
+        glEnableVertexAttribArray(radius_location);
+        glBindBuffer(GL_ARRAY_BUFFER, object.vertex_radius_buffer);
+        glVertexAttribPointer(radius_location, 1, GL_FLOAT, GL_FALSE, 0, 0);
+    }
+
     glBindVertexArray(0);
 }
 
@@ -222,6 +254,13 @@ void Renderer::setup_vertex_color_buffer_object(Object &object) {
     glBindBuffer(GL_ARRAY_BUFFER, object.vertex_color_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * object.colors.size(),
                  &object.colors.at(0), GL_STATIC_DRAW);
+}
+
+void Renderer::setup_vertex_radius_buffer_object(Object &object) {
+    glGenBuffers(1, &object.vertex_radius_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, object.vertex_radius_buffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * object.radius.size(),
+                 &object.radius.at(0), GL_STATIC_DRAW);
 }
 
 void Renderer::setup_vertex_normal_buffer_object_tri(Object &object, bool smoothed) {

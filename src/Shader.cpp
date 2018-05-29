@@ -24,17 +24,18 @@ m_shaderVertexProgram(0),
 m_shaderFragmentProgram(0),
 m_shaderID(0)
 {
-	Init(vsFile,fsFile);
+	Init(vsFile, fsFile);
 }
 
 Shader::~Shader()
 {
 	//Detach and delete the shaders and shader program
 	glDetachShader(m_shaderID,m_shaderVertexProgram);
-	glDetachShader(m_shaderID,m_shaderFragmentProgram);
+    glDetachShader(m_shaderID,m_shaderFragmentProgram);
 
 	glDeleteShader(m_shaderVertexProgram);
 	glDeleteShader(m_shaderFragmentProgram);
+
 	glDeleteProgram(m_shaderID);
 }
 
@@ -63,40 +64,41 @@ const char *Shader::LoadTextFile(const char *filename)
 }
 
 //This is the main function of the Shader class.  This function loads the shader code and creates and compiles the shaders.
-void Shader::Init(const char *vertexShaderFile, const char *fragmentShaderFile)
+void Shader::Init(const char *vertexShaderFile,  const char *fragmentShaderFile)
 {
 	//Set up the vertex and fragment shaders
 	m_shaderVertexProgram = glCreateShader(GL_VERTEX_SHADER);
-	m_shaderFragmentProgram = glCreateShader(GL_FRAGMENT_SHADER);
+    m_shaderFragmentProgram = glCreateShader(GL_FRAGMENT_SHADER);
 
 	//Load in our GLSL code from the appropriate text files
 	const char *vertexShaderText = LoadTextFile(vertexShaderFile);
-	const char *fragmentShaderText = LoadTextFile(fragmentShaderFile);	
+    const char *fragmentShaderText = LoadTextFile(fragmentShaderFile);
 
 	if(vertexShaderText == NULL || fragmentShaderText == NULL){
-		std::cerr << "Either vertex or fragment shader file not found" << std::endl;
+		std::cerr << "Either vertex, geometry or fragment shader file not found" << std::endl;
 		return;
 	}
 	//Associate the appropriate source code text with its shader
 	glShaderSource(m_shaderVertexProgram, 1, &vertexShaderText,0);
-	glShaderSource(m_shaderFragmentProgram, 1, &fragmentShaderText,0);
+    glShaderSource(m_shaderFragmentProgram, 1, &fragmentShaderText,0);
 
 	const int bufferLength = 1024;
 	GLchar buffer[bufferLength];
 	GLsizei returnLength;
 	//compile the shaders
 	glCompileShader(m_shaderVertexProgram);
-	glCompileShader(m_shaderFragmentProgram);
+    glCompileShader(m_shaderFragmentProgram);
 
 	int bDidCompile = 0;
 	//Error reporting, output to terminal
-	glGetShaderiv(m_shaderVertexProgram, GL_COMPILE_STATUS, &bDidCompile); 
+	glGetShaderiv(m_shaderVertexProgram, GL_COMPILE_STATUS, &bDidCompile);
 	if(!bDidCompile){
 		glGetShaderInfoLog(m_shaderVertexProgram, bufferLength, &returnLength, buffer);
 		std::cout << vertexShaderFile << " Did not compile! Info log:" << std::endl << buffer << std::endl;
 	}
+
 	//Error reporting, output to terminal
-	glGetShaderiv(m_shaderFragmentProgram, GL_OBJECT_COMPILE_STATUS_ARB, &bDidCompile); 
+	glGetShaderiv(m_shaderFragmentProgram, GL_COMPILE_STATUS, &bDidCompile);
 	if(!bDidCompile){
 		glGetShaderInfoLog(m_shaderFragmentProgram, bufferLength, &returnLength, buffer);
 		std::cout << fragmentShaderFile << " Did not compile! Info log:" << std::endl << buffer << std::endl;
@@ -104,15 +106,15 @@ void Shader::Init(const char *vertexShaderFile, const char *fragmentShaderFile)
 
 	//Generate the shader program and attach the vertex and fragment shaders
 	m_shaderID = glCreateProgram();
-	glAttachShader(m_shaderID,m_shaderVertexProgram);
-	glAttachShader(m_shaderID,m_shaderFragmentProgram);
+	glAttachShader(m_shaderID, m_shaderVertexProgram);
+    glAttachShader(m_shaderID, m_shaderFragmentProgram);
 
 	//Perform program linking
 	glLinkProgram(m_shaderID);
 
 	//Error reporting, output to terminal
 	int bDidLink = 0;
-	glGetProgramiv(m_shaderID, GL_LINK_STATUS, &bDidLink); 
+	glGetProgramiv(m_shaderID, GL_LINK_STATUS, &bDidLink);
 	if(!bDidLink){
 		glGetProgramInfoLog(m_shaderID, bufferLength, &returnLength, buffer);
 		std::cout << "Program did not link! Info log:" << std::endl << buffer << std::endl;
@@ -120,7 +122,7 @@ void Shader::Init(const char *vertexShaderFile, const char *fragmentShaderFile)
 }
 
 
-void Shader::passUniformToShader(glm::mat4 &modelMatrix, glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix, glm::mat3 &normalMatrix) {
+void Shader::passUniformToShader(glm::mat4 &modelMatrix, glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix, glm::mat3 &normalMatrix, glm::vec4 &viewPort) {
     GLint projectionMatrix_location = glGetUniformLocation(this->ID(), "projectionMatrix");
     GLint viewMatrix_location = glGetUniformLocation(this->ID(), "viewMatrix");
     GLint modelMatrix_location = glGetUniformLocation(this->ID(), "modelMatrix");
@@ -137,6 +139,7 @@ void Shader::passUniformToShader(glm::mat4 &modelMatrix, glm::mat4 &viewMatrix, 
     GLint constantAttenuation_location = glGetUniformLocation(this->ID(), "constantAttenuation");
     GLint linearAttenuation_location = glGetUniformLocation(this->ID(), "linearAttenuation");
     GLint useTexture_location = glGetUniformLocation(this->ID(), "useTexture");
+    GLint viewPort_location = glGetUniformLocation(this->ID(), "viewport");
     glUniformMatrix4fv(projectionMatrix_location, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
     glUniformMatrix4fv(viewMatrix_location, 1, GL_FALSE, glm::value_ptr(viewMatrix));
     glUniformMatrix4fv(modelMatrix_location, 1, GL_FALSE, glm::value_ptr(modelMatrix));
@@ -153,6 +156,9 @@ void Shader::passUniformToShader(glm::mat4 &modelMatrix, glm::mat4 &viewMatrix, 
     glUniform1f(constantAttenuation_location, constantAttenuation);
     glUniform1f(linearAttenuation_location, linearAttenuation);
     glUniform1i(useTexture_location, 0);
+    glUniform4fv(viewPort_location, 1, glm::value_ptr(viewPort));
+
+
 }
 unsigned int Shader::ID()
 {

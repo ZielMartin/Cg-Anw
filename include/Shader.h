@@ -1,7 +1,10 @@
 #pragma once
 
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+#include <glm/mat4x4.hpp>
+#include <glm/mat3x3.hpp>
 
-#include <libs/glm-0.9.7.2/glm/detail/type_mat.hpp>
 
 //A basic class for handling OpenGL (GLSL) shaders
 class Shader {
@@ -22,7 +25,11 @@ public:
 	//The ID used by OpenGL to recognise the shader program.  Used mainly to find uniform variable locations in the program
 	unsigned int ID();
 
-	void passUniformToShader(glm::mat4 &modelMatrix,glm::mat4 &viewMatrix,glm::mat4 &projectionMatrix,glm::mat3 &normalMatrix);
+	void passUniformToShader(glm::mat4 &modelMatrix,
+							 glm::mat4 &viewMatrix,
+							 glm::mat4 &projectionMatrix,
+							 glm::mat3 &normalMatrix,
+							 glm::vec4 &viewPort);
 
 
 	private:
@@ -33,6 +40,7 @@ public:
 	unsigned int m_shaderID;
 	//The ID for the vertex shader
 	unsigned int m_shaderVertexProgram;
+
 	//The ID for the fragment shader
 	unsigned int m_shaderFragmentProgram;
 };

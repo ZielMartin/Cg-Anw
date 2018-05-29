@@ -1,21 +1,45 @@
 // Does the phong illumination calculation once per vertex
-#version 120
+#version 330 core
 
 uniform mat4 projectionMatrix, viewMatrix, modelMatrix;
 uniform mat3 normalMatrix;
 uniform vec3 materialAmbient, materialDiffuse, materialSpecular;
 uniform vec3 lightAmbient, lightDiffuse, lightSpecular, lightPosition, lightGlobal;
 uniform float materialShininess, constantAttenuation, linearAttenuation;
+uniform vec4 viewport;
 
-attribute vec3 vertex_position, vertex_normal, v_color;
-attribute vec2 vertex_uv;
 
-varying vec3 vertex_color;
-varying vec2 uv;
+in vec3 vertex_position, vertex_normal, v_color;
+in vec2 vertex_uv;
+in float radius_attr;
+
+
+out VertexData {
+    vec2 uv;
+    vec3 vertex_color;
+    float radius;
+} VertexOut;
+
+
+
+
+
+
+
+
+
 
 void main(void) {
-    vec4 vertex = vec4(vertex_position, 1.0);
-    vec3 position = vec3(viewMatrix * modelMatrix * vertex);
+
+    vec4 vert = vec4(vertex_position, 1.0);
+    vec3 position = vec3(viewMatrix * modelMatrix * vert);
+
+    // set vertex position in OpenGL
+    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vert;
+
+
+    gl_PointSize = radius_attr;
+
 
     // compute base colors
     vec3 ambientGlobal = materialAmbient * lightGlobal;
@@ -42,9 +66,12 @@ void main(void) {
     }
 
     // pass variables
-    uv = vertex_uv;
-    vertex_color = color + v_color;
+     VertexOut.uv = vertex_uv;
+     VertexOut.vertex_color = color + v_color;
+     VertexOut.radius = radius_attr;
 
-    // set vertex position in OpenGL
-    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vertex;
+
+
+
+
 }
