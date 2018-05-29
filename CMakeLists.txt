@@ -21,26 +21,29 @@ elseif (WIN32)
     set(GLM_PATH ${PROJECT_SOURCE_DIR}/libs/glm-0.9.7.2)
     set(GLUT_PATH ${PROJECT_SOURCE_DIR}/libs/freeglut-3.0.0)
     set(GTEST_PATH ${PROJECT_SOURCE_DIR}/libs/googletest-release-1.8.0-mingw)
+    set(OPENMESH_PATH ${PROJECT_SOURCE_DIR}/libs/OpenMesh)
 
     set(GLFW_INCLUDE_DIRS ${GLFW_PATH}/include)
     set(GLEW_INCLUDE_DIRS ${GLEW_PATH}/include)
     set(GLM_INCLUDE_DIRS ${GLM_PATH})
     set(GLUT_INCLUDE_DIRS ${GLUT_PATH}/include)
     set(GTEST_INCLUDE_DIRS ${GTEST_PATH}/include)
+    set(OPENMESH_INCLUDE_DIRS ${OPENMESH_PATH}/include)
 
     #cmake link_libraries removes .dll and .dll.a ending, but not .dll.dll wtf
     set(GLFW_STATIC_LIBRARIES "glfw3.dll.dll")
     set(GLEW_LIBRARIES "glew32.dll.dll")
     set(GLUT_LIBRARIES "freeglut.dll.dll" winmm gdi32)
     set(GTEST_LIBRARIES "gmock.dll.dll")
+    set(OPENMESH_LIBRARIES "OpenMeshCored")
 
-    link_directories(${GLFW_PATH}/lib-mingw-w64 ${GLEW_PATH}/lib ${GLUT_PATH}/lib ${GTEST_PATH}/lib)
+    link_directories(${GLFW_PATH}/lib-mingw-w64 ${GLEW_PATH}/lib ${GLUT_PATH}/lib ${GTEST_PATH}/lib ${OPENMESH_PATH}/lib)
 
 else ()
     message("UNSUPPORTED OS")
 endif ()
 
-include_directories(include ${GLEW_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIRS} ${GLM_INCLUDE_DIRS} ${GTEST_INCLUDE_DIRS})
+include_directories(include ${GLEW_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIRS} ${GLM_INCLUDE_DIRS} ${GTEST_INCLUDE_DIRS} ${OPENMESH_INCLUDE_DIRS})
 
 file(GLOB SOURCE_FILES
         src/*.cpp)
@@ -58,7 +61,7 @@ add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${INCLUDE_FILES})
 
 add_executable(${PROJECT_NAME}_TEST ${TEST_FILES} src/HalfEdge.cpp src/SimpleObjParser.cpp src/NormalCalculation.cpp)
 
-target_link_libraries(${PROJECT_NAME} ${GLUT_LIBRARIES} ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${GLUT_LIBRARIES} ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES} ${OPENMESH_LIBRARIES})
 
 target_link_libraries(${PROJECT_NAME}_TEST ${GTEST_LIBRARIES})
 
