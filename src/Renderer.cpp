@@ -6,7 +6,7 @@
 #define GLEW_STATIC
 #include "glew.h"
 
-#include "VBOHandler.h"
+#include "Renderer.h"
 
 #include <libs/glm-0.9.7.2/glm/glm.hpp>
 #include <include/utils.h>
@@ -17,7 +17,7 @@
 using namespace glm;
 
 
-VBOHandler::VBOHandler() {
+Renderer::Renderer() {
     gridPaneColor = vec3(0, 0, 0);
     selectedPointsColor = vec3(1, 0, 0);
     pointsColor = vec3(0.7, 0.7, 0.7);
@@ -27,7 +27,16 @@ VBOHandler::VBOHandler() {
     drawGrid = true;
 }
 
-void VBOHandler::render(Shader &shader) {
+void Renderer::initRenderer(Shader &shader, char* model_path){
+    trig.LoadFile(model_path);
+    initMesh(shader);
+    initGrid(shader);
+    initGridPane(shader);
+}
+
+
+
+void Renderer::render(Shader &shader) {
     renderObject(meshPoints, GL_POINTS, shader);
     renderObject(mesh, GL_TRIANGLES, shader);
 
@@ -39,7 +48,7 @@ void VBOHandler::render(Shader &shader) {
 }
 
 
-void VBOHandler::renderObject(Object &object, int gl_draw_type, Shader &shader) {
+void Renderer::renderObject(Object &object, int gl_draw_type, Shader &shader) {
 
 
     //compute model-matrix of object
@@ -47,38 +56,15 @@ void VBOHandler::renderObject(Object &object, int gl_draw_type, Shader &shader) 
     glUniformMatrix4fv(modelMatrix_location, 1, GL_FALSE, &object.model[0][0]);
 
 
-    // bind vertex positions to shader
-    GLint position_location = glGetAttribLocation(shader.ID(), "vertex_position");
-    if (position_location != -1) {
-        glEnableVertexAttribArray(position_location);
-        glBindBuffer(GL_ARRAY_BUFFER, object.vertex_position_buffer);
-        glVertexAttribPointer(position_location, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    }
-    // bind vertex normals to shader
-    GLint normal_location = glGetAttribLocation(shader.ID(), "vertex_normal");
-    if (normal_location != -1) {
-        glEnableVertexAttribArray(normal_location);
-        glBindBuffer(GL_ARRAY_BUFFER, object.vertex_normal_buffer);
-        glVertexAttribPointer(normal_location, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    }
-    // bind color to shader
-    GLint color_location = glGetAttribLocation(shader.ID(), "v_color");
-    if (color_location != -1) {
-        glEnableVertexAttribArray(color_location);
-        glBindBuffer(GL_ARRAY_BUFFER, object.vertex_color_buffer);
-        glVertexAttribPointer(color_location, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    }
 
+    glBindVertexArray(object.vaoID);
     glPointSize(10); //dimensions
-
     glDrawArrays(gl_draw_type, 0, object.vertices.size());
-    glDisableVertexAttribArray(position_location);
-    glDisableVertexAttribArray(normal_location);
-    glDisableVertexAttribArray(color_location);
+
 
 }
 
-void VBOHandler::initGrid() {
+void Renderer::initGrid(Shader &shader) {
     glm::vec3 color = gridColor;
     float grid_lenght = 200;//dimensions.getGridSize();
     glm::vec3 gridPosition = glm::vec3(0.0f, 0.0f, 0.0f); //dimensions.getGridPosition();
@@ -126,11 +112,13 @@ void VBOHandler::initGrid() {
     setup_vertex_position_buffer_object(grid);
     setup_vertex_color_buffer_object(grid);
     //setup_vertex_normal_buffer_object_tri(grid, true);
+    setup_vao(grid, shader);
+
 
 
 }
 
-void VBOHandler::initGridPane() {
+void Renderer::initGridPane(Shader &shader) {
     float grid_lenght = 200;//dimensions.getGridSize();
     glm::vec3 gridPosition = glm::vec3(0, 0, 0); //dimensions.getGridPosition();
 
@@ -157,23 +145,24 @@ void VBOHandler::initGridPane() {
     gridPane.colors.push_back(gridPaneColor);
     gridPane.colors.push_back(gridPaneColor);
 
-
     setup_vertex_position_buffer_object(gridPane);
     setup_vertex_color_buffer_object(gridPane);
-    setup_vertex_normal_buffer_object_tri(gridPane, true);
+    //setup_vertex_normal_buffer_object_tri(gridPane, true);
+    setup_vao(gridPane, shader);
 }
 
 
-void VBOHandler::initMesh(char *model_path) {
-    trig.LoadFile(model_path);
+void Renderer::initMesh(Shader &shader) {
+
     mesh.vertices = trig.Vertices();
     for (glm::vec3 vert : mesh.vertices) {
         mesh.colors.push_back(faceColor);
     }
 
     setup_vertex_position_buffer_object(mesh);
-    setup_vertex_normal_buffer_object_tri(mesh, true);
     setup_vertex_color_buffer_object(mesh);
+    setup_vertex_normal_buffer_object_tri(mesh, true);
+    setup_vao(mesh, shader);
 
     meshPoints.vertices = trig.Vertices();
     for (glm::vec3 vert : meshPoints.vertices) {
@@ -181,27 +170,61 @@ void VBOHandler::initMesh(char *model_path) {
     }
 
     setup_vertex_position_buffer_object(meshPoints);
-    setup_vertex_normal_buffer_object_tri(meshPoints, true);
     setup_vertex_color_buffer_object(meshPoints);
+    setup_vertex_normal_buffer_object_tri(meshPoints, true);
+    setup_vao(meshPoints, shader);
 
 }
 
+void Renderer::setup_vao(Object &object, Shader &shader) {
 
-void VBOHandler::setup_vertex_position_buffer_object(Object &object) {
+
+
+    glGenVertexArrays(1, &object.vaoID);
+    glBindVertexArray(object.vaoID);
+
+
+    // bind vertex positions to shader
+    GLint position_location = glGetAttribLocation(shader.ID(), "vertex_position");
+    if (position_location != -1) {
+        glEnableVertexAttribArray(position_location);
+        glBindBuffer(GL_ARRAY_BUFFER, object.vertex_position_buffer);
+        glVertexAttribPointer(position_location, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    }
+    // bind vertex normals to shader
+    GLint normal_location = glGetAttribLocation(shader.ID(), "vertex_normal");
+    if (normal_location != -1) {
+        glEnableVertexAttribArray(normal_location);
+        glBindBuffer(GL_ARRAY_BUFFER, object.vertex_normal_buffer);
+        glVertexAttribPointer(normal_location, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    }
+    // bind color to shader
+    GLint color_location = glGetAttribLocation(shader.ID(), "v_color");
+    if (color_location != -1) {
+        glEnableVertexAttribArray(color_location);
+        glBindBuffer(GL_ARRAY_BUFFER, object.vertex_color_buffer);
+        glVertexAttribPointer(color_location, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    }
+
+    glBindVertexArray(0);
+}
+
+
+void Renderer::setup_vertex_position_buffer_object(Object &object) {
     glGenBuffers(1, &object.vertex_position_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, object.vertex_position_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * object.vertices.size(),
                  &object.vertices.at(0), GL_STATIC_DRAW);
 }
 
-void VBOHandler::setup_vertex_color_buffer_object(Object &object) {
+void Renderer::setup_vertex_color_buffer_object(Object &object) {
     glGenBuffers(1, &object.vertex_color_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, object.vertex_color_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * object.colors.size(),
                  &object.colors.at(0), GL_STATIC_DRAW);
 }
 
-void VBOHandler::setup_vertex_normal_buffer_object_tri(Object &object, bool smoothed) {
+void Renderer::setup_vertex_normal_buffer_object_tri(Object &object, bool smoothed) {
 
     std::vector<glm::vec3> normals;
     if (smoothed) {
@@ -261,11 +284,11 @@ void VBOHandler::setup_vertex_normal_buffer_object_tri(Object &object, bool smoo
                  &normals[0], GL_STATIC_DRAW);
 }
 
-bool VBOHandler::isDrawGrid() const {
+bool Renderer::isDrawGrid() const {
     return drawGrid;
 }
 
-void VBOHandler::setDrawGrid(bool drawGrid) {
-    VBOHandler::drawGrid = drawGrid;
+void Renderer::setDrawGrid(bool drawGrid) {
+    Renderer::drawGrid = drawGrid;
 }
 

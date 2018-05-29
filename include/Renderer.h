@@ -19,6 +19,7 @@
 
 struct Object {
     /* IDs for several buffers. */
+    uint32_t vaoID;
 
     uint32_t vertex_position_buffer;
     uint32_t vertex_normal_buffer;
@@ -32,19 +33,30 @@ struct Object {
 };
 
 
-class VBOHandler {
+class Renderer {
 public:
-    VBOHandler();
+    Renderer();
 
     void renderObject(Object &object, int gl_draw_type, Shader &shader);
 
-    void initGrid();
-
-    void initGridPane();
-
-    void initMesh(char *model_path);
-
     void render(Shader &shader);
+
+    bool isDrawGrid() const;
+
+    void setDrawGrid(bool drawGrid);
+
+    void initRenderer(Shader &shader, char* model_path);
+
+
+private:
+
+    void initGrid(Shader &shader);
+
+    void initGridPane(Shader &shader);
+
+    void initMesh(Shader &shader);
+
+    void setup_vao(Object &object, Shader &shader);
 
     void setup_vertex_normal_buffer_object_tri(Object &object, bool smoothed);
 
@@ -52,11 +64,7 @@ public:
 
     void setup_vertex_position_buffer_object(Object &object);
 
-    bool isDrawGrid() const;
 
-    void setDrawGrid(bool drawGrid);
-
-private:
 
     bool drawGrid;
 
@@ -69,8 +77,6 @@ private:
     glm::vec3 pointsColor;
     glm::vec3 gridColor;
     glm::vec3 faceColor;
-
-
 
 
 };

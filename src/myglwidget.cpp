@@ -92,9 +92,7 @@ void MyGLWidget::initializeGL() {
     shader.Init(vertexshader_path, fragmentshader_path);
 
     //prepare data for OpenGL
-    vboHandler.initMesh(model_path);
-    vboHandler.initGrid();
-    vboHandler.initGridPane();
+    renderer.initRenderer(shader, model_path);
 
 
 
@@ -129,7 +127,7 @@ void MyGLWidget::paintGL() {
     shader.passUniformToShader(modelMatrix, viewMatrix, projectionMatrix, normalMatrix);
 
 
-    vboHandler.render(shader);
+    renderer.render(shader);
 
     shader.Unbind();
 
@@ -193,7 +191,7 @@ void MyGLWidget::keyPressEvent(QKeyEvent *event) {
             camera->Move(UP);
             break;
         case Qt::Key_G:
-            vboHandler.setDrawGrid(!vboHandler.isDrawGrid());
+            renderer.setDrawGrid(!renderer.isDrawGrid());
         default:
             break;
     }

@@ -21,7 +21,7 @@
 #ifndef MYGLWIDGET_H
 #define MYGLWIDGET_H
 
-#include "VBOHandler.h"
+#include "Renderer.h"
 #include <QGLWidget>
 #include "camera.h"
 
@@ -84,7 +84,7 @@ private:
     glm::vec3 getWorldCoordinates(int x, int y);
 
 
-    VBOHandler vboHandler;
+    Renderer renderer;
     cg::Camera *camera;
 
     glm::mat4 projectionMatrix, viewMatrix, modelMatrix;
