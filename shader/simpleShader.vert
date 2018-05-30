@@ -6,8 +6,7 @@ uniform mat3 normalMatrix;
 uniform vec3 materialAmbient, materialDiffuse, materialSpecular;
 uniform vec3 lightAmbient, lightDiffuse, lightSpecular, lightPosition, lightGlobal;
 uniform float materialShininess, constantAttenuation, linearAttenuation;
-uniform vec4 viewport;
-
+uniform vec3 cameraPos;
 
 in vec3 vertex_position, vertex_normal, v_color;
 in vec2 vertex_uv;
@@ -38,7 +37,13 @@ void main(void) {
     gl_Position = projectionMatrix * viewMatrix * modelMatrix * vert;
 
 
-    gl_PointSize = radius_attr;
+
+
+
+	float distance = length(vertex_position - cameraPos);
+    gl_PointSize = radius_attr * 50 / distance;
+
+    //gl_PointSize =  radius_attr;
 
 
     // compute base colors

@@ -192,4 +192,8 @@ namespace cg {
 		V = view;
 		M = model;
 	}
+
+	vec3 &Camera::getCamera_position() {
+		return camera_position;
+	}
 }

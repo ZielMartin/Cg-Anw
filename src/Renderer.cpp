@@ -20,7 +20,7 @@ using namespace glm;
 Renderer::Renderer() {
     gridPaneColor = vec3(0, 0, 0);
     selectedPointsColor = vec3(1, 0, 0);
-    pointsColor = vec3(0.7, 0.7, 0.7);
+    pointsColor = vec3(0.1, 0.2, 0.15);
     gridColor = vec3(1, 1, 1);
     faceColor = vec3(0.25, 0.4, 0.3);
 
@@ -188,7 +188,7 @@ void Renderer::initMesh(Shader &shader) {
 
     meshPoints.vertices = trig.Vertices();
     for (glm::vec3 vert : meshPoints.vertices) {
-        meshPoints.colors.push_back(faceColor+glm::vec3(0.1,0.1,0.1));
+        meshPoints.colors.push_back(pointsColor);
         meshPoints.radius.push_back(20.0);
     }
 

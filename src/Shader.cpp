@@ -122,7 +122,7 @@ void Shader::Init(const char *vertexShaderFile,  const char *fragmentShaderFile)
 }
 
 
-void Shader::passUniformToShader(glm::mat4 &modelMatrix, glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix, glm::mat3 &normalMatrix, glm::vec4 &viewPort) {
+void Shader::passUniformToShader(glm::mat4 &modelMatrix, glm::mat4 &viewMatrix, glm::mat4 &projectionMatrix, glm::mat3 &normalMatrix, glm::vec3 &cameraPos) {
     GLint projectionMatrix_location = glGetUniformLocation(this->ID(), "projectionMatrix");
     GLint viewMatrix_location = glGetUniformLocation(this->ID(), "viewMatrix");
     GLint modelMatrix_location = glGetUniformLocation(this->ID(), "modelMatrix");
@@ -139,7 +139,8 @@ void Shader::passUniformToShader(glm::mat4 &modelMatrix, glm::mat4 &viewMatrix, 
     GLint constantAttenuation_location = glGetUniformLocation(this->ID(), "constantAttenuation");
     GLint linearAttenuation_location = glGetUniformLocation(this->ID(), "linearAttenuation");
     GLint useTexture_location = glGetUniformLocation(this->ID(), "useTexture");
-    GLint viewPort_location = glGetUniformLocation(this->ID(), "viewport");
+    //GLint viewPort_location = glGetUniformLocation(this->ID(), "viewport");
+    GLint cameraPos_location = glGetUniformLocation(this->ID(), "cameraPos");
     glUniformMatrix4fv(projectionMatrix_location, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
     glUniformMatrix4fv(viewMatrix_location, 1, GL_FALSE, glm::value_ptr(viewMatrix));
     glUniformMatrix4fv(modelMatrix_location, 1, GL_FALSE, glm::value_ptr(modelMatrix));
@@ -156,7 +157,8 @@ void Shader::passUniformToShader(glm::mat4 &modelMatrix, glm::mat4 &viewMatrix, 
     glUniform1f(constantAttenuation_location, constantAttenuation);
     glUniform1f(linearAttenuation_location, linearAttenuation);
     glUniform1i(useTexture_location, 0);
-    glUniform4fv(viewPort_location, 1, glm::value_ptr(viewPort));
+    //glUniform4fv(viewPort_location, 1, glm::value_ptr(viewPort));
+    glUniform3fv(cameraPos_location, 1, glm::value_ptr(cameraPos));
 
 
 }

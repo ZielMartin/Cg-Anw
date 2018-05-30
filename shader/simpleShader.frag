@@ -29,6 +29,7 @@ void main(void) {
             float mag = dot(N.xy, N.xy);
             if (mag > 1.0) discard;   // kill pixels outside circle
             N.z = sqrt(1.0-mag);
+
         }
 
 

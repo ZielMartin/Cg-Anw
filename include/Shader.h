@@ -29,7 +29,7 @@ public:
 							 glm::mat4 &viewMatrix,
 							 glm::mat4 &projectionMatrix,
 							 glm::mat3 &normalMatrix,
-							 glm::vec4 &viewPort);
+							 glm::vec3 &cameraPos);
 
 
 	private:

@@ -128,12 +128,9 @@ void MyGLWidget::paintGL() {
 
     shader.Bind();
 
-    int loc_x, loc_y, width, height;
-    camera->GetViewport(loc_x, loc_y, width, height);
-    glm::vec4 viewPort(loc_x, loc_y, width, height);
 
     // pass uniform variables to shader
-    shader.passUniformToShader(modelMatrix, viewMatrix, projectionMatrix, normalMatrix, viewPort);
+    shader.passUniformToShader(modelMatrix, viewMatrix, projectionMatrix, normalMatrix, camera->getCamera_position());
 
 
     renderer.render(shader);

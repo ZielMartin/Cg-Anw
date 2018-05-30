@@ -83,6 +83,9 @@ namespace cg {
 
 		void GetMatricies(glm::mat4 &P, glm::mat4 &V, glm::mat4 &M);
 
+		glm::vec3 &getCamera_position();
+
+
 		CameraType camera_mode;
 
 		int viewport_x;
@@ -105,6 +108,8 @@ namespace cg {
 		bool move_camera;
 
 		glm::vec3 camera_position;
+
+
 		glm::vec3 camera_position_delta;
 		glm::vec3 camera_look_at;
 		glm::vec3 camera_direction;
