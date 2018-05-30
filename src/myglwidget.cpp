@@ -86,6 +86,7 @@ void MyGLWidget::initializeGL() {
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
+    glEnable(GL_POINT_SMOOTH);
 
 
     //enable vertex radius in shader
@@ -133,7 +134,7 @@ void MyGLWidget::paintGL() {
     shader.passUniformToShader(modelMatrix, viewMatrix, projectionMatrix, normalMatrix, camera->getCamera_position());
 
 
-    renderer.render(shader);
+    renderer.render();
 
     shader.Unbind();
 
@@ -157,7 +158,8 @@ void MyGLWidget::mousePressEvent(QMouseEvent *event) {
     if(event->modifiers().testFlag(Qt::ControlModifier)){
         //TODO
         //selectVertex(getWorldCoordinates(event->x(), event->x()), 1, true); //dimensions radius
-        cout << "x: " << getWorldCoordinates(event->x(), event->x()).x << " y: " << getWorldCoordinates(event->x(), event->x()).y << " z: " << getWorldCoordinates(event->x(), event->x()).z << endl;
+        renderer.select(getWorldCoordinates(event->pos().x(), event->pos().y()));
+        updateGL();
     }
 
 }
@@ -209,6 +211,19 @@ void MyGLWidget::keyPressEvent(QKeyEvent *event) {
 
 
 vec3 MyGLWidget::getWorldCoordinates(int x, int y) {
+    /*double objx, objy, objz;
+    GLint viewport[4];
+    GLdouble modelview[16];
+    GLdouble projection[16];
+    GLfloat winX, winY, winZ;
+    glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+    glGetDoublev(GL_PROJECTION_MATRIX, projection);
+    glGetIntegerv(GL_VIEWPORT, viewport);
+    winX = (float) x;
+    winY = (float) viewport[3] - (float) y;
+    glReadPixels(x, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
+    gluUnProject(winX, winY, winZ, modelview, projection, viewport, &objx, &objy, &objz);*/
+
     double objx, objy, objz;
     GLint viewport[4];
     GLdouble modelview[16];
@@ -222,9 +237,10 @@ vec3 MyGLWidget::getWorldCoordinates(int x, int y) {
     glReadPixels(x, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
     gluUnProject(winX, winY, winZ, modelview, projection, viewport, &objx, &objy, &objz);
 
-    //cout << objx << " , " << objy << " , " << objz << "\n";
+    cout << objx << " , " << objy << " , " << objz << "\n";
 
     return vec3(objx, objy, objz);
+
 
 }
 

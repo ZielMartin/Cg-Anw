@@ -40,9 +40,9 @@ class Renderer {
 public:
     Renderer();
 
-    void renderObject(Object &object, int gl_draw_type, Shader &shader);
+    void renderObject(Object &object, int gl_draw_type);
 
-    void render(Shader &shader);
+    void render();
 
     bool isDrawGrid() const;
 
@@ -50,16 +50,18 @@ public:
 
     void initRenderer(Shader &shader, char* model_path);
 
+    void select(glm::vec3 pos);
+
 
 private:
 
-    void initGrid(Shader &shader);
+    void initGrid();
 
-    void initGridPane(Shader &shader);
+    void initGridPane();
 
-    void initMesh(Shader &shader);
+    void initMesh();
 
-    void setup_vao(Object &object, Shader &shader);
+    void setup_vao(Object &object);
 
     void setup_vertex_normal_buffer_object_tri(Object &object, bool smoothed);
 
@@ -76,6 +78,8 @@ private:
     Object mesh, grid, meshPoints, gridPane;
 
     TriangleMesh trig;
+
+    Shader shader;
 
     glm::vec3 gridPaneColor;
     glm::vec3 selectedPointsColor;

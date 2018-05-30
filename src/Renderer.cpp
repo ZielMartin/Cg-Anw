@@ -29,26 +29,27 @@ Renderer::Renderer() {
 
 void Renderer::initRenderer(Shader &shader, char* model_path){
     trig.LoadFile(model_path);
-    initMesh(shader);
-    initGrid(shader);
-    initGridPane(shader);
+    this->shader = shader;
+    initMesh();
+    initGrid();
+    initGridPane();
 }
 
 
 
-void Renderer::render(Shader &shader) {
-    renderObject(meshPoints, GL_POINTS, shader);
-    renderObject(mesh, GL_TRIANGLES, shader);
+void Renderer::render() {
+    renderObject(meshPoints, GL_POINTS);
+    renderObject(mesh, GL_TRIANGLES);
 
     if (drawGrid) {
-        renderObject(grid, GL_LINES, shader);
-        renderObject(gridPane, GL_TRIANGLES, shader);
+        renderObject(grid, GL_LINES);
+        renderObject(gridPane, GL_TRIANGLES);
     }
 
 }
 
 
-void Renderer::renderObject(Object &object, int gl_draw_type, Shader &shader) {
+void Renderer::renderObject(Object &object, int gl_draw_type) {
 
 
     //compute model-matrix of object
@@ -63,7 +64,7 @@ void Renderer::renderObject(Object &object, int gl_draw_type, Shader &shader) {
 
 }
 
-void Renderer::initGrid(Shader &shader) {
+void Renderer::initGrid() {
     glm::vec3 color = gridColor;
     float grid_lenght = 200;//dimensions.getGridSize();
     glm::vec3 gridPosition = glm::vec3(0.0f, 0.0f, 0.0f); //dimensions.getGridPosition();
@@ -119,13 +120,13 @@ void Renderer::initGrid(Shader &shader) {
     setup_vertex_position_buffer_object(grid);
     setup_vertex_color_buffer_object(grid);
     //setup_vertex_normal_buffer_object_tri(grid, true);
-    setup_vao(grid, shader);
+    setup_vao(grid);
 
 
 
 }
 
-void Renderer::initGridPane(Shader &shader) {
+void Renderer::initGridPane() {
     float grid_lenght = 200;//dimensions.getGridSize();
     glm::vec3 gridPosition = glm::vec3(0, 0, 0); //dimensions.getGridPosition();
 
@@ -167,11 +168,12 @@ void Renderer::initGridPane(Shader &shader) {
     setup_vertex_position_buffer_object(gridPane);
     setup_vertex_color_buffer_object(gridPane);
     setup_vertex_normal_buffer_object_tri(gridPane, true);
-    setup_vao(gridPane, shader);
+    setup_vao(gridPane);
 }
 
 
-void Renderer::initMesh(Shader &shader) {
+void Renderer::initMesh() {
+
 
     mesh.vertices = trig.Vertices();
     for (glm::vec3 vert : mesh.vertices) {
@@ -184,23 +186,23 @@ void Renderer::initMesh(Shader &shader) {
     setup_vertex_position_buffer_object(mesh);
     setup_vertex_color_buffer_object(mesh);
     setup_vertex_normal_buffer_object_tri(mesh, true);
-    setup_vao(mesh, shader);
+    setup_vao(mesh);
 
     meshPoints.vertices = trig.Vertices();
     for (glm::vec3 vert : meshPoints.vertices) {
         meshPoints.colors.push_back(pointsColor);
-        meshPoints.radius.push_back(20.0);
+        meshPoints.radius.push_back(50.0);
     }
 
     setup_vertex_position_buffer_object(meshPoints);
     setup_vertex_color_buffer_object(meshPoints);
     setup_vertex_normal_buffer_object_tri(meshPoints, true);
     setup_vertex_radius_buffer_object(meshPoints);
-    setup_vao(meshPoints, shader);
+    setup_vao(meshPoints);
 
 }
 
-void Renderer::setup_vao(Object &object, Shader &shader) {
+void Renderer::setup_vao(Object &object) {
 
 
 
@@ -321,6 +323,28 @@ void Renderer::setup_vertex_normal_buffer_object_tri(Object &object, bool smooth
     glBindBuffer(GL_ARRAY_BUFFER, object.vertex_normal_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * normals.size(),
                  &normals[0], GL_STATIC_DRAW);
+}
+
+
+void Renderer::select(glm::vec3 pos){
+    bool found = false;
+    int i = 0;
+    for(glm::vec3 vert : meshPoints.vertices){{
+        if(glm::distance(vert, pos) < 1){
+            meshPoints.colors.at(i) = selectedPointsColor;
+            found = true;
+        }
+        i++;
+    }
+    if(found == true){
+        glBindBuffer(GL_ARRAY_BUFFER, meshPoints.vertex_color_buffer);
+        glBufferSubData(GL_ARRAY_BUFFER,0, sizeof(glm::vec3) * meshPoints.colors.size(), &meshPoints.colors.at(0));
+
+
+    }
+
+
+    }
 }
 
 bool Renderer::isDrawGrid() const {

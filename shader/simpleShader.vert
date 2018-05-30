@@ -41,7 +41,7 @@ void main(void) {
 
 
 	float distance = length(vertex_position - cameraPos);
-    gl_PointSize = radius_attr * 50 / distance;
+    gl_PointSize = radius_attr * 30 / distance;
 
     //gl_PointSize =  radius_attr;
 

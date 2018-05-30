@@ -85,6 +85,8 @@ namespace cg {
 
 		glm::vec3 &getCamera_position();
 
+		const glm::vec3 &getCamera_look_at() const;
+
 
 		CameraType camera_mode;
 

@@ -11,7 +11,7 @@ namespace cg {
 		camera_up = vec3(0, 1, 0);
 		field_of_view = 45;
 		camera_position_delta = vec3(0, 0, 0);
-		camera_scale = .1f;
+		camera_scale = .3f;
 		max_pitch_rate = 0.01;
 		max_heading_rate = 0.01;
 		move_camera = true;
@@ -195,5 +195,9 @@ namespace cg {
 
 	vec3 &Camera::getCamera_position() {
 		return camera_position;
+	}
+
+	const vec3 &Camera::getCamera_look_at() const {
+		return camera_look_at;
 	}
 }
