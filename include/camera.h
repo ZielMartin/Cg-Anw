@@ -6,11 +6,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#ifdef __APPLE__
-#include <GLUT/glut.h>
-#else
-#include <GL/freeglut.h>
-#endif
+
 
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
@@ -19,6 +15,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
+#include <QtGui/QMouseEvent>
 
 namespace cg {
 
@@ -77,7 +74,7 @@ namespace cg {
 
 		void SetDistance(double cam_dist);
 
-		void SetPos(int button, int state, int x, int y);
+		void SetPos(QMouseEvent *event);
 
 		//Getting Functions
 		CameraType GetMode();
@@ -85,6 +82,11 @@ namespace cg {
 		void GetViewport(int &loc_x, int &loc_y, int &width, int &height);
 
 		void GetMatricies(glm::mat4 &P, glm::mat4 &V, glm::mat4 &M);
+
+		glm::vec3 &getCamera_position();
+
+		const glm::vec3 &getCamera_look_at() const;
+
 
 		CameraType camera_mode;
 
@@ -108,6 +110,8 @@ namespace cg {
 		bool move_camera;
 
 		glm::vec3 camera_position;
+
+
 		glm::vec3 camera_position_delta;
 		glm::vec3 camera_look_at;
 		glm::vec3 camera_direction;

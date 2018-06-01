@@ -57,7 +57,7 @@
 #define OPENMESH_CONFIG_H
 
 //=============================================================================
-#include <cstring>
+
 #include <assert.h>
 #include <OpenMesh/Core/System/compiler.hh>
 #include <OpenMesh/Core/System/OpenMeshDLLMacros.hh>
@@ -65,11 +65,7 @@
 // ----------------------------------------------------------------------------
 
 
-#define OM_VERSION 0x70000
-//#define OM_VERSION 0x60300
-
-// only defined, if it is a beta version
-//#define OM_VERSION_BETA 4
+#define OM_VERSION 0x70100
 
 #define OM_GET_VER ((OM_VERSION & 0xf0000) >> 16)
 #define OM_GET_MAJ ((OM_VERSION & 0x0ff00) >> 8)

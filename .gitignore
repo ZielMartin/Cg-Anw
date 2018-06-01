@@ -61,3 +61,6 @@ fabric.properties
 */install_manifest.txt
 */compile_commands.json
 */CTestTestfile.cmake
+
+#qt dlls
+libs/Qt/

@@ -1,5 +1,6 @@
 //camera.cpp
 #include <iostream>
+#include <GL/gl.h>
 #include "camera.h"
 using namespace std;
 using namespace glm;
@@ -10,9 +11,9 @@ namespace cg {
 		camera_up = vec3(0, 1, 0);
 		field_of_view = 45;
 		camera_position_delta = vec3(0, 0, 0);
-		camera_scale = .1f;
-		max_pitch_rate = 0.01;
-		max_heading_rate = 0.01;
+		camera_scale = .05f;
+		max_pitch_rate = 0.015;
+		max_heading_rate = 0.015;
 		move_camera = true;
 	}
 
@@ -169,18 +170,9 @@ namespace cg {
 
 	}
 
-	void Camera::SetPos(int button, int state, int x, int y) {
-		/*if (button == 3 && state == GLUT_DOWN) {
-            camera_position_delta += camera_up * .05f;
-        } else if (button == 4 && state == GLUT_DOWN) {
-            camera_position_delta -= camera_up * .05f;
-        } else*/
-		if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-			move_camera = true;
-		} else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
-			move_camera = false;
-		}
-		mouse_position = vec3(x, y, 0);
+	void Camera::SetPos(QMouseEvent *event) {
+
+		mouse_position = vec3(event->pos().x(), event->pos().y(), 0);
 
 	}
 
@@ -199,5 +191,13 @@ namespace cg {
 		P = projection;
 		V = view;
 		M = model;
+	}
+
+	vec3 &Camera::getCamera_position() {
+		return camera_position;
+	}
+
+	const vec3 &Camera::getCamera_look_at() const {
+		return camera_look_at;
 	}
 }
