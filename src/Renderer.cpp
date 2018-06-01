@@ -91,18 +91,14 @@ void Renderer::initGrid() {
 
             gridObject.radius.push_back(0);
             gridObject.radius.push_back(0);
-
-
         }
 
         if (i >= 0) {
 
-            //glRotatef(-90, 0, 1, 0);
-
             glm::vec3 vert1 = glm::vec3((gridPosition.x - grid_lenght / 2), gridPosition.y, gridPosition.z);
             glm::vec3 vert2 = glm::vec3((gridPosition.x + grid_lenght / 2), gridPosition.y, gridPosition.z);
 
-            //1,5708
+            //rotation
             GLfloat tempX = vert1.x;
             vert1.x = (cos(1.5708) * vert1.x + sin(1.5708) * vert1.z) + (i - grid_lenght / 2);
             vert1.z = (-sin(1.5708) * tempX + cos(1.5708) * vert1.z);
@@ -193,7 +189,7 @@ void Renderer::initMesh() {
 
             meshPointsObject.vertices.push_back(vec3(v[0], v[1], v[2]));
             meshPointsObject.colors.push_back(faceColor);
-            meshPointsObject.radius.push_back(5);
+            meshPointsObject.radius.push_back(30);
         }
     }
 

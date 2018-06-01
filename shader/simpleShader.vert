@@ -7,6 +7,7 @@ uniform vec3 materialAmbient, materialDiffuse, materialSpecular;
 uniform vec3 lightAmbient, lightDiffuse, lightSpecular, lightPosition, lightGlobal;
 uniform float materialShininess, constantAttenuation, linearAttenuation;
 uniform vec3 cameraPos;
+uniform float heightOfNearPlane;
 
 in vec3 vertex_position, vertex_normal, v_color;
 in vec2 vertex_uv;
@@ -41,9 +42,9 @@ void main(void) {
 
 
 	float distance = length(vertex_position - cameraPos);
-    gl_PointSize = radius_attr * 5 / distance;
+    //gl_PointSize = (heightOfNearPlane * radius_attr) / gl_Position.w;
 
-    //gl_PointSize =  radius_attr;
+    gl_PointSize =  radius_attr/distance;
 
 
     // compute base colors

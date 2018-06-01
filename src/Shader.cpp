@@ -139,7 +139,6 @@ void Shader::passUniformToShader(glm::mat4 &modelMatrix, glm::mat4 &viewMatrix, 
     GLint constantAttenuation_location = glGetUniformLocation(this->ID(), "constantAttenuation");
     GLint linearAttenuation_location = glGetUniformLocation(this->ID(), "linearAttenuation");
     GLint useTexture_location = glGetUniformLocation(this->ID(), "useTexture");
-    //GLint viewPort_location = glGetUniformLocation(this->ID(), "viewport");
     GLint cameraPos_location = glGetUniformLocation(this->ID(), "cameraPos");
     glUniformMatrix4fv(projectionMatrix_location, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
     glUniformMatrix4fv(viewMatrix_location, 1, GL_FALSE, glm::value_ptr(viewMatrix));
@@ -157,7 +156,6 @@ void Shader::passUniformToShader(glm::mat4 &modelMatrix, glm::mat4 &viewMatrix, 
     glUniform1f(constantAttenuation_location, constantAttenuation);
     glUniform1f(linearAttenuation_location, linearAttenuation);
     glUniform1i(useTexture_location, 0);
-    //glUniform4fv(viewPort_location, 1, glm::value_ptr(viewPort));
     glUniform3fv(cameraPos_location, 1, glm::value_ptr(cameraPos));
 
 

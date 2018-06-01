@@ -5,6 +5,9 @@
 
 #include "myglwidget.h"
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 using namespace cg;
 using namespace glm;
 using namespace std;
@@ -127,10 +130,7 @@ void MyGLWidget::paintGL() {
 
     shader.Bind();
 
-
-    // pass uniform variables to shader
     shader.passUniformToShader(modelMatrix, viewMatrix, projectionMatrix, normalMatrix, camera->getCamera_position());
-
 
     renderer.render();
 
@@ -151,13 +151,12 @@ void MyGLWidget::resizeGL(int width, int height) {
 }
 
 void MyGLWidget::mousePressEvent(QMouseEvent *event) {
-    camera->SetPos(event);
+
 
     if(event->modifiers().testFlag(Qt::ControlModifier)){
-        //TODO
-        //selectVertex(getWorldCoordinates(event->x(), event->x()), 1, true); //dimensions radius
         renderer.select(getWorldCoordinates(event->pos().x(), event->pos().y()));
         updateGL();
+
     }
 
 }
@@ -180,28 +179,34 @@ void MyGLWidget::keyPressEvent(QKeyEvent *event) {
             break;
         case Qt::Key_W:
             camera->Move(FORWARD);
+            updateGL();
             break;
         case Qt::Key_A:
             camera->Move(LEFT);
+            updateGL();
             break;
         case Qt::Key_S:
             camera->Move(BACK);
+            updateGL();
             break;
         case Qt::Key_D:
             camera->Move(RIGHT);
+            updateGL();
             break;
         case Qt::Key_Q:
             camera->Move(DOWN);
+            updateGL();
             break;
         case Qt::Key_E:
             camera->Move(UP);
+            updateGL();
             break;
         case Qt::Key_G:
             renderer.setDrawGrid(!renderer.isDrawGrid());
+            updateGL();
         default:
             break;
     }
-    updateGL();
 
 
 }
@@ -209,18 +214,6 @@ void MyGLWidget::keyPressEvent(QKeyEvent *event) {
 
 
 vec3 MyGLWidget::getWorldCoordinates(int x, int y) {
-    /*double objx, objy, objz;
-    GLint viewport[4];
-    GLdouble modelview[16];
-    GLdouble projection[16];
-    GLfloat winX, winY, winZ;
-    glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
-    glGetDoublev(GL_PROJECTION_MATRIX, projection);
-    glGetIntegerv(GL_VIEWPORT, viewport);
-    winX = (float) x;
-    winY = (float) viewport[3] - (float) y;
-    glReadPixels(x, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
-    gluUnProject(winX, winY, winZ, modelview, projection, viewport, &objx, &objy, &objz);*/
 
     double objx, objy, objz;
     GLint viewport[4];
@@ -235,7 +228,6 @@ vec3 MyGLWidget::getWorldCoordinates(int x, int y) {
     glReadPixels(x, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
     gluUnProject(winX, winY, winZ, modelview, projection, viewport, &objx, &objy, &objz);
 
-    cout << objx << " , " << objy << " , " << objz << "\n";
 
     return vec3(objx, objy, objz);
 
