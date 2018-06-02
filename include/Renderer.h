@@ -30,6 +30,8 @@ struct Object {
 
 
     std::vector<glm::vec3> vertices;
+    std::vector<glm::vec3> normals;
+    //indices can be empty, using DRAW_ARRAY then
     std::vector<uint32_t> indices;
     std::vector<glm::vec3> colors;
     std::vector<float> radius;
@@ -55,6 +57,7 @@ public:
 
     void select(glm::vec3 pos);
 
+    void moveSelected(glm::vec3 relativeMovement);
 
 private:
 
@@ -66,7 +69,7 @@ private:
 
     void setup_vao(Object &object);
 
-    void setup_vertex_normal_buffer_object_tri(Object &object, bool smoothed);
+    void setup_vertex_normal_buffer_object(Object &object);
 
     void setup_vertex_color_buffer_object(Object &object);
 
@@ -75,6 +78,8 @@ private:
     void setup_vertex_radius_buffer_object(Object &object);
 
     void setup_vertex_index_buffer_object(Object &object);
+
+
 
 
 

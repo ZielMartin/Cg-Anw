@@ -40,7 +40,7 @@ void Renderer::initRenderer(Shader &shader, char *model_path) {
 
 
 void Renderer::render() {
-    //renderObject(meshPointsObject, GL_POINTS);
+    renderObject(meshPointsObject, GL_POINTS);
     renderObject(meshObject, GL_TRIANGLES);
 
     if (drawGrid) {
@@ -61,9 +61,9 @@ void Renderer::renderObject(Object &object, int gl_draw_type) {
 
     glBindVertexArray(object.vaoID);
 
-    if(object.indices.size() == 0){
+    if (object.indices.size() == 0) {
         glDrawArrays(gl_draw_type, 0, object.vertices.size());
-    }else{
+    } else {
         glDrawElements(gl_draw_type, object.indices.size(), GL_UNSIGNED_INT, NULL);
     }
 
@@ -120,8 +120,6 @@ void Renderer::initGrid() {
 
     setup_vertex_position_buffer_object(gridObject);
     setup_vertex_color_buffer_object(gridObject);
-    //setup_vertex_index_buffer_object(gridObject);
-    //setup_vertex_normal_buffer_object_tri(grid, true);
     setup_vao(gridObject);
 
 
@@ -138,7 +136,7 @@ void Renderer::initGridPane() {
             vec3(gridPosition.x - grid_lenght / 2, gridPosition.y, gridPosition.z + grid_lenght / 2));
 
     gridPaneObject.vertices.push_back(
-            vec3(gridPosition.x + grid_lenght / 2, gridPosition.y , gridPosition.z + grid_lenght / 2));
+            vec3(gridPosition.x + grid_lenght / 2, gridPosition.y, gridPosition.z + grid_lenght / 2));
 
     gridPaneObject.vertices.push_back(
             vec3(gridPosition.x + grid_lenght / 2, gridPosition.y, gridPosition.z - grid_lenght / 2));
@@ -156,13 +154,12 @@ void Renderer::initGridPane() {
     gridPaneObject.radius.push_back(0);
 
 
-    gridPaneObject.indices = {0,1,2,2,3,0};
+    gridPaneObject.indices = {0, 1, 2, 2, 3, 0};
 
 
 
     setup_vertex_position_buffer_object(gridPaneObject);
     setup_vertex_color_buffer_object(gridPaneObject);
-    //setup_vertex_normal_buffer_object_tri(gridPaneObject, true);
     setup_vertex_index_buffer_object(gridPaneObject);
     setup_vao(gridPaneObject);
 }
@@ -170,26 +167,32 @@ void Renderer::initGridPane() {
 
 void Renderer::initMesh() {
 
-    meshObject.vertices = meshWrapper.getVertices();
 
-    for(glm::vec3 v : meshObject.vertices){
+    meshWrapper.getVerticesAndNormals(meshObject.vertices, meshObject.normals);
+    meshPointsObject.vertices = meshObject.vertices;
+
+
+
+    for (glm::vec3 v : meshObject.vertices) {
         meshObject.radius.push_back(0);
         meshObject.colors.push_back(faceColor);
+
+        meshPointsObject.radius.push_back(30);
+        meshPointsObject.colors.push_back(pointsColor);
     }
 
 
     setup_vertex_position_buffer_object(meshObject);
     setup_vertex_color_buffer_object(meshObject);
-    setup_vertex_normal_buffer_object_tri(meshObject, true);
-    //setup_vertex_index_buffer_object(meshObject);
+    setup_vertex_normal_buffer_object(meshObject);
     setup_vao(meshObject);
 
-/*
+
     setup_vertex_position_buffer_object(meshPointsObject);
     setup_vertex_color_buffer_object(meshPointsObject);
     setup_vertex_radius_buffer_object(meshPointsObject);
     setup_vao(meshPointsObject);
-*/
+
 
 }
 
@@ -241,14 +244,14 @@ void Renderer::setup_vertex_position_buffer_object(Object &object) {
     glGenBuffers(1, &object.vertex_position_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, object.vertex_position_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * object.vertices.size(),
-                 &object.vertices.at(0), GL_STATIC_DRAW);
+                 &object.vertices.at(0), GL_DYNAMIC_DRAW);
 }
 
 void Renderer::setup_vertex_index_buffer_object(Object &object) {
     glGenBuffers(1, &object.vertex_index_buffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object.vertex_index_buffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * object.indices.size(),
-                 &object.indices.at(0), GL_STATIC_DRAW);
+                 &object.indices.at(0), GL_DYNAMIC_DRAW);
 
 }
 
@@ -256,99 +259,79 @@ void Renderer::setup_vertex_color_buffer_object(Object &object) {
     glGenBuffers(1, &object.vertex_color_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, object.vertex_color_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * object.colors.size(),
-                 &object.colors.at(0), GL_STATIC_DRAW);
+                 &object.colors.at(0), GL_DYNAMIC_DRAW);
 }
 
 void Renderer::setup_vertex_radius_buffer_object(Object &object) {
     glGenBuffers(1, &object.vertex_radius_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, object.vertex_radius_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * object.radius.size(),
-                 &object.radius.at(0), GL_STATIC_DRAW);
+                 &object.radius.at(0), GL_DYNAMIC_DRAW);
 }
 
-void Renderer::setup_vertex_normal_buffer_object_tri(Object &object, bool smoothed) {
-
-    std::vector<glm::vec3> normals;
-    if (smoothed) {
-        // initialize map of normals to zero
-        // note that we store readily hashable vector<double> types instead of
-        // vec3s and convert between the two as required
-        std::map<std::vector<double>, std::vector<double> > normal_map;
-        for (int i = 0; i < object.vertices.size(); i++) {
-            std::vector<double> zeros;
-            zeros.push_back(0.0);
-            zeros.push_back(0.0);
-            zeros.push_back(0.0);
-            normal_map[to_vector(object.vertices[i])] = zeros;
-        }
-        for (int i = 0; i < object.vertices.size(); i += 3) {
-            // get vertices of the current triangle
-            glm::vec3 v1 = object.vertices[i];
-            glm::vec3 v2 = object.vertices[i + 1];
-            glm::vec3 v3 = object.vertices[i + 2];
-            std::vector<double> v1_key = to_vector(v1);
-            std::vector<double> v2_key = to_vector(v2);
-            std::vector<double> v3_key = to_vector(v3);
-            // compute face normal
-            glm::vec3 face_normal = glm::cross(v3 - v2, v1 - v2);
-            // get the old vertex normal
-            glm::vec3 v1_old = to_vec3(normal_map[v1_key]);
-            glm::vec3 v2_old = to_vec3(normal_map[v2_key]);
-            glm::vec3 v3_old = to_vec3(normal_map[v3_key]);
-            // replace the old value with the new value
-            normal_map.erase(v1_key);
-            normal_map.erase(v2_key);
-            normal_map.erase(v3_key);
-            normal_map[v1_key] = to_vector(glm::normalize(v1_old + face_normal));
-            normal_map[v2_key] = to_vector(glm::normalize(v2_old + face_normal));
-            normal_map[v3_key] = to_vector(glm::normalize(v3_old + face_normal));
-        }
-        // convert the map of normals to a vector of normals
-        for (int i = 0; i < object.vertices.size(); i++) {
-            normals.push_back(to_vec3(normal_map[to_vector(object.vertices[i])]));
-        }
-    } else {
-        for (int i = 0; i < object.vertices.size(); i += 3) {
-            // get vertices of this triangle
-            glm::vec3 v1 = object.vertices[i];
-            glm::vec3 v2 = object.vertices[i + 1];
-            glm::vec3 v3 = object.vertices[i + 2];
-            // compute face normal
-            glm::vec3 face_normal = glm::cross(v3 - v2, v1 - v2);
-            normals.push_back(glm::normalize(face_normal));
-            normals.push_back(glm::normalize(face_normal));
-            normals.push_back(glm::normalize(face_normal));
-        }
-    }
+void Renderer::setup_vertex_normal_buffer_object(Object &object) {
     glGenBuffers(1, &object.vertex_normal_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, object.vertex_normal_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * normals.size(),
-                 &normals[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * object.normals.size(),
+                 &object.normals.at(0), GL_DYNAMIC_DRAW);
 }
 
 
 void Renderer::select(glm::vec3 pos) {
-    bool found = false;
+    meshWrapper.selectVertex(pos);
+
+    std::vector<glm::vec3> selected = meshWrapper.getSelectedVertices();
+
     int i = 0;
     for (glm::vec3 vert : meshPointsObject.vertices) {
-        {
-            if (glm::distance(vert, pos) < 0.03) {
-                meshPointsObject.colors.at(i) = selectedPointsColor;
+        bool found = false;
+        for (glm::vec3 selectedVert : selected) {
+            if (vert.x - selectedVert.x == 0 && vert.y - selectedVert.y == 0 && vert.z - selectedVert.z == 0) {
                 found = true;
             }
-            i++;
         }
-        if (found == true) {
-            glBindBuffer(GL_ARRAY_BUFFER, meshPointsObject.vertex_color_buffer);
-            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::vec3) * meshPointsObject.colors.size(),
-                            &meshPointsObject.colors.at(0));
-
-
+        if(found){
+            meshPointsObject.colors.at(i) = selectedPointsColor;
+        }else{
+            meshPointsObject.colors.at(i) = pointsColor;
         }
-
+        i++;
 
     }
+    glBindBuffer(GL_ARRAY_BUFFER, meshPointsObject.vertex_color_buffer);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::vec3) * meshPointsObject.colors.size(),
+                    &meshPointsObject.colors.at(0));
+
+
 }
+
+void Renderer::moveSelected(glm::vec3 relativeMovement){
+    meshWrapper.moveSelectedVertices(relativeMovement);
+
+    meshObject.vertices.clear();
+    meshObject.normals.clear();
+    meshWrapper.getVerticesAndNormals(meshObject.vertices, meshObject.normals);
+    meshPointsObject.vertices = meshObject.vertices;
+
+
+
+
+    //update mesh vertex position buffer
+    glBindBuffer(GL_ARRAY_BUFFER, meshPointsObject.vertex_position_buffer);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::vec3) * meshPointsObject.vertices.size(),
+                    &meshPointsObject.vertices.at(0));
+
+    //update meshPoints vertex position buffer
+    glBindBuffer(GL_ARRAY_BUFFER, meshObject.vertex_position_buffer);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::vec3) * meshObject.vertices.size(),
+                    &meshObject.vertices.at(0));
+
+    //update mesh vertex normal buffer
+    glBindBuffer(GL_ARRAY_BUFFER, meshObject.vertex_normal_buffer);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::vec3) * meshObject.normals.size(),
+                    &meshObject.normals.at(0));
+}
+
 
 bool Renderer::isDrawGrid() const {
     return drawGrid;

@@ -32,17 +32,26 @@ public:
 
     void moveVertex(HE_MESH::VertexIter v_it, glm::vec3 relativeMovement);
 
-    std::vector<glm::vec3> getVertices();
+    void moveSelectedVertices(glm::vec3 relativeMovement);
+
+    void getVerticesAndNormals(std::vector<glm::vec3> &vertices, std::vector<glm::vec3> &normals);
+
+    void selectVertex(glm::vec3 pos);
+
+    void deselectAll();
+
+    std::vector<glm::vec3> getSelectedVertices();
 
 
 private:
 
-    void recalcVertexNormals();
-
 
 
     HE_MESH mesh;
+
     OpenMesh::IO::Options opt;
+
+    std::vector<HE_MESH::VertexIter> selectedVertices;
 
 
 };

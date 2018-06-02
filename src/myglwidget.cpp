@@ -1,11 +1,13 @@
 // myglwidget.cpp
 
 #define GLEW_STATIC
+
 #include "glew.c"
 
 #include "myglwidget.h"
 
 #define _USE_MATH_DEFINES
+
 #include <math.h>
 
 using namespace cg;
@@ -112,8 +114,6 @@ void MyGLWidget::initializeGL() {
 }
 
 
-
-
 void MyGLWidget::paintGL() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -140,9 +140,6 @@ void MyGLWidget::paintGL() {
 }
 
 
-
-
-
 void MyGLWidget::resizeGL(int width, int height) {
     int side = qMin(width, height);
     glViewport(0, 0, width, height);
@@ -153,7 +150,7 @@ void MyGLWidget::resizeGL(int width, int height) {
 void MyGLWidget::mousePressEvent(QMouseEvent *event) {
 
 
-    if(event->modifiers().testFlag(Qt::ControlModifier)){
+    if (event->modifiers().testFlag(Qt::ControlModifier)) {
         renderer.select(getWorldCoordinates(event->pos().x(), event->pos().y()));
         updateGL();
 
@@ -172,6 +169,8 @@ void MyGLWidget::mouseMoveEvent(QMouseEvent *event) {
 }
 
 void MyGLWidget::keyPressEvent(QKeyEvent *event) {
+
+    float moveStepSize = 0.01;
 
     switch (event->key()) {
         case Qt::Key_Escape:
@@ -204,13 +203,37 @@ void MyGLWidget::keyPressEvent(QKeyEvent *event) {
         case Qt::Key_G:
             renderer.setDrawGrid(!renderer.isDrawGrid());
             updateGL();
+            break;
+        case Qt::Key_Left:
+            renderer.moveSelected(glm::vec3(-moveStepSize, 0.0, 0.0));
+            updateGL();
+            break;
+        case Qt::Key_Right:
+            renderer.moveSelected(glm::vec3(moveStepSize, 0.0, 0.0));
+            updateGL();
+            break;
+        case Qt::Key_Up:
+            renderer.moveSelected(glm::vec3(0.0, 0.0, -moveStepSize));
+            updateGL();
+            break;
+        case Qt::Key_Down:
+            renderer.moveSelected(glm::vec3(0.0, 0.0, moveStepSize));
+            updateGL();
+            break;
+        case Qt::Key_Minus:
+            renderer.moveSelected(glm::vec3(0.0, -moveStepSize, 0.0));
+            updateGL();
+            break;
+        case Qt::Key_Plus:
+            renderer.moveSelected(glm::vec3(0.0, moveStepSize, 0.0));
+            updateGL();
+            break;
         default:
             break;
     }
 
 
 }
-
 
 
 vec3 MyGLWidget::getWorldCoordinates(int x, int y) {
