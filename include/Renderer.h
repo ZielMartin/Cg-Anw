@@ -85,7 +85,7 @@ private:
     void setup_vertex_index_buffer_object(Object &object);
 
     template<typename T>
-    void updateBufferData(glm::uint32 bufferID, std::vector<T> &data) const;
+    void updateBufferData(glm::uint32 bufferID, std::vector<T> &data);
 
     void clearObject(Object &object);
 

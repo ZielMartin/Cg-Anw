@@ -126,7 +126,7 @@ void MeshWrapper::deleteSelectedVertices(){
 }
 
 void MeshWrapper::addVertex(glm::vec3 vertex){
-    mesh.add_vertex(HE_MESH::Point(vertex.x,vertex.y,vertex.z));
+    mesh.new_vertex(HE_MESH::Point(vertex.x,vertex.y,vertex.z));
 }
 
 

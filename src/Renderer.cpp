@@ -325,7 +325,7 @@ void Renderer::moveSelected(glm::vec3 relativeMovement){
 }
 
 template<typename T>
-void Renderer::updateBufferData(uint32 bufferID, std::vector<T> &data) const {
+void Renderer::updateBufferData(uint32 bufferID, std::vector<T> &data) {
     glBindBuffer(GL_ARRAY_BUFFER, bufferID);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(T) * data.size(),
                     &data.at(0));
