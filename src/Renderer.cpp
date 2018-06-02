@@ -54,7 +54,6 @@ void Renderer::render() {
 
 void Renderer::renderObject(Object &object, int gl_draw_type) {
 
-
     //compute model-matrix of object
     GLint modelMatrix_location = glGetUniformLocation(shader.ID(), "modelMatrix");
     glUniformMatrix4fv(modelMatrix_location, 1, GL_FALSE, &object.model[0][0]);
@@ -169,15 +168,17 @@ void Renderer::initGridPane() {
 void Renderer::initMesh() {
 
 
-    meshWrapper.getVerticesAndNormals(meshObject.vertices, meshObject.normals);
-    meshPointsObject.vertices = meshObject.vertices;
+    meshWrapper.getVerticesAndNormalsTriangulated(meshObject.vertices, meshObject.normals);
+    meshWrapper.getVertices(meshPointsObject.vertices);
 
 
 
     for (glm::vec3 v : meshObject.vertices) {
         meshObject.radius.push_back(0);
         meshObject.colors.push_back(faceColor);
+    }
 
+    for (glm::vec3 v : meshPointsObject.vertices) {
         meshPointsObject.radius.push_back(pointSize);
         meshPointsObject.colors.push_back(pointsColor);
     }
@@ -235,8 +236,8 @@ void Renderer::setup_vao(Object &object) {
     }
 
     // bind indices
-    //glGenBuffers(1, &object.vertex_index_buffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object.vertex_index_buffer);
+
     glBindVertexArray(0);
 }
 
@@ -308,8 +309,10 @@ void Renderer::moveSelected(glm::vec3 relativeMovement){
 
     meshObject.vertices.clear();
     meshObject.normals.clear();
-    meshWrapper.getVerticesAndNormals(meshObject.vertices, meshObject.normals);
-    meshPointsObject.vertices = meshObject.vertices;
+    meshPointsObject.vertices.clear();
+    meshWrapper.getVerticesAndNormalsTriangulated(meshObject.vertices, meshObject.normals);
+    meshWrapper.getVertices(meshPointsObject.vertices);
+
 
 
     //update mesh vertex position buffer
@@ -322,30 +325,37 @@ void Renderer::moveSelected(glm::vec3 relativeMovement){
 }
 
 template<typename T>
-void Renderer::updateBufferData(uint32 bufferID, std::vector<T> &vector) const {
+void Renderer::updateBufferData(uint32 bufferID, std::vector<T> &data) const {
     glBindBuffer(GL_ARRAY_BUFFER, bufferID);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(T) * vector.size(),
-                    &vector.at(0));
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(T) * data.size(),
+                    &data.at(0));
 }
 
 void Renderer::deleteSelectedVertices(){
     meshWrapper.deleteSelectedVertices();
+    updateMeshAndMeshPoints();
+}
 
+void Renderer::updateMeshAndMeshPoints() {
     clearObject(meshObject);
     clearObject(meshPointsObject);
 
 
-    meshWrapper.getVerticesAndNormals(meshObject.vertices, meshObject.normals);
-    meshPointsObject.vertices = meshObject.vertices;
+    meshWrapper.getVerticesAndNormalsTriangulated(meshObject.vertices, meshObject.normals);
+    meshWrapper.getVertices(meshPointsObject.vertices);
 
-    for(glm::vec3 vert : meshObject.vertices){
+
+    for(vec3 vert : meshObject.vertices){
         meshObject.colors.push_back(faceColor);
-        meshPointsObject.colors.push_back(pointsColor);
-
         meshObject.radius.push_back(0);
+    }
+    for(vec3 vert : meshPointsObject.vertices){
+        meshPointsObject.colors.push_back(pointsColor);
         meshPointsObject.radius.push_back(pointSize);
 
     }
+
+    meshWrapper.deselectAll();
 
     updateBufferData(meshObject.vertex_position_buffer, meshObject.vertices);
     updateBufferData(meshObject.vertex_normal_buffer, meshObject.normals);
@@ -355,8 +365,6 @@ void Renderer::deleteSelectedVertices(){
     updateBufferData(meshPointsObject.vertex_position_buffer, meshPointsObject.vertices);
     updateBufferData(meshPointsObject.vertex_color_buffer, meshPointsObject.colors);
     updateBufferData(meshPointsObject.vertex_radius_buffer, meshPointsObject.radius);
-
-
 }
 
 void Renderer::clearObject(Object &object) {
@@ -366,6 +374,18 @@ void Renderer::clearObject(Object &object) {
     object.radius.clear();
     object.indices.clear();
 }
+
+void Renderer::addVertex(glm::vec3 worldPos){
+    meshWrapper.addVertex(worldPos);
+
+    updateMeshAndMeshPoints();
+
+    select(worldPos);
+
+    std::cout << "selected: " << meshWrapper.getSelectedVertices().size() << std::endl;
+
+}
+
 
 
 bool Renderer::isDrawGrid() const {

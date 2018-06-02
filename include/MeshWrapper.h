@@ -34,7 +34,9 @@ public:
 
     void moveSelectedVertices(glm::vec3 relativeMovement);
 
-    void getVerticesAndNormals(std::vector<glm::vec3> &vertices, std::vector<glm::vec3> &normals);
+    void getVerticesAndNormalsTriangulated(std::vector<glm::vec3> &vertices, std::vector<glm::vec3> &normals);
+
+    void getVertices(std::vector<glm::vec3> &vertices);
 
     void selectVertex(glm::vec3 pos);
 
@@ -43,6 +45,8 @@ public:
     std::vector<glm::vec3> getSelectedVertices();
 
     void deleteSelectedVertices();
+
+    void addVertex(glm::vec3 vertex);
 
 
 private:

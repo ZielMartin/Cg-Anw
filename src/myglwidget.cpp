@@ -150,10 +150,12 @@ void MyGLWidget::resizeGL(int width, int height) {
 }
 
 void MyGLWidget::mousePressEvent(QMouseEvent *event) {
-    if (event->modifiers().testFlag(Qt::ControlModifier)) {
+    if (event->modifiers().testFlag(Qt::ControlModifier) && event->buttons() & Qt::LeftButton) {
         renderer.select(getWorldCoordinates(event->pos().x(), event->pos().y()));
-        updateGL();
+    }else if(event->buttons() & Qt::RightButton){
+        renderer.addVertex(getWorldCoordinates(event->pos().x(), event->pos().y()));
     }
+    updateGL();
 }
 
 

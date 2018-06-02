@@ -19,7 +19,7 @@ void MeshWrapper::loadMesh(const char *path) {
     mesh.triangulate();
 
 
-    //if this is not here, normals are not calculate on first getVerticesAndNormals call?!Oo
+    //if this is not here, normals are not calculate on first getVerticesAndNormalsTriangulated call?!Oo
     mesh.request_face_normals();
     mesh.update_normals();
     mesh.request_vertex_normals();
@@ -27,7 +27,7 @@ void MeshWrapper::loadMesh(const char *path) {
 
 //gets vertices in triangle order, if mesh should not be triangulated, an index array must be implemented -
 //and this function would not be necessary anymore
-void MeshWrapper::getVerticesAndNormals(std::vector<glm::vec3> &vertices, std::vector<glm::vec3> &normals) {
+void MeshWrapper::getVerticesAndNormalsTriangulated(std::vector<glm::vec3> &vertices, std::vector<glm::vec3> &normals) {
 
     mesh.request_face_normals();
     mesh.update_normals();
@@ -47,6 +47,15 @@ void MeshWrapper::getVerticesAndNormals(std::vector<glm::vec3> &vertices, std::v
         }
     }
 }
+
+void MeshWrapper::getVertices(std::vector<glm::vec3> &vertices){
+    for(HE_MESH::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it){
+        OpenMesh::Vec3f v = mesh.point(*v_it);
+        vertices.push_back(glm::vec3(v[0],v[1],v[2]));
+    }
+
+}
+
 
 
 void MeshWrapper::moveVertex(HE_MESH::VertexIter v_it, glm::vec3 relativeMovement) {
@@ -115,6 +124,11 @@ void MeshWrapper::deleteSelectedVertices(){
     deselectAll();
 
 }
+
+void MeshWrapper::addVertex(glm::vec3 vertex){
+    mesh.add_vertex(HE_MESH::Point(vertex.x,vertex.y,vertex.z));
+}
+
 
 
 

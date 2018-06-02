@@ -61,6 +61,9 @@ public:
 
     void deleteSelectedVertices();
 
+    void addVertex(glm::vec3 worldPos);
+
+
 private:
 
     void initGrid();
@@ -82,9 +85,10 @@ private:
     void setup_vertex_index_buffer_object(Object &object);
 
     template<typename T>
-    void updateBufferData(glm::uint32 bufferID, std::vector<T> &vector) const;
+    void updateBufferData(glm::uint32 bufferID, std::vector<T> &data) const;
 
     void clearObject(Object &object);
+
 
 
 
@@ -105,6 +109,7 @@ private:
     int pointSize;
 
 
+    void updateMeshAndMeshPoints();
 };
 
 
