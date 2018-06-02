@@ -30,11 +30,8 @@ Renderer::Renderer() {
 }
 
 void Renderer::initRenderer(Shader &shader, char *model_path) {
-    OpenMesh::IO::Options opt;
-    if (!OpenMesh::IO::read_mesh(myMesh, model_path, opt)) {
-        std::cerr << "Error loading mesh from file " << model_path << std::endl;
-        return;
-    }
+    meshWrapper.loadMesh(model_path);
+
     this->shader = shader;
     initMesh();
     initGrid();
@@ -43,7 +40,7 @@ void Renderer::initRenderer(Shader &shader, char *model_path) {
 
 
 void Renderer::render() {
-    renderObject(meshPointsObject, GL_POINTS);
+    //renderObject(meshPointsObject, GL_POINTS);
     renderObject(meshObject, GL_TRIANGLES);
 
     if (drawGrid) {
@@ -173,24 +170,11 @@ void Renderer::initGridPane() {
 
 void Renderer::initMesh() {
 
-    myMesh.triangulate();
+    meshObject.vertices = meshWrapper.getVertices();
 
-    MyMesh::VertexHandle vh;
-    OpenMesh::Vec3f v;
-
-    for (MyMesh::FaceIter f_it=myMesh.faces_begin(); f_it!=myMesh.faces_end(); ++f_it){
-        for(MyMesh::FaceVertexIter fv_it = myMesh.fv_begin(f_it); fv_it!=myMesh.fv_end(f_it); ++fv_it ){
-            //vh = fv_it.toVertexHandle();
-            v = myMesh.point(fv_it.handle());
-
-            meshObject.vertices.push_back(vec3(v[0], v[1], v[2]));
-            meshObject.colors.push_back(faceColor);
-            meshObject.radius.push_back(0);
-
-            meshPointsObject.vertices.push_back(vec3(v[0], v[1], v[2]));
-            meshPointsObject.colors.push_back(faceColor);
-            meshPointsObject.radius.push_back(30);
-        }
+    for(glm::vec3 v : meshObject.vertices){
+        meshObject.radius.push_back(0);
+        meshObject.colors.push_back(faceColor);
     }
 
 
@@ -200,12 +184,12 @@ void Renderer::initMesh() {
     //setup_vertex_index_buffer_object(meshObject);
     setup_vao(meshObject);
 
-
+/*
     setup_vertex_position_buffer_object(meshPointsObject);
     setup_vertex_color_buffer_object(meshPointsObject);
     setup_vertex_radius_buffer_object(meshPointsObject);
     setup_vao(meshPointsObject);
-
+*/
 
 }
 

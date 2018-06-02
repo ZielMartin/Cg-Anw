@@ -25,7 +25,6 @@
 #include <QGLWidget>
 #include "camera.h"
 
-#include "TriangleMesh.h"
 #include "Shader.h"
 #include "utils.h"
 #include "scene_constants.h"

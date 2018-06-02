@@ -8,15 +8,13 @@
 
 
 #include "Shader.h"
-#include "TriangleMesh.h"
+#include "MeshWrapper.h"
 
 #include <libs/glm-0.9.7.2/glm/mat4x4.hpp>
 #include <libs/glm-0.9.7.2/glm/vec3.hpp>
 #include <vector>
 
-#include <OpenMesh/Core/IO/MeshIO.hh>
-#include <OpenMesh/Core/Mesh/PolyMesh_ArrayKernelT.hh>
-typedef OpenMesh::PolyMesh_ArrayKernelT<>  MyMesh;
+
 
 
 
@@ -84,7 +82,7 @@ private:
 
     Object meshObject, gridObject, meshPointsObject, gridPaneObject;
 
-    MyMesh myMesh;
+    MeshWrapper meshWrapper;
 
     Shader shader;
 
