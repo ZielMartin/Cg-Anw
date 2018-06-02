@@ -30,7 +30,7 @@ public:
 
     void loadMesh(const char *path);
 
-    void moveVertex(HE_MESH::VertexIter v_it, glm::vec3 relativeMovement);
+    void moveVertex(HE_MESH::VertexHandle v_h, glm::vec3 relativeMovement);
 
     void moveSelectedVertices(glm::vec3 relativeMovement);
 
@@ -57,7 +57,7 @@ private:
 
     OpenMesh::IO::Options opt;
 
-    std::vector<HE_MESH::VertexIter> selectedVertices;
+    std::vector<HE_MESH::VertexHandle> selectedVertices;
 
 
 };

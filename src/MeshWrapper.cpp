@@ -58,9 +58,9 @@ void MeshWrapper::getVertices(std::vector<glm::vec3> &vertices){
 
 
 
-void MeshWrapper::moveVertex(HE_MESH::VertexIter v_it, glm::vec3 relativeMovement) {
-    OpenMesh::Vec3f newPoint =  mesh.point(*v_it) + HE_MESH::Point(relativeMovement.x, relativeMovement.y, relativeMovement.z);
-    mesh.set_point(*v_it, newPoint);
+void MeshWrapper::moveVertex(HE_MESH::VertexHandle v_h, glm::vec3 relativeMovement) {
+    OpenMesh::Vec3f newPoint =  mesh.point(v_h) + HE_MESH::Point(relativeMovement.x, relativeMovement.y, relativeMovement.z);
+    mesh.set_point(v_h, newPoint);
 }
 
 void MeshWrapper::selectVertex(glm::vec3 pos){
@@ -85,7 +85,7 @@ void MeshWrapper::selectVertex(glm::vec3 pos){
                 selectedVertices.erase(std::find(selectedVertices.begin(), selectedVertices.end(), v_it));
             }else{
                 //select
-                selectedVertices.push_back(v_it);
+                selectedVertices.push_back(*v_it);
             }
         }
     }
@@ -99,15 +99,15 @@ void MeshWrapper::deselectAll() {
 std::vector<glm::vec3> MeshWrapper::getSelectedVertices(){
     std::vector<glm::vec3> selected;
 
-    for(HE_MESH::VertexIter v_it : selectedVertices){
-        selected.push_back(glm::vec3(mesh.point(*v_it)[0], mesh.point(*v_it)[1], mesh.point(*v_it)[2]));
+    for(HE_MESH::VertexHandle v_h : selectedVertices){
+        selected.push_back(glm::vec3(mesh.point(v_h)[0], mesh.point(v_h)[1], mesh.point(v_h)[2]));
     }
     return selected;
 }
 
 void MeshWrapper::moveSelectedVertices(glm::vec3 relativeMovement){
-    for(HE_MESH::VertexIter v_it : selectedVertices){
-        moveVertex(v_it, relativeMovement);
+    for(HE_MESH::VertexHandle v_h : selectedVertices){
+        moveVertex(v_h, relativeMovement);
     }
 
 }
@@ -117,8 +117,8 @@ void MeshWrapper::deleteSelectedVertices(){
     mesh.request_edge_status();
     mesh.request_vertex_status();
 
-    for(HE_MESH::VertexIter v_it : selectedVertices){
-        mesh.delete_vertex(*v_it, true);
+    for(HE_MESH::VertexHandle v_h : selectedVertices){
+        mesh.delete_vertex(v_h, true);
     }
     mesh.garbage_collection();
     deselectAll();
@@ -126,7 +126,8 @@ void MeshWrapper::deleteSelectedVertices(){
 }
 
 void MeshWrapper::addVertex(glm::vec3 vertex){
-    mesh.new_vertex(HE_MESH::Point(vertex.x,vertex.y,vertex.z));
+    OpenMesh::Vec3f const newPoint = HE_MESH::Point(vertex.x,vertex.y,vertex.z);
+    mesh.new_vertex(newPoint);
 }
 
 

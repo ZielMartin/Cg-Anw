@@ -157,7 +157,6 @@ void Renderer::initGridPane() {
     gridPaneObject.indices = {0, 1, 2, 2, 3, 0};
 
 
-
     setup_vertex_position_buffer_object(gridPaneObject);
     setup_vertex_color_buffer_object(gridPaneObject);
     setup_vertex_index_buffer_object(gridPaneObject);
@@ -170,7 +169,6 @@ void Renderer::initMesh() {
 
     meshWrapper.getVerticesAndNormalsTriangulated(meshObject.vertices, meshObject.normals);
     meshWrapper.getVertices(meshPointsObject.vertices);
-
 
 
     for (glm::vec3 v : meshObject.vertices) {
@@ -284,6 +282,7 @@ void Renderer::select(glm::vec3 pos) {
 
     std::vector<glm::vec3> selected = meshWrapper.getSelectedVertices();
 
+    //for rendering
     int i = 0;
     for (glm::vec3 vert : meshPointsObject.vertices) {
         bool found = false;
@@ -292,9 +291,9 @@ void Renderer::select(glm::vec3 pos) {
                 found = true;
             }
         }
-        if(found){
+        if (found) {
             meshPointsObject.colors.at(i) = selectedPointsColor;
-        }else{
+        } else {
             meshPointsObject.colors.at(i) = pointsColor;
         }
         i++;
@@ -304,7 +303,7 @@ void Renderer::select(glm::vec3 pos) {
 
 }
 
-void Renderer::moveSelected(glm::vec3 relativeMovement){
+void Renderer::moveSelected(glm::vec3 relativeMovement) {
     meshWrapper.moveSelectedVertices(relativeMovement);
 
     meshObject.vertices.clear();
@@ -331,7 +330,7 @@ void Renderer::updateBufferData(uint32 bufferID, std::vector<T> &data) {
                     &data.at(0));
 }
 
-void Renderer::deleteSelectedVertices(){
+void Renderer::deleteSelectedVertices() {
     meshWrapper.deleteSelectedVertices();
     updateMeshAndMeshPoints();
 }
@@ -345,11 +344,11 @@ void Renderer::updateMeshAndMeshPoints() {
     meshWrapper.getVertices(meshPointsObject.vertices);
 
 
-    for(vec3 vert : meshObject.vertices){
+    for (vec3 vert : meshObject.vertices) {
         meshObject.colors.push_back(faceColor);
         meshObject.radius.push_back(0);
     }
-    for(vec3 vert : meshPointsObject.vertices){
+    for (vec3 vert : meshPointsObject.vertices) {
         meshPointsObject.colors.push_back(pointsColor);
         meshPointsObject.radius.push_back(pointSize);
 
@@ -375,17 +374,20 @@ void Renderer::clearObject(Object &object) {
     object.indices.clear();
 }
 
-void Renderer::addVertex(glm::vec3 worldPos){
+void Renderer::addVertex(glm::vec3 worldPos) {
     meshWrapper.addVertex(worldPos);
 
-    updateMeshAndMeshPoints();
+    clearObject(meshObject);
+    clearObject(meshPointsObject);
+
+    meshWrapper.deselectAll();
+
+    initMesh();
 
     select(worldPos);
 
-    std::cout << "selected: " << meshWrapper.getSelectedVertices().size() << std::endl;
 
 }
-
 
 
 bool Renderer::isDrawGrid() const {

@@ -89,6 +89,8 @@ private:
 
     void clearObject(Object &object);
 
+    void updateMeshAndMeshPoints();
+
 
 
 
@@ -109,7 +111,6 @@ private:
     int pointSize;
 
 
-    void updateMeshAndMeshPoints();
 };
 
 
