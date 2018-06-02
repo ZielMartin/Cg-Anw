@@ -42,6 +42,8 @@ public:
 
     std::vector<glm::vec3> getSelectedVertices();
 
+    void deleteSelectedVertices();
+
 
 private:
 

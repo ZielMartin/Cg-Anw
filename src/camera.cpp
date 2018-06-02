@@ -25,6 +25,7 @@ namespace cg {
 	}
 
 	void Camera::Update() {
+
 		camera_direction = normalize(camera_look_at - camera_position);
 		//need to set the matrix state. this is only important because lighting doesn't work if this isn't done
 		glViewport(viewport_x, viewport_y, window_width, window_height);
@@ -95,6 +96,7 @@ namespace cg {
 	}
 
 	void Camera::Move(CameraDirection dir) {
+
 		if (camera_mode == FREE) {
 			switch (dir) {
 				case UP:
@@ -172,7 +174,8 @@ namespace cg {
 
 	void Camera::SetPos(QMouseEvent *event) {
 
-		mouse_position = vec3(event->pos().x(), event->pos().y(), 0);
+			mouse_position = vec3(event->pos().x(), event->pos().y(), 0);
+
 
 	}
 

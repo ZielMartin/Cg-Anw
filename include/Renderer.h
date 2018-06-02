@@ -59,6 +59,8 @@ public:
 
     void moveSelected(glm::vec3 relativeMovement);
 
+    void deleteSelectedVertices();
+
 private:
 
     void initGrid();
@@ -79,7 +81,10 @@ private:
 
     void setup_vertex_index_buffer_object(Object &object);
 
+    template<typename T>
+    void updateBufferData(glm::uint32 bufferID, std::vector<T> &vector) const;
 
+    void clearObject(Object &object);
 
 
 
@@ -97,6 +102,7 @@ private:
     glm::vec3 gridColor;
     glm::vec3 faceColor;
     float grid_lenght;
+    int pointSize;
 
 
 };

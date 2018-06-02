@@ -61,7 +61,7 @@ void MeshWrapper::selectVertex(glm::vec3 pos){
     vertexPos[2] = pos.z;
 
 
-    float tolerance = 0.01;
+    float tolerance = 0.02;
 
     for(HE_MESH::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it){
         float xDif = mesh.point(*v_it)[0] - vertexPos[0];
@@ -100,6 +100,19 @@ void MeshWrapper::moveSelectedVertices(glm::vec3 relativeMovement){
     for(HE_MESH::VertexIter v_it : selectedVertices){
         moveVertex(v_it, relativeMovement);
     }
+
+}
+
+void MeshWrapper::deleteSelectedVertices(){
+    mesh.request_face_status();
+    mesh.request_edge_status();
+    mesh.request_vertex_status();
+
+    for(HE_MESH::VertexIter v_it : selectedVertices){
+        mesh.delete_vertex(*v_it, true);
+    }
+    mesh.garbage_collection();
+    deselectAll();
 
 }
 

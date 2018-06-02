@@ -25,6 +25,7 @@ Renderer::Renderer() {
     gridColor = vec3(1, 1, 1);
     faceColor = vec3(0.25, 0.4, 0.3);
     grid_lenght = 10;
+    pointSize = 30;
 
     drawGrid = true;
 }
@@ -177,7 +178,7 @@ void Renderer::initMesh() {
         meshObject.radius.push_back(0);
         meshObject.colors.push_back(faceColor);
 
-        meshPointsObject.radius.push_back(30);
+        meshPointsObject.radius.push_back(pointSize);
         meshPointsObject.colors.push_back(pointsColor);
     }
 
@@ -298,10 +299,7 @@ void Renderer::select(glm::vec3 pos) {
         i++;
 
     }
-    glBindBuffer(GL_ARRAY_BUFFER, meshPointsObject.vertex_color_buffer);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::vec3) * meshPointsObject.colors.size(),
-                    &meshPointsObject.colors.at(0));
-
+    updateBufferData(meshPointsObject.vertex_color_buffer, meshPointsObject.colors);
 
 }
 
@@ -314,22 +312,59 @@ void Renderer::moveSelected(glm::vec3 relativeMovement){
     meshPointsObject.vertices = meshObject.vertices;
 
 
-
-
     //update mesh vertex position buffer
-    glBindBuffer(GL_ARRAY_BUFFER, meshPointsObject.vertex_position_buffer);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::vec3) * meshPointsObject.vertices.size(),
-                    &meshPointsObject.vertices.at(0));
-
+    updateBufferData(meshObject.vertex_position_buffer, meshObject.vertices);
     //update meshPoints vertex position buffer
-    glBindBuffer(GL_ARRAY_BUFFER, meshObject.vertex_position_buffer);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::vec3) * meshObject.vertices.size(),
-                    &meshObject.vertices.at(0));
-
+    updateBufferData(meshPointsObject.vertex_position_buffer, meshPointsObject.vertices);
     //update mesh vertex normal buffer
-    glBindBuffer(GL_ARRAY_BUFFER, meshObject.vertex_normal_buffer);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::vec3) * meshObject.normals.size(),
-                    &meshObject.normals.at(0));
+    updateBufferData(meshObject.vertex_normal_buffer, meshObject.normals);
+
+}
+
+template<typename T>
+void Renderer::updateBufferData(uint32 bufferID, std::vector<T> &vector) const {
+    glBindBuffer(GL_ARRAY_BUFFER, bufferID);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(T) * vector.size(),
+                    &vector.at(0));
+}
+
+void Renderer::deleteSelectedVertices(){
+    meshWrapper.deleteSelectedVertices();
+
+    clearObject(meshObject);
+    clearObject(meshPointsObject);
+
+
+    meshWrapper.getVerticesAndNormals(meshObject.vertices, meshObject.normals);
+    meshPointsObject.vertices = meshObject.vertices;
+
+    for(glm::vec3 vert : meshObject.vertices){
+        meshObject.colors.push_back(faceColor);
+        meshPointsObject.colors.push_back(pointsColor);
+
+        meshObject.radius.push_back(0);
+        meshPointsObject.radius.push_back(pointSize);
+
+    }
+
+    updateBufferData(meshObject.vertex_position_buffer, meshObject.vertices);
+    updateBufferData(meshObject.vertex_normal_buffer, meshObject.normals);
+    updateBufferData(meshObject.vertex_color_buffer, meshObject.colors);
+    updateBufferData(meshObject.vertex_radius_buffer, meshObject.radius);
+
+    updateBufferData(meshPointsObject.vertex_position_buffer, meshPointsObject.vertices);
+    updateBufferData(meshPointsObject.vertex_color_buffer, meshPointsObject.colors);
+    updateBufferData(meshPointsObject.vertex_radius_buffer, meshPointsObject.radius);
+
+
+}
+
+void Renderer::clearObject(Object &object) {
+    object.vertices.clear();
+    object.normals.clear();
+    object.colors.clear();
+    object.radius.clear();
+    object.indices.clear();
 }
 
 

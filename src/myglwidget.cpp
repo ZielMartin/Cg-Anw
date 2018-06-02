@@ -111,6 +111,9 @@ void MyGLWidget::initializeGL() {
     camera->SetLookAt(vec3(0, 0, 0));
     camera->SetClipping(.1, 1000);
     camera->SetFOV(45);
+
+
+
 }
 
 
@@ -118,14 +121,13 @@ void MyGLWidget::paintGL() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
     camera->Update();
     camera->GetMatricies(projectionMatrix, viewMatrix, modelMatrix);
 
     mat4 mvp = projectionMatrix * viewMatrix * modelMatrix;    //Compute the mvp matrix
-    glMatrixMode(GL_PROJECTION);
+    //glMatrixMode(GL_PROJECTION);
     glLoadMatrixf(value_ptr(mvp));
-    glMatrixMode(GL_MODELVIEW);
+    //glMatrixMode(GL_MODELVIEW);
 
 
     shader.Bind();
@@ -148,20 +150,15 @@ void MyGLWidget::resizeGL(int width, int height) {
 }
 
 void MyGLWidget::mousePressEvent(QMouseEvent *event) {
-
-
     if (event->modifiers().testFlag(Qt::ControlModifier)) {
         renderer.select(getWorldCoordinates(event->pos().x(), event->pos().y()));
         updateGL();
-
     }
-
 }
 
 
 void MyGLWidget::mouseMoveEvent(QMouseEvent *event) {
     if (event->buttons() & Qt::LeftButton) {
-        //camera->SetPos(event);
         camera->Move2D(event->x(), event->y());
         updateGL();
     }
@@ -202,6 +199,10 @@ void MyGLWidget::keyPressEvent(QKeyEvent *event) {
             break;
         case Qt::Key_G:
             renderer.setDrawGrid(!renderer.isDrawGrid());
+            updateGL();
+            break;
+        case Qt::Key_R:
+            renderer.deleteSelectedVertices();
             updateGL();
             break;
         case Qt::Key_Left:
