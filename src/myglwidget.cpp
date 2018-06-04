@@ -112,6 +112,8 @@ void MyGLWidget::initializeGL() {
     camera->SetClipping(.1, 1000);
     camera->SetFOV(45);
 
+    //camera->Update();
+
 
 
 }
@@ -121,7 +123,7 @@ void MyGLWidget::paintGL() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    camera->Update();
+    //camera->Update();
     camera->GetMatricies(projectionMatrix, viewMatrix, modelMatrix);
 
     mat4 mvp = projectionMatrix * viewMatrix * modelMatrix;    //Compute the mvp matrix
@@ -146,16 +148,21 @@ void MyGLWidget::resizeGL(int width, int height) {
     int side = qMin(width, height);
     glViewport(0, 0, width, height);
     camera->SetViewport(0, 0, width, height);
+    camera->Update();
 
 }
 
 void MyGLWidget::mousePressEvent(QMouseEvent *event) {
+
     if (event->modifiers().testFlag(Qt::ControlModifier) && event->buttons() & Qt::LeftButton) {
         renderer.select(getWorldCoordinates(event->pos().x(), event->pos().y()));
+        updateGL();
     }else if(event->buttons() & Qt::RightButton){
         renderer.addVertex(getWorldCoordinates(event->pos().x(), event->pos().y()));
+        updateGL();
     }
-    updateGL();
+
+
 }
 
 

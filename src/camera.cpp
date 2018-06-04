@@ -8,10 +8,10 @@ using namespace glm;
 namespace cg {
 	Camera::Camera() {
 		camera_mode = FREE;
-		camera_up = vec3(0, 1, 0);
+		camera_up = vec3(0.0f, 1.0f, 0.0f);
 		field_of_view = 45;
-		camera_position_delta = vec3(0, 0, 0);
-		camera_scale = .05f;
+		camera_position_delta = vec3(0.0f, 0.0f, 0.0f);
+		camera_scale = 0.05f;
 		max_pitch_rate = 0.015;
 		max_heading_rate = 0.015;
 		move_camera = true;
@@ -21,7 +21,7 @@ namespace cg {
 	}
 
 	void Camera::Reset() {
-		camera_up = vec3(0, 1, 0);
+		camera_up = vec3(0.0f, 1.0f, 0.0f);
 	}
 
 	void Camera::Update() {
@@ -119,6 +119,7 @@ namespace cg {
 					break;
 			}
 		}
+		Update();
 	}
 
 	void Camera::ChangePitch(float degrees) {
@@ -169,6 +170,8 @@ namespace cg {
 			ChangePitch(.08f * mouse_delta.y);
 		}
 		mouse_position = vec3(x, y, 0);
+
+		Update();
 
 	}
 
