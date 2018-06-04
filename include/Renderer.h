@@ -73,6 +73,8 @@ public:
 
     void undo();
 
+    void rotateMesh(glm::vec3 rotationVec, float angle);
+
 
 private:
 

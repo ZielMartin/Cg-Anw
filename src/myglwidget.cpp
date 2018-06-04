@@ -49,7 +49,7 @@ static void qNormalizeAngle(int &angle) {
 }
 
 void MyGLWidget::setXRotation(int angle) {
-    qNormalizeAngle(angle);
+    static int lastAngle = 0;
     if (angle != xRot) {
         xRot = angle;
         emit xRotationChanged(angle);
@@ -89,10 +89,9 @@ void MyGLWidget::initializeGL() {
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-    glEnable(GL_POINT_SMOOTH);
 
 
-    //enable vertex radius in shader
+    //enable point size in shader
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
 

@@ -15,42 +15,45 @@ void MeshWrapper::loadMesh(const char *path) {
     if (!OpenMesh::IO::read_mesh(mesh, path, opt)) {
         std::cerr << "Error loading mesh from file " << path << std::endl;
     }
-    //triangulation needed for DRAW_TRIANGLES without index buffer
-    mesh.triangulate();
-
-
-    //if this is not here, normals are not calculate on first getVerticesAndNormalsTriangulated call?!Oo
-    mesh.request_face_normals();
-    mesh.update_normals();
-    mesh.request_vertex_normals();
 }
 
-//gets vertices in triangle order, if mesh should not be triangulated, an index array must be implemented -
-//and this function would not be necessary anymore
+//gets vertices in triangle order, if mesh should not be triangulated, an index array must be implemented with triangulated indices
 void MeshWrapper::getVerticesAndNormalsTriangulated(std::vector<glm::vec3> &vertices, std::vector<glm::vec3> &normals) {
 
     mesh.request_face_normals();
     mesh.update_normals();
     mesh.request_vertex_normals();
 
+    HE_MESH meshTriangulated = HE_MESH(mesh);
+    //triangulation needed for DRAW_TRIANGLES
+    meshTriangulated.triangulate();
+
+    meshTriangulated.request_face_normals();
+    meshTriangulated.update_normals();
+    meshTriangulated.request_vertex_normals();
+
     OpenMesh::Vec3f v, n;
 
     //run throught each face(witch is a triangle)
-    for (HE_MESH::FaceIter f_it = mesh.faces_begin(); f_it != mesh.faces_end(); ++f_it) {
+    for (HE_MESH::FaceIter f_it = meshTriangulated.faces_begin(); f_it != meshTriangulated.faces_end(); ++f_it) {
         //run throught each vertex in this face
-        for (HE_MESH::FaceVertexIter fv_it = mesh.fv_begin(*f_it); fv_it != mesh.fv_end(*f_it); ++fv_it) {
-            v = mesh.point(*fv_it);
+        for (HE_MESH::FaceVertexIter fv_it = meshTriangulated.fv_begin(*f_it); fv_it != meshTriangulated.fv_end(*f_it); ++fv_it) {
+            v = meshTriangulated.point(*fv_it);
             vertices.push_back(glm::vec3(v[0], v[1], v[2]));
-            n = mesh.normal(*fv_it);
+            n = meshTriangulated.normal(*fv_it);
             normals.push_back(glm::vec3(n[0], n[1], n[2]));
 
         }
     }
 }
 
-void MeshWrapper::getVertices(std::vector<glm::vec3> &vertices) {
-    for (HE_MESH::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it) {
-        OpenMesh::Vec3f v = mesh.point(*v_it);
+void MeshWrapper::getVerticesTriangulated(std::vector<glm::vec3> &vertices) {
+    HE_MESH meshTriangulated = HE_MESH(mesh);
+    //triangulation needed for DRAW_TRIANGLES without index buffer
+    meshTriangulated.triangulate();
+
+    for (HE_MESH::VertexIter v_it = meshTriangulated.vertices_begin(); v_it != meshTriangulated.vertices_end(); ++v_it) {
+        OpenMesh::Vec3f v = meshTriangulated.point(*v_it);
         vertices.push_back(glm::vec3(v[0], v[1], v[2]));
     }
 
@@ -61,16 +64,15 @@ void MeshWrapper::moveVertex(HE_MESH::VertexHandle v_h, glm::vec3 relativeMoveme
     OpenMesh::Vec3f newPoint =
             mesh.point(v_h) + HE_MESH::Point(relativeMovement.x, relativeMovement.y, relativeMovement.z);
     mesh.set_point(v_h, newPoint);
+
 }
 
-void MeshWrapper::selectVertex(glm::vec3 pos) {
+void MeshWrapper::selectVertex(glm::vec3 pos, float radius) {
     OpenMesh::Vec3f vertexPos;
     vertexPos[0] = pos.x;
     vertexPos[1] = pos.y;
     vertexPos[2] = pos.z;
 
-
-    float tolerance = 0.02;
 
     for (HE_MESH::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it) {
         float xDif = mesh.point(*v_it)[0] - vertexPos[0];
@@ -78,8 +80,8 @@ void MeshWrapper::selectVertex(glm::vec3 pos) {
         float zDif = mesh.point(*v_it)[2] - vertexPos[2];
 
 
-        if ((xDif < tolerance && xDif > -tolerance) && (yDif < tolerance && yDif > -tolerance) &&
-            (zDif < tolerance && zDif > -tolerance)) {
+        if ((xDif < radius && xDif > -radius) && (yDif < radius && yDif > -radius) &&
+            (zDif < radius && zDif > -radius)) {
 
             if (std::find(selectedVertices.begin(), selectedVertices.end(), v_it) != selectedVertices.end()) {
                 //deselect
@@ -118,6 +120,7 @@ void MeshWrapper::deleteSelectedVertices() {
     mesh.request_edge_status();
     mesh.request_vertex_status();
 
+
     for (HE_MESH::VertexHandle v_h : selectedVertices) {
         mesh.delete_vertex(v_h, true);
     }
@@ -144,7 +147,6 @@ void MeshWrapper::subdivision() {
     catmull(1);
     catmull.detach();
 
-    mesh.triangulate();
 }
 
 void MeshWrapper::undo() {

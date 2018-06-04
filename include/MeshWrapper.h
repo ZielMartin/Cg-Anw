@@ -30,6 +30,11 @@ struct Traits : OpenMesh::DefaultTraits
 typedef OpenMesh::PolyMesh_ArrayKernelT<Traits>  HE_MESH;
 
 
+
+
+
+
+
 class MeshWrapper {
 public:
 
@@ -43,9 +48,9 @@ public:
 
     void getVerticesAndNormalsTriangulated(std::vector<glm::vec3> &vertices, std::vector<glm::vec3> &normals);
 
-    void getVertices(std::vector<glm::vec3> &vertices);
+    void getVerticesTriangulated(std::vector<glm::vec3> &vertices);
 
-    void selectVertex(glm::vec3 pos);
+    void selectVertex(glm::vec3 pos, float radius);
 
     void deselectAll();
 

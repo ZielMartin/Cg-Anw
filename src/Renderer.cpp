@@ -13,6 +13,7 @@
 #include <include/utils.h>
 #include <c++/map>
 #include <include/Shader.h>
+#include <libs/glm-0.9.7.2/glm/gtc/matrix_transform.hpp>
 
 
 using namespace glm;
@@ -172,7 +173,7 @@ void Renderer::initMesh() {
 
 
     meshWrapper.getVerticesAndNormalsTriangulated(meshObject.vertices, meshObject.normals);
-    meshWrapper.getVertices(meshPointsObject.vertices);
+    meshWrapper.getVerticesTriangulated(meshPointsObject.vertices);
 
 
     for (glm::vec3 v : meshObject.vertices) {
@@ -282,7 +283,7 @@ void Renderer::setup_vertex_normal_buffer_object(Object &object) {
 
 
 void Renderer::select(glm::vec3 pos) {
-    meshWrapper.selectVertex(pos);
+    meshWrapper.selectVertex(pos, 0.02);
 
     std::vector<glm::vec3> selected = meshWrapper.getSelectedVertices();
 
@@ -314,7 +315,7 @@ void Renderer::moveSelected(glm::vec3 relativeMovement) {
     meshObject.normals.clear();
     meshPointsObject.vertices.clear();
     meshWrapper.getVerticesAndNormalsTriangulated(meshObject.vertices, meshObject.normals);
-    meshWrapper.getVertices(meshPointsObject.vertices);
+    meshWrapper.getVerticesTriangulated(meshPointsObject.vertices);
 
 
 
@@ -345,7 +346,7 @@ void Renderer::updateMeshAndMeshPoints() {
 
 
     meshWrapper.getVerticesAndNormalsTriangulated(meshObject.vertices, meshObject.normals);
-    meshWrapper.getVertices(meshPointsObject.vertices);
+    meshWrapper.getVerticesTriangulated(meshPointsObject.vertices);
 
 
     for (vec3 vert : meshObject.vertices) {
@@ -421,6 +422,11 @@ void Renderer::undo() {
     clearObject(meshPointsObject);
 
     initMesh();
+}
+
+void Renderer::rotateMesh(glm::vec3 rotationVec, float angle) {
+    meshObject.model = glm::rotate(meshObject.model, angle, rotationVec);
+    meshPointsObject.model = glm::rotate(meshPointsObject.model, angle, rotationVec);
 }
 
 
