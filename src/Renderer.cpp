@@ -27,7 +27,8 @@ Renderer::Renderer() {
     grid_lenght = 10;
     pointSize = 30;
 
-    drawGrid = true;
+    renderGrid = true;
+    renderPoints = true;
 }
 
 void Renderer::initRenderer(Shader &shader, char *model_path) {
@@ -41,10 +42,13 @@ void Renderer::initRenderer(Shader &shader, char *model_path) {
 
 
 void Renderer::render() {
-    renderObject(meshPointsObject, GL_POINTS);
     renderObject(meshObject, GL_TRIANGLES);
 
-    if (drawGrid) {
+    if(renderPoints){
+        renderObject(meshPointsObject, GL_POINTS);
+    }
+
+    if (renderGrid) {
         renderObject(gridObject, GL_LINES);
         renderObject(gridPaneObject, GL_TRIANGLES);
     }
@@ -389,12 +393,52 @@ void Renderer::addVertex(glm::vec3 worldPos) {
 
 }
 
+void Renderer::addFace() {
+    meshWrapper.makeSelectedFace();
 
-bool Renderer::isDrawGrid() const {
-    return drawGrid;
+    clearObject(meshObject);
+    clearObject(meshPointsObject);
+
+    meshWrapper.deselectAll();
+
+    initMesh();
+
 }
 
-void Renderer::setDrawGrid(bool drawGrid) {
-    Renderer::drawGrid = drawGrid;
+void Renderer::subdivision(){
+    meshWrapper.subdivision();
+
+    clearObject(meshObject);
+    clearObject(meshPointsObject);
+
+    initMesh();
 }
+
+void Renderer::undo() {
+    meshWrapper.undo();
+
+    clearObject(meshObject);
+    clearObject(meshPointsObject);
+
+    initMesh();
+}
+
+
+bool Renderer::isRenderGrid() const {
+    return renderGrid;
+}
+
+void Renderer::setRenderGrid(bool drawGrid) {
+    Renderer::renderGrid = drawGrid;
+}
+
+bool Renderer::isRenderPoints() const {
+    return renderPoints;
+}
+
+void Renderer::setRenderPoints(bool renderPoints) {
+    Renderer::renderPoints = renderPoints;
+}
+
+
 

@@ -49,9 +49,13 @@ public:
 
     void render();
 
-    bool isDrawGrid() const;
+    bool isRenderGrid() const;
 
-    void setDrawGrid(bool drawGrid);
+    void setRenderGrid(bool drawGrid);
+
+    bool isRenderPoints() const;
+
+    void setRenderPoints(bool renderPoints);
 
     void initRenderer(Shader &shader, char* model_path);
 
@@ -62,6 +66,12 @@ public:
     void deleteSelectedVertices();
 
     void addVertex(glm::vec3 worldPos);
+
+    void addFace();
+
+    void subdivision();
+
+    void undo();
 
 
 private:
@@ -94,7 +104,9 @@ private:
 
 
 
-    bool drawGrid;
+    bool renderGrid, renderPoints;
+
+private:
 
     Object meshObject, gridObject, meshPointsObject, gridPaneObject;
 

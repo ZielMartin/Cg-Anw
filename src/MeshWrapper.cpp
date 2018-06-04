@@ -40,30 +40,30 @@ void MeshWrapper::getVerticesAndNormalsTriangulated(std::vector<glm::vec3> &vert
         //run throught each vertex in this face
         for (HE_MESH::FaceVertexIter fv_it = mesh.fv_begin(*f_it); fv_it != mesh.fv_end(*f_it); ++fv_it) {
             v = mesh.point(*fv_it);
-            vertices.push_back(glm::vec3(v[0],v[1],v[2]));
+            vertices.push_back(glm::vec3(v[0], v[1], v[2]));
             n = mesh.normal(*fv_it);
-            normals.push_back(glm::vec3(n[0],n[1],n[2]));
+            normals.push_back(glm::vec3(n[0], n[1], n[2]));
 
         }
     }
 }
 
-void MeshWrapper::getVertices(std::vector<glm::vec3> &vertices){
-    for(HE_MESH::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it){
+void MeshWrapper::getVertices(std::vector<glm::vec3> &vertices) {
+    for (HE_MESH::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it) {
         OpenMesh::Vec3f v = mesh.point(*v_it);
-        vertices.push_back(glm::vec3(v[0],v[1],v[2]));
+        vertices.push_back(glm::vec3(v[0], v[1], v[2]));
     }
 
 }
 
 
-
 void MeshWrapper::moveVertex(HE_MESH::VertexHandle v_h, glm::vec3 relativeMovement) {
-    OpenMesh::Vec3f newPoint =  mesh.point(v_h) + HE_MESH::Point(relativeMovement.x, relativeMovement.y, relativeMovement.z);
+    OpenMesh::Vec3f newPoint =
+            mesh.point(v_h) + HE_MESH::Point(relativeMovement.x, relativeMovement.y, relativeMovement.z);
     mesh.set_point(v_h, newPoint);
 }
 
-void MeshWrapper::selectVertex(glm::vec3 pos){
+void MeshWrapper::selectVertex(glm::vec3 pos) {
     OpenMesh::Vec3f vertexPos;
     vertexPos[0] = pos.x;
     vertexPos[1] = pos.y;
@@ -72,18 +72,19 @@ void MeshWrapper::selectVertex(glm::vec3 pos){
 
     float tolerance = 0.02;
 
-    for(HE_MESH::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it){
+    for (HE_MESH::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it) {
         float xDif = mesh.point(*v_it)[0] - vertexPos[0];
         float yDif = mesh.point(*v_it)[1] - vertexPos[1];
         float zDif = mesh.point(*v_it)[2] - vertexPos[2];
 
 
-        if((xDif < tolerance && xDif > -tolerance) && (yDif < tolerance && yDif > -tolerance) && (zDif < tolerance && zDif > -tolerance)){
+        if ((xDif < tolerance && xDif > -tolerance) && (yDif < tolerance && yDif > -tolerance) &&
+            (zDif < tolerance && zDif > -tolerance)) {
 
-            if(std::find(selectedVertices.begin(), selectedVertices.end(), v_it) != selectedVertices.end()){
+            if (std::find(selectedVertices.begin(), selectedVertices.end(), v_it) != selectedVertices.end()) {
                 //deselect
                 selectedVertices.erase(std::find(selectedVertices.begin(), selectedVertices.end(), v_it));
-            }else{
+            } else {
                 //select
                 selectedVertices.push_back(*v_it);
             }
@@ -96,28 +97,28 @@ void MeshWrapper::deselectAll() {
 }
 
 
-std::vector<glm::vec3> MeshWrapper::getSelectedVertices(){
+std::vector<glm::vec3> MeshWrapper::getSelectedVertices() {
     std::vector<glm::vec3> selected;
 
-    for(HE_MESH::VertexHandle v_h : selectedVertices){
+    for (HE_MESH::VertexHandle v_h : selectedVertices) {
         selected.push_back(glm::vec3(mesh.point(v_h)[0], mesh.point(v_h)[1], mesh.point(v_h)[2]));
     }
     return selected;
 }
 
-void MeshWrapper::moveSelectedVertices(glm::vec3 relativeMovement){
-    for(HE_MESH::VertexHandle v_h : selectedVertices){
+void MeshWrapper::moveSelectedVertices(glm::vec3 relativeMovement) {
+    for (HE_MESH::VertexHandle v_h : selectedVertices) {
         moveVertex(v_h, relativeMovement);
     }
 
 }
 
-void MeshWrapper::deleteSelectedVertices(){
+void MeshWrapper::deleteSelectedVertices() {
     mesh.request_face_status();
     mesh.request_edge_status();
     mesh.request_vertex_status();
 
-    for(HE_MESH::VertexHandle v_h : selectedVertices){
+    for (HE_MESH::VertexHandle v_h : selectedVertices) {
         mesh.delete_vertex(v_h, true);
     }
     mesh.garbage_collection();
@@ -125,9 +126,32 @@ void MeshWrapper::deleteSelectedVertices(){
 
 }
 
-void MeshWrapper::addVertex(glm::vec3 vertex){
-    OpenMesh::Vec3f const newPoint = HE_MESH::Point(vertex.x,vertex.y,vertex.z);
+void MeshWrapper::addVertex(glm::vec3 vertex) {
+    OpenMesh::Vec3f const newPoint = HE_MESH::Point(vertex.x, vertex.y, vertex.z);
     mesh.new_vertex(newPoint);
+}
+
+void MeshWrapper::makeSelectedFace() {
+    if (selectedVertices.size() == 3) {
+        mesh.add_face(selectedVertices);
+    }
+}
+
+void MeshWrapper::subdivision() {
+    backstack.push_back(mesh);
+
+    catmull.attach(mesh);
+    catmull(1);
+    catmull.detach();
+
+    mesh.triangulate();
+}
+
+void MeshWrapper::undo() {
+    if(backstack.size() > 0) {
+        mesh = backstack.at(backstack.size() - 1);
+        backstack.pop_back();
+    }
 }
 
 

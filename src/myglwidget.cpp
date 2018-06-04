@@ -77,7 +77,7 @@ void MyGLWidget::setZRotation(int angle) {
 
 void MyGLWidget::initializeGL() {
 
-    char *model_path = ((char *) "../obj/teapot.obj");
+    char *model_path = ((char *) "../obj/cube.obj");
     char *vertexshader_path = (char *) "../shader/simpleShader.vert";
     char *fragmentshader_path = (char *) "../shader/simpleShader.frag";
 
@@ -171,6 +171,11 @@ void MyGLWidget::keyPressEvent(QKeyEvent *event) {
 
     float moveStepSize = 0.01;
 
+    if(event->modifiers().testFlag(Qt::ControlModifier) && event->key() == Qt::Key_Z){
+        renderer.undo();
+        updateGL();
+    }
+
     switch (event->key()) {
         case Qt::Key_Escape:
             close();
@@ -200,11 +205,23 @@ void MyGLWidget::keyPressEvent(QKeyEvent *event) {
             updateGL();
             break;
         case Qt::Key_G:
-            renderer.setDrawGrid(!renderer.isDrawGrid());
+            renderer.setRenderGrid(!renderer.isRenderGrid());
+            updateGL();
+            break;
+        case Qt::Key_P:
+            renderer.setRenderPoints(!renderer.isRenderPoints());
             updateGL();
             break;
         case Qt::Key_R:
             renderer.deleteSelectedVertices();
+            updateGL();
+            break;
+        case Qt::Key_F:
+            renderer.addFace();
+            updateGL();
+            break;
+        case Qt::Key_C:
+            renderer.subdivision();
             updateGL();
             break;
         case Qt::Key_Left:
