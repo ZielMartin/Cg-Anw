@@ -45,7 +45,7 @@ void Renderer::initRenderer(Shader &shader, char *model_path) {
 void Renderer::render() {
     renderObject(meshObject, GL_TRIANGLES);
 
-    if(renderPoints){
+    if (renderPoints) {
         renderObject(meshPointsObject, GL_POINTS);
     }
 
@@ -66,7 +66,7 @@ void Renderer::renderObject(Object &object, int gl_draw_type) {
 
     glBindVertexArray(object.vaoID);
 
-    if (object.indices.size() == 0) {
+    if (object.indices.empty()) {
         glDrawArrays(gl_draw_type, 0, object.vertices.size());
     } else {
         glDrawElements(gl_draw_type, object.indices.size(), GL_UNSIGNED_INT, NULL);
@@ -123,8 +123,6 @@ void Renderer::initGrid() {
 
     }
 
-    setup_vertex_position_buffer_object(gridObject);
-    setup_vertex_color_buffer_object(gridObject);
     setup_vao(gridObject);
 
 
@@ -159,12 +157,10 @@ void Renderer::initGridPane() {
     gridPaneObject.radius.push_back(0);
 
 
+
     gridPaneObject.indices = {0, 1, 2, 2, 3, 0};
 
 
-    setup_vertex_position_buffer_object(gridPaneObject);
-    setup_vertex_color_buffer_object(gridPaneObject);
-    setup_vertex_index_buffer_object(gridPaneObject);
     setup_vao(gridPaneObject);
 }
 
@@ -181,21 +177,16 @@ void Renderer::initMesh() {
         meshObject.colors.push_back(faceColor);
     }
 
+
     for (glm::vec3 v : meshPointsObject.vertices) {
         meshPointsObject.radius.push_back(pointSize);
         meshPointsObject.colors.push_back(pointsColor);
     }
 
 
-    setup_vertex_position_buffer_object(meshObject);
-    setup_vertex_color_buffer_object(meshObject);
-    setup_vertex_normal_buffer_object(meshObject);
+
     setup_vao(meshObject);
 
-
-    setup_vertex_position_buffer_object(meshPointsObject);
-    setup_vertex_color_buffer_object(meshPointsObject);
-    setup_vertex_radius_buffer_object(meshPointsObject);
     setup_vao(meshPointsObject);
 
 
@@ -207,79 +198,63 @@ void Renderer::setup_vao(Object &object) {
     glGenVertexArrays(1, &object.vaoID);
     glBindVertexArray(object.vaoID);
 
-
-    // bind vertex positions to shader
-    GLint position_location = glGetAttribLocation(shader.ID(), "vertex_position");
-    if (position_location != -1) {
-        glEnableVertexAttribArray(position_location);
-        glBindBuffer(GL_ARRAY_BUFFER, object.vertex_position_buffer);
-        glVertexAttribPointer(position_location, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    if(!object.vertices.empty()){
+        setupBufferData(object.vertex_position_buffer, object.vertices);
+        // bind vertex positions to shader
+        uint32_t position_location = glGetAttribLocation(shader.ID(), "vertex_position");
+        bindBufferToShader(object.vertex_position_buffer, position_location, 3);
     }
-    // bind vertex normals to shader
-    GLint normal_location = glGetAttribLocation(shader.ID(), "vertex_normal");
-    if (normal_location != -1) {
-        glEnableVertexAttribArray(normal_location);
-        glBindBuffer(GL_ARRAY_BUFFER, object.vertex_normal_buffer);
-        glVertexAttribPointer(normal_location, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    if(!object.colors.empty()){
+        setupBufferData(object.vertex_color_buffer, object.colors);
+        // bind color to shader
+        uint32_t color_location = glGetAttribLocation(shader.ID(), "v_color");
+        bindBufferToShader(object.vertex_color_buffer, color_location, 3);
     }
-    // bind color to shader
-    GLint color_location = glGetAttribLocation(shader.ID(), "v_color");
-    if (color_location != -1) {
-        glEnableVertexAttribArray(color_location);
-        glBindBuffer(GL_ARRAY_BUFFER, object.vertex_color_buffer);
-        glVertexAttribPointer(color_location, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    if(!object.indices.empty()){
+        setupBufferData(object.vertex_index_buffer, object.indices);
+        // bind indices
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object.vertex_index_buffer);
     }
-
-    // bind radius to shader
-    GLint radius_location = glGetAttribLocation(shader.ID(), "radius_attr");
-    if (radius_location != -1) {
-        glEnableVertexAttribArray(radius_location);
-        glBindBuffer(GL_ARRAY_BUFFER, object.vertex_radius_buffer);
-        glVertexAttribPointer(radius_location, 1, GL_FLOAT, GL_FALSE, 0, 0);
+    if(!object.normals.empty()){
+        setupBufferData(object.vertex_normal_buffer, object.normals);
+        // bind vertex normals to shader
+        uint32_t normal_location = glGetAttribLocation(shader.ID(), "vertex_normal");
+        bindBufferToShader(object.vertex_normal_buffer, normal_location, 3);
     }
-
-    // bind indices
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object.vertex_index_buffer);
+    if(!object.radius.empty()){
+        setupBufferData(object.vertex_radius_buffer, object.radius);
+        // bind radius to shader
+        uint32_t radius_location = glGetAttribLocation(shader.ID(), "radius_attr");
+        bindBufferToShader(object.vertex_radius_buffer, radius_location, 1);
+    }
 
     glBindVertexArray(0);
 }
 
-
-void Renderer::setup_vertex_position_buffer_object(Object &object) {
-    glGenBuffers(1, &object.vertex_position_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, object.vertex_position_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * object.vertices.size(),
-                 &object.vertices.at(0), GL_DYNAMIC_DRAW);
+void Renderer::bindBufferToShader(uint32_t &bufferID, uint32_t &location, int size) {
+    if (location != -1) {
+            glEnableVertexAttribArray(location);
+            glBindBuffer(GL_ARRAY_BUFFER, bufferID);
+            glVertexAttribPointer(location, size, GL_FLOAT, GL_FALSE, 0, 0);
+        }
 }
 
-void Renderer::setup_vertex_index_buffer_object(Object &object) {
-    glGenBuffers(1, &object.vertex_index_buffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object.vertex_index_buffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * object.indices.size(),
-                 &object.indices.at(0), GL_DYNAMIC_DRAW);
 
+template<typename T>
+void Renderer::setupBufferData(uint32 &bufferID, std::vector<T> &data) {
+    glGenBuffers(1, &bufferID);
+    glBindBuffer(GL_ARRAY_BUFFER, bufferID);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(T) * data.size(),
+                 &data.at(0), GL_DYNAMIC_DRAW);
 }
 
-void Renderer::setup_vertex_color_buffer_object(Object &object) {
-    glGenBuffers(1, &object.vertex_color_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, object.vertex_color_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * object.colors.size(),
-                 &object.colors.at(0), GL_DYNAMIC_DRAW);
+template<typename T>
+void Renderer::updateBufferData(uint32 &bufferID, std::vector<T> &data) {
+    glBindBuffer(GL_ARRAY_BUFFER, bufferID);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(T) * data.size(),
+                    &data.at(0));
 }
 
-void Renderer::setup_vertex_radius_buffer_object(Object &object) {
-    glGenBuffers(1, &object.vertex_radius_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, object.vertex_radius_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * object.radius.size(),
-                 &object.radius.at(0), GL_DYNAMIC_DRAW);
-}
-
-void Renderer::setup_vertex_normal_buffer_object(Object &object) {
-    glGenBuffers(1, &object.vertex_normal_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, object.vertex_normal_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * object.normals.size(),
-                 &object.normals.at(0), GL_DYNAMIC_DRAW);
-}
 
 
 void Renderer::select(glm::vec3 pos) {
@@ -328,12 +303,6 @@ void Renderer::moveSelected(glm::vec3 relativeMovement) {
 
 }
 
-template<typename T>
-void Renderer::updateBufferData(uint32 bufferID, std::vector<T> &data) {
-    glBindBuffer(GL_ARRAY_BUFFER, bufferID);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(T) * data.size(),
-                    &data.at(0));
-}
 
 void Renderer::deleteSelectedVertices() {
     meshWrapper.deleteSelectedVertices();
@@ -406,7 +375,7 @@ void Renderer::addFace() {
 
 }
 
-void Renderer::subdivision(){
+void Renderer::subdivision() {
     meshWrapper.subdivision();
 
     clearObject(meshObject);

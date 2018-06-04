@@ -86,27 +86,21 @@ private:
 
     void setup_vao(Object &object);
 
-    void setup_vertex_normal_buffer_object(Object &object);
-
-    void setup_vertex_color_buffer_object(Object &object);
-
-    void setup_vertex_position_buffer_object(Object &object);
-
-    void setup_vertex_radius_buffer_object(Object &object);
-
-    void setup_vertex_index_buffer_object(Object &object);
 
     template<typename T>
-    void updateBufferData(glm::uint32 bufferID, std::vector<T> &data);
+    void updateBufferData(uint32_t &bufferID, std::vector<T> &data);
+
+    template<typename T>
+    void setupBufferData(uint32_t &bufferID, std::vector<T> &data);
 
     void clearObject(Object &object);
 
     void updateMeshAndMeshPoints();
 
 
+    void bindBufferToShader(uint32_t &bufferID, uint32_t &location, int size);
 
 
-    bool renderGrid, renderPoints;
 
 private:
 
@@ -123,6 +117,9 @@ private:
     glm::vec3 faceColor;
     float grid_lenght;
     int pointSize;
+
+    bool renderGrid, renderPoints;
+
 
 
 };
