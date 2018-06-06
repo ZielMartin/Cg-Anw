@@ -8,8 +8,8 @@
 
 
 Window::Window(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::Window)
+        QWidget(parent),
+        ui(new Ui::Window)
 {
     ui->setupUi(this);
 

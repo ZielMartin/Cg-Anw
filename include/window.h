@@ -7,12 +7,12 @@
 #include <QSlider>
 
 namespace Ui {
-class Window;
+    class Window;
 }
 
 class Window : public QWidget
 {
-    Q_OBJECT
+Q_OBJECT
 
 public:
     explicit Window(QWidget *parent = 0);
