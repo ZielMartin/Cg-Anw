@@ -19,6 +19,9 @@ public:
     ~Window();
 
 
+public slots:
+
+
 private:
     Ui::Window *ui;
 };
