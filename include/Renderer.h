@@ -95,7 +95,7 @@ private:
 
     void clearObject(Object &object);
 
-    void updateMeshAndMeshPoints();
+    void updateMesh(bool updatePointColor);
 
 
     void bindBufferToShader(uint32_t &bufferID, uint32_t &location, int size);
@@ -104,7 +104,7 @@ private:
 
 private:
 
-    Object meshObject, gridObject, meshPointsObject, gridPaneObject;
+    Object meshObject, gridObject, meshPointsObject, meshLinesObject, gridPaneObject;
 
     MeshWrapper meshWrapper;
 
@@ -115,13 +115,14 @@ private:
     glm::vec3 pointsColor;
     glm::vec3 gridColor;
     glm::vec3 faceColor;
+    glm::vec3 meshLineColor;
     float grid_lenght;
     int pointSize;
 
     bool renderGrid, renderPoints;
 
 
-
+    void recreateMesh();
 };
 
 

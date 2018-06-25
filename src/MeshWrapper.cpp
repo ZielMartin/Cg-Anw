@@ -12,6 +12,7 @@ MeshWrapper::MeshWrapper() {
 
 void MeshWrapper::loadMesh(const char *path) {
 
+
     if (!OpenMesh::IO::read_mesh(mesh, path, opt)) {
         std::cerr << "Error loading mesh from file " << path << std::endl;
     }
@@ -47,14 +48,37 @@ void MeshWrapper::getVerticesAndNormalsTriangulated(std::vector<glm::vec3> &vert
     }
 }
 
-void MeshWrapper::getVerticesTriangulated(std::vector<glm::vec3> &vertices) {
-    HE_MESH meshTriangulated = HE_MESH(mesh);
-    //triangulation needed for DRAW_TRIANGLES without index buffer
-    meshTriangulated.triangulate();
+void MeshWrapper::getVertices(std::vector<glm::vec3> &vertices) {
 
-    for (HE_MESH::VertexIter v_it = meshTriangulated.vertices_begin(); v_it != meshTriangulated.vertices_end(); ++v_it) {
-        OpenMesh::Vec3f v = meshTriangulated.point(*v_it);
+    for (HE_MESH::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it) {
+        OpenMesh::Vec3f v = mesh.point(*v_it);
         vertices.push_back(glm::vec3(v[0], v[1], v[2]));
+    }
+
+}
+
+void MeshWrapper::getLineVertices(std::vector<glm::vec3> &vertices) {
+
+    for (HE_MESH::FaceIter f_it = mesh.faces_begin(); f_it != mesh.faces_end(); ++f_it) {
+        //run throught each vertex in this face
+        HE_MESH::FaceVertexIter fv_it_first = mesh.fv_begin(*f_it);
+
+        int counter = mesh.valence(*f_it);
+        for (HE_MESH::FaceVertexIter fv_it = mesh.fv_begin(*f_it); fv_it != mesh.fv_end(*f_it); ++fv_it) {
+            counter--;
+
+            OpenMesh::Vec3f v = mesh.point(*fv_it);
+            if(fv_it != fv_it_first){
+                vertices.push_back(glm::vec3(v[0], v[1], v[2]));
+            }
+            vertices.push_back(glm::vec3(v[0], v[1], v[2]));
+
+            if(counter == 0){
+                v = mesh.point(*mesh.fv_begin(*f_it));
+                vertices.push_back(glm::vec3(v[0], v[1], v[2]));
+            }
+
+        }
     }
 
 }

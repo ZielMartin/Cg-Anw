@@ -88,7 +88,7 @@ void MyGLWidget::initializeGL() {
 
 
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
 
 
     //enable point size in shader
@@ -126,9 +126,9 @@ void MyGLWidget::paintGL() {
     camera->GetMatricies(projectionMatrix, viewMatrix, modelMatrix);
 
     mat4 mvp = projectionMatrix * viewMatrix * modelMatrix;    //Compute the mvp matrix
-    //glMatrixMode(GL_PROJECTION);
+    glMatrixMode(GL_PROJECTION);
     glLoadMatrixf(value_ptr(mvp));
-    //glMatrixMode(GL_MODELVIEW);
+    glMatrixMode(GL_MODELVIEW);
 
 
     shader.Bind();

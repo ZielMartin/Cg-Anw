@@ -25,6 +25,7 @@ Renderer::Renderer() {
     pointsColor = vec3(0.1, 0.2, 0.15);
     gridColor = vec3(1, 1, 1);
     faceColor = vec3(0.25, 0.4, 0.3);
+    meshLineColor = vec3(0.2,0.1,0.1);
     grid_lenght = 10;
     pointSize = 30;
 
@@ -44,6 +45,7 @@ void Renderer::initRenderer(Shader &shader, char *model_path) {
 
 void Renderer::render() {
     renderObject(meshObject, GL_TRIANGLES);
+    renderObject(meshLinesObject, GL_LINES);
 
     if (renderPoints) {
         renderObject(meshPointsObject, GL_POINTS);
@@ -169,7 +171,8 @@ void Renderer::initMesh() {
 
 
     meshWrapper.getVerticesAndNormalsTriangulated(meshObject.vertices, meshObject.normals);
-    meshWrapper.getVerticesTriangulated(meshPointsObject.vertices);
+    meshWrapper.getVertices(meshPointsObject.vertices);
+    meshWrapper.getLineVertices(meshLinesObject.vertices);
 
 
     for (glm::vec3 v : meshObject.vertices) {
@@ -177,16 +180,20 @@ void Renderer::initMesh() {
         meshObject.colors.push_back(faceColor);
     }
 
-
     for (glm::vec3 v : meshPointsObject.vertices) {
         meshPointsObject.radius.push_back(pointSize);
         meshPointsObject.colors.push_back(pointsColor);
     }
 
+    for (glm::vec3 v : meshLinesObject.vertices) {
+        meshLinesObject.radius.push_back(0);
+        meshLinesObject.colors.push_back(meshLineColor);
+    }
+
 
 
     setup_vao(meshObject);
-
+    setup_vao(meshLinesObject);
     setup_vao(meshPointsObject);
 
 
@@ -286,36 +293,34 @@ void Renderer::select(glm::vec3 pos) {
 void Renderer::moveSelected(glm::vec3 relativeMovement) {
     meshWrapper.moveSelectedVertices(relativeMovement);
 
-    meshObject.vertices.clear();
-    meshObject.normals.clear();
-    meshPointsObject.vertices.clear();
-    meshWrapper.getVerticesAndNormalsTriangulated(meshObject.vertices, meshObject.normals);
-    meshWrapper.getVerticesTriangulated(meshPointsObject.vertices);
-
-
-
-    //update mesh vertex position buffer
-    updateBufferData(meshObject.vertex_position_buffer, meshObject.vertices);
-    //update meshPoints vertex position buffer
-    updateBufferData(meshPointsObject.vertex_position_buffer, meshPointsObject.vertices);
-    //update mesh vertex normal buffer
-    updateBufferData(meshObject.vertex_normal_buffer, meshObject.normals);
+    updateMesh(false);
 
 }
 
 
 void Renderer::deleteSelectedVertices() {
     meshWrapper.deleteSelectedVertices();
-    updateMeshAndMeshPoints();
+    updateMesh(true);
 }
 
-void Renderer::updateMeshAndMeshPoints() {
+
+/**
+ * does not work if vertex-count of mesh is changed
+ */
+void Renderer::updateMesh(bool updatePointColor) {
     clearObject(meshObject);
-    clearObject(meshPointsObject);
+    if(updatePointColor){
+        clearObject(meshPointsObject);
+    }else{
+        meshPointsObject.vertices.clear();
+    }
+    clearObject(meshLinesObject);
 
 
     meshWrapper.getVerticesAndNormalsTriangulated(meshObject.vertices, meshObject.normals);
-    meshWrapper.getVerticesTriangulated(meshPointsObject.vertices);
+    meshWrapper.getVertices(meshPointsObject.vertices);
+    meshWrapper.getLineVertices(meshLinesObject.vertices);
+
 
 
     for (vec3 vert : meshObject.vertices) {
@@ -323,12 +328,17 @@ void Renderer::updateMeshAndMeshPoints() {
         meshObject.radius.push_back(0);
     }
     for (vec3 vert : meshPointsObject.vertices) {
-        meshPointsObject.colors.push_back(pointsColor);
+        if(updatePointColor){
+            meshPointsObject.colors.push_back(pointsColor);
+        }
         meshPointsObject.radius.push_back(pointSize);
 
     }
+    for (glm::vec3 v : meshLinesObject.vertices) {
+        meshLinesObject.radius.push_back(0);
+        meshLinesObject.colors.push_back(meshLineColor);
+    }
 
-    meshWrapper.deselectAll();
 
     updateBufferData(meshObject.vertex_position_buffer, meshObject.vertices);
     updateBufferData(meshObject.vertex_normal_buffer, meshObject.normals);
@@ -338,6 +348,10 @@ void Renderer::updateMeshAndMeshPoints() {
     updateBufferData(meshPointsObject.vertex_position_buffer, meshPointsObject.vertices);
     updateBufferData(meshPointsObject.vertex_color_buffer, meshPointsObject.colors);
     updateBufferData(meshPointsObject.vertex_radius_buffer, meshPointsObject.radius);
+
+    updateBufferData(meshLinesObject.vertex_position_buffer, meshLinesObject.vertices);
+    updateBufferData(meshLinesObject.vertex_color_buffer, meshLinesObject.colors);
+    updateBufferData(meshLinesObject.vertex_radius_buffer, meshLinesObject.radius);
 }
 
 void Renderer::clearObject(Object &object) {
@@ -351,12 +365,9 @@ void Renderer::clearObject(Object &object) {
 void Renderer::addVertex(glm::vec3 worldPos) {
     meshWrapper.addVertex(worldPos);
 
-    clearObject(meshObject);
-    clearObject(meshPointsObject);
-
     meshWrapper.deselectAll();
 
-    initMesh();
+    recreateMesh();
 
     select(worldPos);
 
@@ -366,29 +377,31 @@ void Renderer::addVertex(glm::vec3 worldPos) {
 void Renderer::addFace() {
     meshWrapper.makeSelectedFace();
 
-    clearObject(meshObject);
-    clearObject(meshPointsObject);
-
     meshWrapper.deselectAll();
 
-    initMesh();
+    recreateMesh();
 
 }
 
 void Renderer::subdivision() {
     meshWrapper.subdivision();
 
-    clearObject(meshObject);
-    clearObject(meshPointsObject);
-
-    initMesh();
+    recreateMesh();
 }
 
 void Renderer::undo() {
     meshWrapper.undo();
 
+    recreateMesh();
+
+
+}
+
+void Renderer::recreateMesh() {
     clearObject(meshObject);
     clearObject(meshPointsObject);
+    clearObject(meshLinesObject);
+
 
     initMesh();
 }
