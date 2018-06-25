@@ -5,15 +5,15 @@
 
 #define GLEW_STATIC
 
-#include "glew.h"
+#include "GL/glew.h"
 
 #include "Renderer.h"
 
-#include <libs/glm-0.9.7.2/glm/glm.hpp>
+#include <glm/glm.hpp>
 #include <include/utils.h>
-#include <c++/map>
-#include <include/Shader.h>
-#include <libs/glm-0.9.7.2/glm/gtc/matrix_transform.hpp>
+#include <map>
+#include <Shader.h>
+#include <glm/gtc/matrix_transform.hpp>
 
 
 using namespace glm;

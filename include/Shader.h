@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SHADER_H
+#define SHADER_H
 
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
@@ -44,3 +45,5 @@ public:
 	//The ID for the fragment shader
 	unsigned int m_shaderFragmentProgram;
 };
+
+#endif

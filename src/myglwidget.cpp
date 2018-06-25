@@ -1,8 +1,6 @@
 // myglwidget.cpp
 
-#define GLEW_STATIC
-
-#include "glew.c"
+#include "GL/glew.h"
 
 #include "myglwidget.h"
 
@@ -15,8 +13,8 @@ using namespace glm;
 using namespace std;
 
 
-MyGLWidget::MyGLWidget(QWidget *parent)
-        : QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
+MyGLWidget::MyGLWidget(QWidget *parent, QGLFormat format)
+        : QGLWidget(format, parent) {
 
     camera = new Camera();
 
@@ -82,6 +80,7 @@ void MyGLWidget::initializeGL() {
     char *fragmentshader_path = (char *) "../shader/simpleShader.frag";
 
     glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, 1);
+
 
     glewExperimental = GL_TRUE;
     glewInit();

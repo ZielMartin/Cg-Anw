@@ -7,32 +7,13 @@
 
 
 
-
+#include "MyMesh.h"
 #include <OpenMesh/Core/IO/MeshIO.hh>
 #include <OpenMesh/Core/Mesh/PolyMesh_ArrayKernelT.hh>
 #include <OpenMesh/Tools/Subdivider/Uniform/CatmullClarkT.hh>
 
 
-#include <libs/glm-0.9.7.2/glm/vec3.hpp>
-
-
-
-// Define my personal traits
-struct Traits : OpenMesh::DefaultTraits
-{
-    // Let Point and Normal be a float vec3
-    typedef OpenMesh::Vec3f Point;
-    typedef OpenMesh::Vec3f Normal;
-
-};
-
-// Define my mesh with the new traits!
-typedef OpenMesh::PolyMesh_ArrayKernelT<Traits>  HE_MESH;
-
-
-
-
-
+#include <glm/vec3.hpp>
 
 
 class MeshWrapper {

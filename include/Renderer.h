@@ -10,8 +10,8 @@
 #include "Shader.h"
 #include "MeshWrapper.h"
 
-#include <libs/glm-0.9.7.2/glm/mat4x4.hpp>
-#include <libs/glm-0.9.7.2/glm/vec3.hpp>
+#include <glm/mat4x4.hpp>
+#include <glm/vec3.hpp>
 #include <vector>
 
 

@@ -12,6 +12,10 @@ if (UNIX AND NOT CYGWIN)
     set(GTEST_PATH ${PROJECT_SOURCE_DIR}/libs/googletest-release-1.8.0-mingw)
     set(GTEST_INCLUDE_DIRS ${GTEST_PATH}/include)
 
+    set(OPENMESH_LIBRARIES "OpenMeshCore")
+    link_directories("/usr/local/lib")
+
+
     set(GTEST_LIBRARIES gtest)
 elseif (WIN32)
     find_package(OPENGL REQUIRED)
@@ -50,13 +54,13 @@ find_package(Qt5Widgets REQUIRED)
 find_package(Qt5OpenGL REQUIRED)
 
 get_target_property(QtCore_location Qt5::Core LOCATION)
+include_directories(include ui ${Qt5Core_INCLUDE_DIRS} ${Qt5Widgets_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIRS} ${GLM_INCLUDE_DIRS} ${GTEST_INCLUDE_DIRS} ${OPENMESH_INCLUDE_DIRS})
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-include_directories(include ui C:/Qt/5.11.0/mingw53_32/include ${GLEW_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIRS} ${GLM_INCLUDE_DIRS} ${GTEST_INCLUDE_DIRS} ${OPENMESH_INCLUDE_DIRS})
+set(CMAKE_CXX_FLAGS -fPIC) #needed for qt on ubuntu
 
 file(GLOB SOURCE_FILES
         src/*.cpp)
@@ -75,13 +79,13 @@ file(GLOB RES_FILES
 file(GLOB TEST_FILES
         test/*.cpp)
 
-SET(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} "-static -static-libgcc -static-libstdc++")
+#SET(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} "-static -static-libgcc -static-libstdc++")
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${UI_FILES} ${INCLUDE_FILES})
 
-add_executable(${PROJECT_NAME}_TEST ${TEST_FILES}  )
+add_executable(${PROJECT_NAME}_TEST ${TEST_FILES})
 
-target_link_libraries(${PROJECT_NAME} Qt5::Core Qt5::Widgets Qt5::OpenGL ${OPENGL_LIBRARIES} ${OPENMESH_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${GLEW_LIBRARIES} Qt5::Core Qt5::Widgets Qt5::OpenGL ${OPENGL_LIBRARIES} ${OPENMESH_LIBRARIES})
 
 target_link_libraries(${PROJECT_NAME}_TEST ${GTEST_LIBRARIES})
 
