@@ -97,6 +97,7 @@ private:
 
     void updateMesh(bool updatePointColor);
 
+    void fillMeshData(bool updatePointColor);
 
     void bindBufferToShader(uint32_t &bufferID, uint32_t &location, int size);
 
@@ -111,7 +112,7 @@ private:
     Shader shader;
 
     glm::vec3 gridPaneColor;
-    glm::vec3 selectedPointsColor;
+    glm::vec3 selectedColor;
     glm::vec3 pointsColor;
     glm::vec3 gridColor;
     glm::vec3 faceColor;
@@ -123,6 +124,7 @@ private:
 
 
     void recreateMesh();
+
 };
 
 

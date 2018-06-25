@@ -50,15 +50,15 @@ public:
 
     void getVertices(std::vector<glm::vec3> &vertices);
 
-    void getLineVertices(std::vector<glm::vec3> &vertices);
+    void getLineVertices(std::vector<glm::vec3> &vertices, std::vector<bool> &selected);
 
     void selectVertex(glm::vec3 pos, float radius);
+
+    void deleteSelectedVertices();
 
     void deselectAll();
 
     std::vector<glm::vec3> getSelectedVertices();
-
-    void deleteSelectedVertices();
 
     void addVertex(glm::vec3 vertex);
 
@@ -82,6 +82,22 @@ private:
     OpenMesh::IO::Options opt;
 
     std::vector<HE_MESH::VertexHandle> selectedVertices;
+
+    /*
+     * selecting order determines which half-edge is selected
+     */
+    std::vector<HE_MESH::HalfedgeHandle> selectedHalfEdges;
+
+    std::vector<HE_MESH::EdgeHandle> selectedEdges;
+
+
+    std::pair<HE_MESH::VertexHandle, HE_MESH::VertexHandle> getVerticesFromHalfEdge(HE_MESH::HalfedgeHandle heh);
+
+    void selectHalfEdge(HE_MESH::VertexHandle v1, HE_MESH::VertexHandle v2);
+
+    bool checkSelectedHalfEdges(HE_MESH::VertexHandle v1, HE_MESH::VertexHandle v2);
+
+
 
 
 };

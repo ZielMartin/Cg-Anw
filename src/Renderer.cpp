@@ -21,7 +21,7 @@ using namespace glm;
 
 Renderer::Renderer() {
     gridPaneColor = vec3(0, 0, 0);
-    selectedPointsColor = vec3(1, 0, 0);
+    selectedColor = vec3(1, 0, 0);
     pointsColor = vec3(0.1, 0.2, 0.15);
     gridColor = vec3(1, 1, 1);
     faceColor = vec3(0.25, 0.4, 0.3);
@@ -170,27 +170,7 @@ void Renderer::initGridPane() {
 void Renderer::initMesh() {
 
 
-    meshWrapper.getVerticesAndNormalsTriangulated(meshObject.vertices, meshObject.normals);
-    meshWrapper.getVertices(meshPointsObject.vertices);
-    meshWrapper.getLineVertices(meshLinesObject.vertices);
-
-
-    for (glm::vec3 v : meshObject.vertices) {
-        meshObject.radius.push_back(0);
-        meshObject.colors.push_back(faceColor);
-    }
-
-    for (glm::vec3 v : meshPointsObject.vertices) {
-        meshPointsObject.radius.push_back(pointSize);
-        meshPointsObject.colors.push_back(pointsColor);
-    }
-
-    for (glm::vec3 v : meshLinesObject.vertices) {
-        meshLinesObject.radius.push_back(0);
-        meshLinesObject.colors.push_back(meshLineColor);
-    }
-
-
+    fillMeshData(true);
 
     setup_vao(meshObject);
     setup_vao(meshLinesObject);
@@ -269,7 +249,6 @@ void Renderer::select(glm::vec3 pos) {
 
     std::vector<glm::vec3> selected = meshWrapper.getSelectedVertices();
 
-    //for rendering
     int i = 0;
     for (glm::vec3 vert : meshPointsObject.vertices) {
         bool found = false;
@@ -279,7 +258,7 @@ void Renderer::select(glm::vec3 pos) {
             }
         }
         if (found) {
-            meshPointsObject.colors.at(i) = selectedPointsColor;
+            meshPointsObject.colors.at(i) = selectedColor;
         } else {
             meshPointsObject.colors.at(i) = pointsColor;
         }
@@ -287,6 +266,7 @@ void Renderer::select(glm::vec3 pos) {
 
     }
     updateBufferData(meshPointsObject.vertex_color_buffer, meshPointsObject.colors);
+    updateMesh(false);
 
 }
 
@@ -317,27 +297,7 @@ void Renderer::updateMesh(bool updatePointColor) {
     clearObject(meshLinesObject);
 
 
-    meshWrapper.getVerticesAndNormalsTriangulated(meshObject.vertices, meshObject.normals);
-    meshWrapper.getVertices(meshPointsObject.vertices);
-    meshWrapper.getLineVertices(meshLinesObject.vertices);
-
-
-
-    for (vec3 vert : meshObject.vertices) {
-        meshObject.colors.push_back(faceColor);
-        meshObject.radius.push_back(0);
-    }
-    for (vec3 vert : meshPointsObject.vertices) {
-        if(updatePointColor){
-            meshPointsObject.colors.push_back(pointsColor);
-        }
-        meshPointsObject.radius.push_back(pointSize);
-
-    }
-    for (glm::vec3 v : meshLinesObject.vertices) {
-        meshLinesObject.radius.push_back(0);
-        meshLinesObject.colors.push_back(meshLineColor);
-    }
+    fillMeshData(updatePointColor);
 
 
     updateBufferData(meshObject.vertex_position_buffer, meshObject.vertices);
@@ -352,6 +312,37 @@ void Renderer::updateMesh(bool updatePointColor) {
     updateBufferData(meshLinesObject.vertex_position_buffer, meshLinesObject.vertices);
     updateBufferData(meshLinesObject.vertex_color_buffer, meshLinesObject.colors);
     updateBufferData(meshLinesObject.vertex_radius_buffer, meshLinesObject.radius);
+}
+
+void Renderer::fillMeshData(bool updatePointColor) {
+    meshWrapper.getVerticesAndNormalsTriangulated(meshObject.vertices, meshObject.normals);
+    meshWrapper.getVertices(meshPointsObject.vertices);
+
+    std::vector<bool> selected;
+    meshWrapper.getLineVertices(meshLinesObject.vertices, selected);
+
+
+    for (vec3 vert : meshObject.vertices) {
+        meshObject.colors.push_back(faceColor);
+        meshObject.radius.push_back(0);
+    }
+    for (vec3 vert : meshPointsObject.vertices) {
+        if(updatePointColor){
+            meshPointsObject.colors.push_back(pointsColor);
+        }
+        meshPointsObject.radius.push_back(pointSize);
+
+    }
+    for (int i = 0; i < meshLinesObject.vertices.size(); i++) {
+        meshLinesObject.radius.push_back(0);
+        if(selected.at(i)){
+            meshLinesObject.colors.push_back(selectedColor);
+        }else{
+            meshLinesObject.colors.push_back(meshLineColor);
+        }
+    }
+
+
 }
 
 void Renderer::clearObject(Object &object) {
