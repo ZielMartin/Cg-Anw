@@ -33,7 +33,7 @@
 class MyGLWidget : public QGLWidget {
 Q_OBJECT
 public:
-    explicit MyGLWidget(QWidget *parent = 0);
+    explicit MyGLWidget(QWidget *parent = 0, QGLFormat format = QGLFormat::defaultFormat());
 
     ~MyGLWidget() override;
 

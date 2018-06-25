@@ -3,14 +3,12 @@
 
 #include <QtWidgets>
 #include "window.h"
-#include "../ui/ui_window.h"
+#include "ui_window.h"
+
 #include "myglwidget.h"
 
 
-Window::Window(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::Window)
-{
+Window::Window(QWidget *parent) : QWidget(parent), ui(new Ui::Window) {
     ui->setupUi(this);
 
     connect(ui->myGLWidget, SIGNAL(xRotationChanged(int)), ui->rotXSlider, SLOT(setValue(int)));
@@ -18,7 +16,6 @@ Window::Window(QWidget *parent) :
     connect(ui->myGLWidget, SIGNAL(zRotationChanged(int)), ui->rotZSlider, SLOT(setValue(int)));
 }
 
-Window::~Window()
-{
+Window::~Window() {
     delete ui;
 }

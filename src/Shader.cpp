@@ -1,10 +1,10 @@
 #include <fstream>
 #include <iostream>
 #include <stdlib.h>
-#include <libs/glm-0.9.7.2/glm/gtc/type_ptr.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
-#define GLEW_STATIC
-#include "glew.h"
+//#define GLEW_STATIC
+#include "GL/glew.h"
 
 #include "Shader.h"
 

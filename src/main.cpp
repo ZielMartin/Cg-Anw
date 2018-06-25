@@ -2,12 +2,20 @@
 
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QGLFormat>
 
 #include "window.h"
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+
+    QGLFormat glFormat;
+    glFormat.setVersion( 3, 3 );
+    glFormat.setProfile( QGLFormat::CoreProfile );
+    glFormat.setSampleBuffers( true );
+    QGLFormat::setDefaultFormat(glFormat);
+
     Window window;
     window.resize(window.sizeHint());
     int desktopArea = QApplication::desktop()->width() *
