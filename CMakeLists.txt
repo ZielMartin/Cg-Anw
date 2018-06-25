@@ -5,6 +5,8 @@ set(CMAKE_CXX_STANDARD 14)
 #set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
 if (UNIX AND NOT CYGWIN)
+    set(CMAKE_CXX_FLAGS -fPIC)
+
     find_package(OpenGL REQUIRED)
     find_package(GLEW REQUIRED)
     find_package(GLUT REQUIRED)
@@ -34,6 +36,7 @@ elseif (WIN32)
     set(OPENMESH_INCLUDE_DIRS ${OPENMESH_PATH}/include)
 
     #cmake link_libraries removes .dll and .dll.a ending, but not .dll.dll wtf
+    set(GLEW_LIBRARIES "glew32.dll.dll")
     set(GLFW_STATIC_LIBRARIES "glfw3.dll.dll")
     set(GLUT_LIBRARIES "freeglut.dll.dll" winmm gdi32)
     set(GTEST_LIBRARIES "gmock.dll.dll")
@@ -60,7 +63,6 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_CXX_FLAGS -fPIC) #needed for qt on ubuntu
 
 file(GLOB SOURCE_FILES
         src/*.cpp)

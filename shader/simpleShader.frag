@@ -12,14 +12,16 @@ in VertexData {
     float radius;
 } VertexIn;
 
+out vec4 color;
+
 
 
 
 void main(void) {
-    vec3 color = VertexIn.vertex_color;
+    vec3 vertex_color = VertexIn.vertex_color;
 
-    // mix in texture color if required
-    if (useTexture != 0) color *= texture2D(texture0, VertexIn.uv.st).rgb;
+    // mix in texture vertex_color if required
+    if (useTexture != 0) vertex_color *= texture2D(texture0, VertexIn.uv.st).rgb;
 
 
         if(VertexIn.radius > 0){
@@ -38,7 +40,7 @@ void main(void) {
 
 
         // set pixel color in OpenGL
-        gl_FragColor = vec4(color, 1.0);
+        color = vec4(vertex_color, 1.0);
 
 
 
