@@ -8,6 +8,7 @@
 
 
 #include "MyMesh.h"
+#include "CatmullClark1.h"
 #include <OpenMesh/Core/IO/MeshIO.hh>
 #include <OpenMesh/Core/Mesh/PolyMesh_ArrayKernelT.hh>
 #include <OpenMesh/Tools/Subdivider/Uniform/CatmullClarkT.hh>
@@ -51,14 +52,11 @@ public:
 
 
 private:
-
-
-
     HE_MESH mesh;
 
     std::vector<HE_MESH> backstack;
 
-    OpenMesh::Subdivider::Uniform::CatmullClarkT<HE_MESH> catmull;
+    CatmullClark1 catmull;
 
     OpenMesh::IO::Options opt;
 
@@ -77,6 +75,9 @@ private:
     void selectHalfEdge(HE_MESH::VertexHandle v1, HE_MESH::VertexHandle v2);
 
     bool checkSelectedHalfEdges(HE_MESH::VertexHandle v1, HE_MESH::VertexHandle v2);
+
+    void setVertexWeight(HE_MESH::VertexHandle, float);
+    float getVertexWeight(HE_MESH::VertexHandle);
 
 
 

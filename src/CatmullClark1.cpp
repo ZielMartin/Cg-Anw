@@ -70,21 +70,15 @@ HE_MESH CatmullClark1::operator()(HE_MESH &_m, size_t _n, const bool _update_poi
     return newMesh;
 }
 
-void CatmullClark1::setWeighted(std::map<HE_MESH::VertexHandle, float> &w) {
-    this->weighted = w;
-}
-
 HE_MESH::Point CatmullClark1::calc_face_centroid_weighted(const HE_MESH::FaceHandle &_fh) {
     HE_MESH::Point pt;
     pt.vectorize(0);
     float valence = 0.0;
     for (HE_MESH::ConstFaceVertexIter cfv_it = this->mesh.cfv_iter(_fh); cfv_it.is_valid(); ++cfv_it) {
-        float fourthComp;
-        try {
-            fourthComp = this->weighted.at(*cfv_it);
-        } catch (std::out_of_range &ex) {
+        float fourthComp = this->mesh.property(this->mesh.vp_fourth, *cfv_it);
+        if (fourthComp == 0.0f)
             fourthComp = 1.0f;
-        }
+
         pt += this->mesh.point(*cfv_it) * fourthComp;
         valence += fourthComp;
     }

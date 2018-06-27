@@ -24,13 +24,10 @@ public:
 
     HE_MESH operator()(HE_MESH &_m, size_t _n, bool _update_points = true);
 
-    void setWeighted(std::map<HE_MESH::VertexHandle, float> &);
-
     HE_MESH::Point calc_face_centroid_weighted(const HE_MESH::FaceHandle &);
 
 private:
     HE_MESH mesh;
-    std::map<HE_MESH::VertexHandle, float> weighted;
 
     void compute_midpoint(HE_MESH &, const OpenMesh::EdgeHandle &, bool);
     void update_vertex(HE_MESH &, const OpenMesh::VertexHandle &);

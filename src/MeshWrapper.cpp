@@ -6,7 +6,6 @@
 #include "MeshWrapper.h"
 
 MeshWrapper::MeshWrapper() {
-
 }
 
 
@@ -120,9 +119,11 @@ void MeshWrapper::selectVertex(glm::vec3 pos, float radius) {
             if (std::find(selectedVertices.begin(), selectedVertices.end(), v_it) != selectedVertices.end()) {
                 //deselect
                 selectedVertices.erase(std::find(selectedVertices.begin(), selectedVertices.end(), v_it));
+                this->setVertexWeight(*v_it, 1.0);
             } else {
                 //select
                 selectedVertices.push_back(*v_it);
+                this->setVertexWeight(*v_it, 2.0);
             }
         }
     }
@@ -208,10 +209,7 @@ void MeshWrapper::makeSelectedFace() {
 void MeshWrapper::subdivision() {
     backstack.push_back(mesh);
 
-    catmull.attach(mesh);
-    catmull(1);
-    catmull.detach();
-
+    this->mesh = catmull(this->mesh, 1);
 }
 
 void MeshWrapper::undo() {
@@ -219,6 +217,14 @@ void MeshWrapper::undo() {
         mesh = backstack.at(backstack.size() - 1);
         backstack.pop_back();
     }
+}
+
+void MeshWrapper::setVertexWeight(HE_MESH::VertexHandle vertexHandle, float weight) {
+    this->mesh.property(this->mesh.vp_fourth, vertexHandle) = weight;
+}
+
+float MeshWrapper::getVertexWeight(HE_MESH::VertexHandle vertexHandle) {
+    return this->mesh.property(this->mesh.vp_fourth, vertexHandle);
 }
 
 

@@ -17,6 +17,13 @@ struct Traits : OpenMesh::DefaultTraits
 
 };
 
-// Define my mesh with the new traits!
-typedef OpenMesh::PolyMesh_ArrayKernelT<Traits>  HE_MESH;
+
+class HE_MESH : public OpenMesh::PolyMesh_ArrayKernelT<Traits> {
+public:
+    HE_MESH() {
+        this->add_property(this->vp_fourth);
+    }
+    OpenMesh::VPropHandleT<float> vp_fourth;
+};
+
 #endif //CG_ANW_MYMESH_H
