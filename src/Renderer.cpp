@@ -25,7 +25,7 @@ Renderer::Renderer() {
     pointsColor = vec3(0.1, 0.2, 0.15);
     gridColor = vec3(1, 1, 1);
     faceColor = vec3(0.25, 0.4, 0.3);
-    meshLineColor = vec3(0.2,0.1,0.1);
+    meshLineColor = vec3(0.2, 0.1, 0.1);
     grid_lenght = 10;
     pointSize = 30;
 
@@ -159,7 +159,6 @@ void Renderer::initGridPane() {
     gridPaneObject.radius.push_back(0);
 
 
-
     gridPaneObject.indices = {0, 1, 2, 2, 3, 0};
 
 
@@ -185,30 +184,30 @@ void Renderer::setup_vao(Object &object) {
     glGenVertexArrays(1, &object.vaoID);
     glBindVertexArray(object.vaoID);
 
-    if(!object.vertices.empty()){
+    if (!object.vertices.empty()) {
         setupBufferData(object.vertex_position_buffer, object.vertices);
         // bind vertex positions to shader
         uint32_t position_location = glGetAttribLocation(shader.ID(), "vertex_position");
         bindBufferToShader(object.vertex_position_buffer, position_location, 3);
     }
-    if(!object.colors.empty()){
+    if (!object.colors.empty()) {
         setupBufferData(object.vertex_color_buffer, object.colors);
         // bind color to shader
         uint32_t color_location = glGetAttribLocation(shader.ID(), "v_color");
         bindBufferToShader(object.vertex_color_buffer, color_location, 3);
     }
-    if(!object.indices.empty()){
+    if (!object.indices.empty()) {
         setupBufferData(object.vertex_index_buffer, object.indices);
         // bind indices
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object.vertex_index_buffer);
     }
-    if(!object.normals.empty()){
+    if (!object.normals.empty()) {
         setupBufferData(object.vertex_normal_buffer, object.normals);
         // bind vertex normals to shader
         uint32_t normal_location = glGetAttribLocation(shader.ID(), "vertex_normal");
         bindBufferToShader(object.vertex_normal_buffer, normal_location, 3);
     }
-    if(!object.radius.empty()){
+    if (!object.radius.empty()) {
         setupBufferData(object.vertex_radius_buffer, object.radius);
         // bind radius to shader
         uint32_t radius_location = glGetAttribLocation(shader.ID(), "radius_attr");
@@ -220,10 +219,10 @@ void Renderer::setup_vao(Object &object) {
 
 void Renderer::bindBufferToShader(uint32_t &bufferID, uint32_t &location, int size) {
     if (location != -1) {
-            glEnableVertexAttribArray(location);
-            glBindBuffer(GL_ARRAY_BUFFER, bufferID);
-            glVertexAttribPointer(location, size, GL_FLOAT, GL_FALSE, 0, 0);
-        }
+        glEnableVertexAttribArray(location);
+        glBindBuffer(GL_ARRAY_BUFFER, bufferID);
+        glVertexAttribPointer(location, size, GL_FLOAT, GL_FALSE, 0, 0);
+    }
 }
 
 
@@ -241,7 +240,6 @@ void Renderer::updateBufferData(uint32 &bufferID, std::vector<T> &data) {
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(T) * data.size(),
                     &data.at(0));
 }
-
 
 
 void Renderer::select(glm::vec3 pos) {
@@ -289,9 +287,9 @@ void Renderer::deleteSelectedVertices() {
  */
 void Renderer::updateMesh(bool updatePointColor) {
     clearObject(meshObject);
-    if(updatePointColor){
+    if (updatePointColor) {
         clearObject(meshPointsObject);
-    }else{
+    } else {
         meshPointsObject.vertices.clear();
     }
     clearObject(meshLinesObject);
@@ -327,7 +325,7 @@ void Renderer::fillMeshData(bool updatePointColor) {
         meshObject.radius.push_back(0);
     }
     for (vec3 vert : meshPointsObject.vertices) {
-        if(updatePointColor){
+        if (updatePointColor) {
             meshPointsObject.colors.push_back(pointsColor);
         }
         meshPointsObject.radius.push_back(pointSize);
@@ -335,9 +333,9 @@ void Renderer::fillMeshData(bool updatePointColor) {
     }
     for (int i = 0; i < meshLinesObject.vertices.size(); i++) {
         meshLinesObject.radius.push_back(0);
-        if(selected.at(i)){
+        if (selected.at(i)) {
             meshLinesObject.colors.push_back(selectedColor);
-        }else{
+        } else {
             meshLinesObject.colors.push_back(meshLineColor);
         }
     }

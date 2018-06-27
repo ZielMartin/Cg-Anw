@@ -155,7 +155,7 @@ void MyGLWidget::mousePressEvent(QMouseEvent *event) {
     if (event->modifiers().testFlag(Qt::ControlModifier) && event->buttons() & Qt::LeftButton) {
         renderer.select(getWorldCoordinates(event->pos().x(), event->pos().y()));
         updateGL();
-    }else if(event->buttons() & Qt::RightButton){
+    } else if (event->buttons() & Qt::RightButton) {
         renderer.addVertex(getWorldCoordinates(event->pos().x(), event->pos().y()));
         updateGL();
     }
@@ -176,7 +176,7 @@ void MyGLWidget::keyPressEvent(QKeyEvent *event) {
 
     float moveStepSize = 0.01;
 
-    if(event->modifiers().testFlag(Qt::ControlModifier) && event->key() == Qt::Key_Z){
+    if (event->modifiers().testFlag(Qt::ControlModifier) && event->key() == Qt::Key_Z) {
         renderer.undo();
         updateGL();
     }
@@ -260,24 +260,21 @@ void MyGLWidget::keyPressEvent(QKeyEvent *event) {
 
 }
 
-
+#define NORMALMATRIX {1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0}
 vec3 MyGLWidget::getWorldCoordinates(int x, int y) {
 
-    double objx, objy, objz;
+    GLdouble obj[3];
     GLint viewport[4];
-    GLdouble modelview[16];
-    GLdouble projection[16];
+    GLdouble model[16] = NORMALMATRIX;
+    GLdouble *viewProjection = this->camera->viewProjection;
     GLfloat winX, winY, winZ;
-    glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
-    glGetDoublev(GL_PROJECTION_MATRIX, projection);
     glGetIntegerv(GL_VIEWPORT, viewport);
     winX = (float) x;
     winY = (float) viewport[3] - (float) y;
     glReadPixels(x, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
-    gluUnProject(winX, winY, winZ, modelview, projection, viewport, &objx, &objy, &objz);
+    gluUnProject(winX, winY, winZ, model, viewProjection, viewport, obj, obj + 1, obj + 2);
 
-
-    return vec3(objx, objy, objz);
+    return vec3(obj[0], obj[1], obj[2]);
 
 
 }

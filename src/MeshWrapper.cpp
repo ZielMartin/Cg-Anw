@@ -108,9 +108,10 @@ void MeshWrapper::selectVertex(glm::vec3 pos, float radius) {
 
 
     for (HE_MESH::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it) {
-        float xDif = mesh.point(*v_it)[0] - vertexPos[0];
-        float yDif = mesh.point(*v_it)[1] - vertexPos[1];
-        float zDif = mesh.point(*v_it)[2] - vertexPos[2];
+        OpenMesh::Vec3f meshPoint = mesh.point(*v_it);
+        float xDif = meshPoint[0] - vertexPos[0];
+        float yDif = meshPoint[1] - vertexPos[1];
+        float zDif = meshPoint[2] - vertexPos[2];
 
 
         if ((xDif < radius && xDif > -radius) && (yDif < radius && yDif > -radius) &&
@@ -136,7 +137,7 @@ void MeshWrapper::selectVertex(glm::vec3 pos, float radius) {
 
 void MeshWrapper::selectHalfEdge(HE_MESH::VertexHandle v1, HE_MESH::VertexHandle v2){
 
-    for(HE_MESH::VertexOHalfedgeIter voh_it = mesh.voh_iter(v1); voh_it; ++voh_it) {
+    for(HE_MESH::VertexOHalfedgeIter voh_it = mesh.voh_iter(v1); voh_it.is_valid(); ++voh_it) {
         // Iterate over all outgoing halfedges...
 
         HE_MESH::VertexHandle vh = mesh.to_vertex_handle(*voh_it);

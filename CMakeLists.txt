@@ -65,6 +65,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 file(GLOB SOURCE_FILES
+        src/*.c
         src/*.cpp)
 
 file(GLOB INCLUDE_FILES
