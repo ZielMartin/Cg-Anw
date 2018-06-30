@@ -21,7 +21,7 @@ void main(void) {
     vec3 vertex_color = VertexIn.vertex_color;
 
     // mix in texture vertex_color if required
-    if (useTexture != 0) vertex_color *= texture2D(texture0, VertexIn.uv.st).rgb;
+    //if (useTexture != 0) vertex_color *= texture2D(texture0, VertexIn.uv.st).rgb;
 
 
         if(VertexIn.radius > 0){

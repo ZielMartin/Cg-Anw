@@ -40,6 +40,8 @@ public:
 
     void deselectAll();
 
+    void clearSelectedEdges();
+
     std::vector<glm::vec3> getSelectedVertices();
 
     void addVertex(glm::vec3 vertex);
@@ -67,8 +69,6 @@ private:
      */
     std::vector<HE_MESH::HalfedgeHandle> selectedHalfEdges;
 
-    std::vector<HE_MESH::EdgeHandle> selectedEdges;
-
 
     std::pair<HE_MESH::VertexHandle, HE_MESH::VertexHandle> getVerticesFromHalfEdge(HE_MESH::HalfedgeHandle heh);
 
@@ -77,6 +77,7 @@ private:
     bool checkSelectedHalfEdges(HE_MESH::VertexHandle v1, HE_MESH::VertexHandle v2);
 
     void setVertexWeight(HE_MESH::VertexHandle, float);
+
     float getVertexWeight(HE_MESH::VertexHandle);
 
 

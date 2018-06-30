@@ -149,6 +149,10 @@ void MeshWrapper::selectHalfEdge(HE_MESH::VertexHandle v1, HE_MESH::VertexHandle
     }
 }
 
+void MeshWrapper::clearSelectedEdges(){
+    selectedHalfEdges.clear();
+}
+
 std::pair<HE_MESH::VertexHandle, HE_MESH::VertexHandle> MeshWrapper::getVerticesFromHalfEdge(HE_MESH::HalfedgeHandle heh){
     std::pair<HE_MESH::VertexHandle, HE_MESH::VertexHandle> vertices;
     vertices.first =  mesh.from_vertex_handle(heh);
@@ -160,7 +164,6 @@ std::pair<HE_MESH::VertexHandle, HE_MESH::VertexHandle> MeshWrapper::getVertices
 
 void MeshWrapper::deselectAll() {
     selectedVertices.clear();
-    selectedEdges.clear();
     selectedHalfEdges.clear();
 }
 

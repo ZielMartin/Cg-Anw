@@ -374,7 +374,7 @@ void Renderer::addFace() {
 
 void Renderer::subdivision() {
     meshWrapper.subdivision();
-
+    meshWrapper.deselectAll();
     recreateMesh();
 }
 
