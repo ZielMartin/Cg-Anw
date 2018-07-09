@@ -27,7 +27,7 @@ Renderer::Renderer() : meshWrapper() {
     faceColor = vec3(0.25, 0.4, 0.3);
     meshLineColor = vec3(0.2, 0.1, 0.1);
     grid_lenght = 10;
-    pointSize = 30;
+
 
     renderGrid = true;
     renderPoints = true;
@@ -35,7 +35,15 @@ Renderer::Renderer() : meshWrapper() {
 
 void Renderer::initRenderer(Shader &shader, char *model_path) {
 
+
+    meshWrapper = *(new MeshWrapper());
+
     meshWrapper.loadMesh(model_path);
+
+    glm::vec3 min, max;
+    meshWrapper.getDimensions(min, max);
+    float dx = max.x-min.x, dy = max.y-min.y, dz = max.z-min.z;
+    pointSize = dx+dy+dz == 0.0f ? 30.0f : 10.0f*((dx+dy+dz)/3.0f);
 
 
     this->shader = shader;

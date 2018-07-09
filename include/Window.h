@@ -32,15 +32,21 @@ private:
     void createMenus();
 
     QMenu *fileMenu;
-    QMenu *vertexMenu;
-    QMenu *helpMenu;
-
     QAction *newAct;
     QAction *openAct;
     QAction *saveAct;
     QAction *exitAct;
 
+
+    QMenu *vertexMenu;
     QAction *vertexWeightAct;
+
+
+    QMenu *helpMenu;
+
+
+
+
 
 
     MyGLWidget *glWidget;

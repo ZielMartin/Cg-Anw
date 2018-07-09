@@ -154,6 +154,7 @@ void MeshWrapper::setVertexWeightAllSelected(float weight) {
     for(HE_MESH::VertexHandle vh : selectedVertices){
         this->setVertexWeight(vh, weight);
     }
+
 }
 
 void MeshWrapper::selectHalfEdge(HE_MESH::VertexHandle v1, HE_MESH::VertexHandle v2){
@@ -248,6 +249,18 @@ void MeshWrapper::setVertexWeight(HE_MESH::VertexHandle vertexHandle, float weig
 
 float MeshWrapper::getVertexWeight(HE_MESH::VertexHandle vertexHandle) {
     return this->mesh.property(this->mesh.vp_fourth, vertexHandle);
+}
+
+void MeshWrapper::getDimensions(glm::vec3 &min, glm::vec3 &max){
+    for (HE_MESH::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it) {
+        if(mesh.point(*v_it)[0] < min.x) min.x =  mesh.point(*v_it)[0];
+        if(mesh.point(*v_it)[1] < min.y) min.y =  mesh.point(*v_it)[1];
+        if(mesh.point(*v_it)[2] < min.z) min.z =  mesh.point(*v_it)[2];
+
+        if(mesh.point(*v_it)[0] > max.x) max.x =  mesh.point(*v_it)[0];
+        if(mesh.point(*v_it)[1] > max.y) max.y =  mesh.point(*v_it)[1];
+        if(mesh.point(*v_it)[2] > max.z) max.z =  mesh.point(*v_it)[2];
+    }
 }
 
 

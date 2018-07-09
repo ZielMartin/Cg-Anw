@@ -56,6 +56,8 @@ public:
 
     void setVertexWeightAllSelected(float weight);
 
+    void getDimensions(glm::vec3 &min, glm::vec3 &max);
+
 
 private:
     HE_MESH mesh;
