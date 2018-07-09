@@ -24,6 +24,7 @@ private slots:
     void open();
     void save();
     void vertexWeight();
+    void userControl();
 
 
 
@@ -43,6 +44,7 @@ private:
 
 
     QMenu *helpMenu;
+    QAction *userControlAct;
 
 
 

@@ -66,6 +66,23 @@ void Window::open() {
         }
 }
 
+void Window::userControl() {
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("User Interaction");
+    msgBox.setText("Move camera direction:\tpress left mouse-button and move mouse\n"
+                   "Move camera position:\tuse keys: 'w','a','s','d','q','e'\n\n"
+                   "Disable/Enable grid:\t\tpress 'g'\n"
+                   "Disable/Enable points:\t\tpress 'p'\n\n"
+                   "Select point:\t\t\tCtrl + left-click on point\n"
+                   "Add new point:\t\tright-click on grid or object\n"
+                   "Delete selected points:\t\tpress 'r'\n"
+                   "Move selected points:\t\tarrow-keys,'+','-'\n\n"
+                   "Create Face:\t\t\tselect vertices in counterclockwise order and press 'f'\n"
+                    );
+
+    msgBox.exec();
+}
+
 void Window::save() {
     QString filename = QFileDialog::getSaveFileName(this, "Save OBJ File",  QDir::currentPath(), "*.obj");
     QFile f( filename );
@@ -105,6 +122,11 @@ void Window::createActions() {
     vertexWeightAct->setStatusTip(tr("Change weight of selected vertices for subdivision"));
     connect(vertexWeightAct, &QAction::triggered, this, &Window::vertexWeight);
 
+    userControlAct = new QAction(tr("&Interaction"), this);
+    userControlAct->setStatusTip(tr("Help for user-interaction"));
+    connect(userControlAct, &QAction::triggered, this, &Window::userControl);
+
+
 
 
 
@@ -124,6 +146,7 @@ void Window::createMenus() {
 
 
     helpMenu = menuBar()->addMenu(tr("&Help"));
+    helpMenu->addAction(userControlAct);
 
 
 }
