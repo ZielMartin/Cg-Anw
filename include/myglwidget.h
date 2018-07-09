@@ -37,6 +37,11 @@ public:
 
     ~MyGLWidget() override;
 
+    void openMesh(char *model_path);
+
+    void saveOBJ(char *file);
+
+
 signals:
 
 public slots:
@@ -61,26 +66,17 @@ protected:
 
 public slots:
 
-    // slots for xyz-rotation slider
-    void setXRotation(int angle);
-
-    void setYRotation(int angle);
-
-    void setZRotation(int angle);
+    void onOpenClicked();
 
 signals:
 
-    // signaling rotation from mouse movement
-    void xRotationChanged(int angle);
-
-    void yRotationChanged(int angle);
-
-    void zRotationChanged(int angle);
+    void openClicked();
 
 private:
 
 
     glm::vec3 getWorldCoordinates(int x, int y);
+
 
 
     Renderer renderer;
@@ -93,6 +89,8 @@ private:
     Shader shader;
 
     glm::vec3 backgroundColor;
+
+
 
 
 

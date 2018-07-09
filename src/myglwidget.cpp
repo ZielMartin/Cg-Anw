@@ -7,6 +7,7 @@
 #define _USE_MATH_DEFINES
 
 #include <math.h>
+#include <QtWidgets/QInputDialog>
 
 using namespace cg;
 using namespace glm;
@@ -16,13 +17,10 @@ using namespace std;
 MyGLWidget::MyGLWidget(QWidget *parent, QGLFormat format)
         : QGLWidget(format, parent) {
 
+
     camera = new Camera();
 
     QWidget::setFocusPolicy(Qt::ClickFocus);
-
-    xRot = 0;
-    yRot = 0;
-    zRot = 0;
 
     backgroundColor = vec3(0, 0, 0);
 
@@ -39,43 +37,16 @@ QSize MyGLWidget::sizeHint() const {
     return QSize(400, 400);
 }
 
-static void qNormalizeAngle(int &angle) {
-    while (angle < 0)
-        angle += 360 * 16;
-    while (angle > 360)
-        angle -= 360 * 16;
+void MyGLWidget::onOpenClicked(){
+    std::cout << "onOpen" << std::endl;
 }
 
-void MyGLWidget::setXRotation(int angle) {
-    static int lastAngle = 0;
-    if (angle != xRot) {
-        xRot = angle;
-        emit xRotationChanged(angle);
-        updateGL();
-    }
-}
 
-void MyGLWidget::setYRotation(int angle) {
-    qNormalizeAngle(angle);
-    if (angle != yRot) {
-        yRot = angle;
-        emit yRotationChanged(angle);
-        updateGL();
-    }
-}
 
-void MyGLWidget::setZRotation(int angle) {
-    qNormalizeAngle(angle);
-    if (angle != zRot) {
-        zRot = angle;
-        emit zRotationChanged(angle);
-        updateGL();
-    }
-}
 
 void MyGLWidget::initializeGL() {
 
-    char *model_path = ((char *) "../obj/cube.obj");
+
     char *vertexshader_path = (char *) "../shader/simpleShader.vert";
     char *fragmentshader_path = (char *) "../shader/simpleShader.frag";
 
@@ -96,9 +67,7 @@ void MyGLWidget::initializeGL() {
 
     //// create shader
     shader.Init(vertexshader_path, fragmentshader_path);
-
-    //prepare data for OpenGL
-    renderer.initRenderer(shader, model_path);
+    openMesh(nullptr);
 
 
 
@@ -114,6 +83,11 @@ void MyGLWidget::initializeGL() {
 
 
 
+}
+
+void MyGLWidget::openMesh(char *model_path) {
+    //prepare data for OpenGL
+    renderer.initRenderer(shader, model_path);
 }
 
 
@@ -153,13 +127,27 @@ void MyGLWidget::resizeGL(int width, int height) {
 void MyGLWidget::mousePressEvent(QMouseEvent *event) {
 
     if (event->modifiers().testFlag(Qt::ControlModifier) && event->buttons() & Qt::LeftButton) {
+
         renderer.select(getWorldCoordinates(event->pos().x(), event->pos().y()));
+
         updateGL();
     } else if (event->buttons() & Qt::RightButton) {
-        renderer.addVertex(getWorldCoordinates(event->pos().x(), event->pos().y()));
+        glm::vec3 worldPos = getWorldCoordinates(event->pos().x(), event->pos().y());
+        renderer.getMeshWrapper().addVertex(worldPos);
+
+        renderer.getMeshWrapper().deselectAll();
+
+        renderer.recreateMesh();
+
+        renderer.select(worldPos);
         updateGL();
     }
 
+
+}
+
+void MyGLWidget::saveOBJ(char *file){
+    renderer.getMeshWrapper().writeMesh(file);
 
 }
 
@@ -177,7 +165,8 @@ void MyGLWidget::keyPressEvent(QKeyEvent *event) {
     float moveStepSize = 0.01;
 
     if (event->modifiers().testFlag(Qt::ControlModifier) && event->key() == Qt::Key_Z) {
-        renderer.undo();
+        renderer.getMeshWrapper().undo();
+        renderer.recreateMesh();
         updateGL();
     }
 
@@ -218,39 +207,50 @@ void MyGLWidget::keyPressEvent(QKeyEvent *event) {
             updateGL();
             break;
         case Qt::Key_R:
-            renderer.deleteSelectedVertices();
+            renderer.getMeshWrapper().deleteSelectedVertices();
+            renderer.updateMesh(true);
             updateGL();
             break;
         case Qt::Key_F:
-            renderer.addFace();
+            renderer.getMeshWrapper().makeSelectedFace();
+            renderer.getMeshWrapper().deselectAll();
+            renderer.recreateMesh();
             updateGL();
             break;
         case Qt::Key_C:
-            renderer.subdivision();
+            renderer.getMeshWrapper().subdivision();
+            renderer.getMeshWrapper().deselectAll();
+            renderer.recreateMesh();
             updateGL();
             break;
         case Qt::Key_Left:
-            renderer.moveSelected(glm::vec3(-moveStepSize, 0.0, 0.0));
+            renderer.getMeshWrapper().moveSelectedVertices(glm::vec3(-moveStepSize, 0.0, 0.0));
+            renderer.updateMesh(false);
             updateGL();
             break;
         case Qt::Key_Right:
-            renderer.moveSelected(glm::vec3(moveStepSize, 0.0, 0.0));
+            renderer.getMeshWrapper().moveSelectedVertices(glm::vec3(moveStepSize, 0.0, 0.0));
+            renderer.updateMesh(false);
             updateGL();
             break;
         case Qt::Key_Up:
-            renderer.moveSelected(glm::vec3(0.0, 0.0, -moveStepSize));
+            renderer.getMeshWrapper().moveSelectedVertices(glm::vec3(0.0, 0.0, -moveStepSize));
+            renderer.updateMesh(false);
             updateGL();
             break;
         case Qt::Key_Down:
-            renderer.moveSelected(glm::vec3(0.0, 0.0, moveStepSize));
+            renderer.getMeshWrapper().moveSelectedVertices(glm::vec3(0.0, 0.0, moveStepSize));
+            renderer.updateMesh(false);
             updateGL();
             break;
         case Qt::Key_Minus:
-            renderer.moveSelected(glm::vec3(0.0, -moveStepSize, 0.0));
+            renderer.getMeshWrapper().moveSelectedVertices(glm::vec3(0.0, -moveStepSize, 0.0));
+            renderer.updateMesh(false);
             updateGL();
             break;
         case Qt::Key_Plus:
-            renderer.moveSelected(glm::vec3(0.0, moveStepSize, 0.0));
+            renderer.getMeshWrapper().moveSelectedVertices(glm::vec3(0.0, moveStepSize, 0.0));
+            renderer.updateMesh(false);
             updateGL();
             break;
         default:

@@ -4,7 +4,7 @@
 #include <QDesktopWidget>
 #include <QGLFormat>
 
-#include "window.h"
+#include "Window.h"
 
 int main(int argc, char *argv[])
 {
@@ -28,5 +28,9 @@ int main(int argc, char *argv[])
         window.show();
     else
         window.showMaximized();
+
+
+
+
     return app.exec();
 }

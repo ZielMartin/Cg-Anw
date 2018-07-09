@@ -19,7 +19,7 @@
 using namespace glm;
 
 
-Renderer::Renderer() {
+Renderer::Renderer() : meshWrapper() {
     gridPaneColor = vec3(0, 0, 0);
     selectedColor = vec3(1, 0, 0);
     pointsColor = vec3(0.1, 0.2, 0.15);
@@ -34,7 +34,9 @@ Renderer::Renderer() {
 }
 
 void Renderer::initRenderer(Shader &shader, char *model_path) {
+
     meshWrapper.loadMesh(model_path);
+
 
     this->shader = shader;
     initMesh();
@@ -78,6 +80,7 @@ void Renderer::renderObject(Object &object, int gl_draw_type) {
 }
 
 void Renderer::initGrid() {
+    clearObject(gridObject);
     glm::vec3 color = gridColor;
     glm::vec3 gridPosition = glm::vec3(0.0f, 0.0f, 0.0f); //dimensions.getGridPosition();
 
@@ -131,6 +134,7 @@ void Renderer::initGrid() {
 }
 
 void Renderer::initGridPane() {
+    clearObject(gridPaneObject);
     glm::vec3 gridPosition = glm::vec3(0, -0.001, 0); //dimensions.getGridPosition();
 
 
@@ -167,7 +171,9 @@ void Renderer::initGridPane() {
 
 
 void Renderer::initMesh() {
-
+    clearObject(meshLinesObject);
+    clearObject(meshPointsObject);
+    clearObject(meshObject);
 
     fillMeshData(true);
 
@@ -236,14 +242,16 @@ void Renderer::setupBufferData(uint32 &bufferID, std::vector<T> &data) {
 
 template<typename T>
 void Renderer::updateBufferData(uint32 &bufferID, std::vector<T> &data) {
-    glBindBuffer(GL_ARRAY_BUFFER, bufferID);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(T) * data.size(),
-                    &data.at(0));
+    if(data.size() > 0) {
+        glBindBuffer(GL_ARRAY_BUFFER, bufferID);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(T) * data.size(),
+                        &data.at(0));
+    }
 }
 
 
-void Renderer::select(glm::vec3 pos) {
-    meshWrapper.selectVertex(pos, 0.02);
+bool Renderer::select(glm::vec3 pos) {
+    bool isSelected = meshWrapper.selectVertex(pos, 0.02);
 
     std::vector<glm::vec3> selected = meshWrapper.getSelectedVertices();
 
@@ -265,21 +273,13 @@ void Renderer::select(glm::vec3 pos) {
     }
     updateBufferData(meshPointsObject.vertex_color_buffer, meshPointsObject.colors);
     updateMesh(false);
-
-}
-
-void Renderer::moveSelected(glm::vec3 relativeMovement) {
-    meshWrapper.moveSelectedVertices(relativeMovement);
-
-    updateMesh(false);
+    return isSelected;
 
 }
 
 
-void Renderer::deleteSelectedVertices() {
-    meshWrapper.deleteSelectedVertices();
-    updateMesh(true);
-}
+
+
 
 
 /**
@@ -351,40 +351,9 @@ void Renderer::clearObject(Object &object) {
     object.indices.clear();
 }
 
-void Renderer::addVertex(glm::vec3 worldPos) {
-    meshWrapper.addVertex(worldPos);
-
-    meshWrapper.deselectAll();
-
-    recreateMesh();
-
-    select(worldPos);
 
 
-}
 
-void Renderer::addFace() {
-    meshWrapper.makeSelectedFace();
-
-    meshWrapper.deselectAll();
-
-    recreateMesh();
-
-}
-
-void Renderer::subdivision() {
-    meshWrapper.subdivision();
-    meshWrapper.deselectAll();
-    recreateMesh();
-}
-
-void Renderer::undo() {
-    meshWrapper.undo();
-
-    recreateMesh();
-
-
-}
 
 void Renderer::recreateMesh() {
     clearObject(meshObject);
@@ -415,6 +384,10 @@ bool Renderer::isRenderPoints() const {
 
 void Renderer::setRenderPoints(bool renderPoints) {
     Renderer::renderPoints = renderPoints;
+}
+
+MeshWrapper &Renderer::getMeshWrapper(){
+    return meshWrapper;
 }
 
 

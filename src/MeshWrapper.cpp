@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <QtWidgets/QInputDialog>
 #include "MeshWrapper.h"
 
 MeshWrapper::MeshWrapper() {
@@ -11,9 +12,18 @@ MeshWrapper::MeshWrapper() {
 
 void MeshWrapper::loadMesh(const char *path) {
 
+    if(path != nullptr) {
+        if (!OpenMesh::IO::read_mesh(mesh, path, opt)) {
+            std::cerr << "Error loading mesh from file " << path << std::endl;
+        }
+    }else{
+        mesh.clear();
+    }
+}
 
-    if (!OpenMesh::IO::read_mesh(mesh, path, opt)) {
-        std::cerr << "Error loading mesh from file " << path << std::endl;
+void MeshWrapper::writeMesh(const char *path){
+    if (!OpenMesh::IO::write_mesh(mesh, path))    {
+        std::cerr << "Error writing mesh to file " << path << std::endl;
     }
 }
 
@@ -99,7 +109,8 @@ void MeshWrapper::moveVertex(HE_MESH::VertexHandle v_h, glm::vec3 relativeMoveme
 
 }
 
-void MeshWrapper::selectVertex(glm::vec3 pos, float radius) {
+bool MeshWrapper::selectVertex(glm::vec3 pos, float radius) {
+    bool isSelected = false;
     OpenMesh::Vec3f vertexPos;
     vertexPos[0] = pos.x;
     vertexPos[1] = pos.y;
@@ -124,8 +135,10 @@ void MeshWrapper::selectVertex(glm::vec3 pos, float radius) {
                 //select
                 selectedVertices.push_back(*v_it);
                 this->setVertexWeight(*v_it, 2.0);
+                isSelected = true;
             }
         }
+
     }
 
     selectedHalfEdges.clear();
@@ -134,6 +147,7 @@ void MeshWrapper::selectVertex(glm::vec3 pos, float radius) {
             selectHalfEdge(selectedVertices.at(i), selectedVertices.at(i + 1));
         }
     }
+    return isSelected;
 }
 
 void MeshWrapper::selectHalfEdge(HE_MESH::VertexHandle v1, HE_MESH::VertexHandle v2){

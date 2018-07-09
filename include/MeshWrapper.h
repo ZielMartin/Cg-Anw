@@ -24,6 +24,8 @@ public:
 
     void loadMesh(const char *path);
 
+    void writeMesh(const char *path);
+
     void moveVertex(HE_MESH::VertexHandle v_h, glm::vec3 relativeMovement);
 
     void moveSelectedVertices(glm::vec3 relativeMovement);
@@ -34,7 +36,7 @@ public:
 
     void getLineVertices(std::vector<glm::vec3> &vertices, std::vector<bool> &selected);
 
-    void selectVertex(glm::vec3 pos, float radius);
+    bool selectVertex(glm::vec3 pos, float radius);
 
     void deleteSelectedVertices();
 

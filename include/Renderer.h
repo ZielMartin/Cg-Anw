@@ -59,21 +59,17 @@ public:
 
     void initRenderer(Shader &shader, char* model_path);
 
-    void select(glm::vec3 pos);
+    bool select(glm::vec3 pos);
 
-    void moveSelected(glm::vec3 relativeMovement);
-
-    void deleteSelectedVertices();
-
-    void addVertex(glm::vec3 worldPos);
-
-    void addFace();
-
-    void subdivision();
-
-    void undo();
+    void updateMesh(bool updatePointColor);
 
     void rotateMesh(glm::vec3 rotationVec, float angle);
+
+    MeshWrapper &getMeshWrapper();
+
+    void recreateMesh();
+
+
 
 
 private:
@@ -95,7 +91,6 @@ private:
 
     void clearObject(Object &object);
 
-    void updateMesh(bool updatePointColor);
 
     void fillMeshData(bool updatePointColor);
 
@@ -108,6 +103,8 @@ private:
     Object meshObject, gridObject, meshPointsObject, meshLinesObject, gridPaneObject;
 
     MeshWrapper meshWrapper;
+
+private:
 
     Shader shader;
 
@@ -123,7 +120,6 @@ private:
     bool renderGrid, renderPoints;
 
 
-    void recreateMesh();
 
 };
 
