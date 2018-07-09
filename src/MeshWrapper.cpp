@@ -130,11 +130,11 @@ bool MeshWrapper::selectVertex(glm::vec3 pos, float radius) {
             if (std::find(selectedVertices.begin(), selectedVertices.end(), v_it) != selectedVertices.end()) {
                 //deselect
                 selectedVertices.erase(std::find(selectedVertices.begin(), selectedVertices.end(), v_it));
-                this->setVertexWeight(*v_it, 1.0);
+                //this->setVertexWeight(*v_it, 1.0);
             } else {
                 //select
                 selectedVertices.push_back(*v_it);
-                this->setVertexWeight(*v_it, 2.0);
+                //this->setVertexWeight(*v_it, 2.0);
                 isSelected = true;
             }
         }
@@ -148,6 +148,12 @@ bool MeshWrapper::selectVertex(glm::vec3 pos, float radius) {
         }
     }
     return isSelected;
+}
+
+void MeshWrapper::setVertexWeightAllSelected(float weight) {
+    for(HE_MESH::VertexHandle vh : selectedVertices){
+        this->setVertexWeight(vh, weight);
+    }
 }
 
 void MeshWrapper::selectHalfEdge(HE_MESH::VertexHandle v1, HE_MESH::VertexHandle v2){

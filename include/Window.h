@@ -23,6 +23,7 @@ private slots:
     void newFile();
     void open();
     void save();
+    void vertexWeight();
 
 
 
@@ -31,14 +32,16 @@ private:
     void createMenus();
 
     QMenu *fileMenu;
-    QMenu *editMenu;
+    QMenu *vertexMenu;
     QMenu *helpMenu;
-    QActionGroup *alignmentGroup;
+
     QAction *newAct;
     QAction *openAct;
     QAction *saveAct;
-    QAction *printAct;
     QAction *exitAct;
+
+    QAction *vertexWeightAct;
+
 
     MyGLWidget *glWidget;
 

@@ -54,6 +54,8 @@ public:
 
     void undo();
 
+    void setVertexWeightAllSelected(float weight);
+
 
 private:
     HE_MESH mesh;

@@ -37,13 +37,6 @@ QSize MyGLWidget::sizeHint() const {
     return QSize(400, 400);
 }
 
-void MyGLWidget::onOpenClicked(){
-    std::cout << "onOpen" << std::endl;
-}
-
-
-
-
 void MyGLWidget::initializeGL() {
 
 
@@ -58,7 +51,6 @@ void MyGLWidget::initializeGL() {
 
 
     glEnable(GL_DEPTH_TEST);
-    //glEnable(GL_CULL_FACE);
 
 
     //enable point size in shader
@@ -79,14 +71,12 @@ void MyGLWidget::initializeGL() {
     camera->SetClipping(.1, 1000);
     camera->SetFOV(45);
 
-    //camera->Update();
 
 
 
 }
 
 void MyGLWidget::openMesh(char *model_path) {
-    //prepare data for OpenGL
     renderer.initRenderer(shader, model_path);
 }
 
@@ -95,7 +85,6 @@ void MyGLWidget::paintGL() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    //camera->Update();
     camera->GetMatricies(projectionMatrix, viewMatrix, modelMatrix);
 
     mat4 mvp = projectionMatrix * viewMatrix * modelMatrix;    //Compute the mvp matrix
@@ -258,6 +247,11 @@ void MyGLWidget::keyPressEvent(QKeyEvent *event) {
     }
 
 
+}
+
+
+void MyGLWidget::setVertexWeight(float weight){
+    renderer.getMeshWrapper().setVertexWeightAllSelected(weight);
 }
 
 #define NORMALMATRIX {1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0}

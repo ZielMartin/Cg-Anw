@@ -41,10 +41,10 @@ public:
 
     void saveOBJ(char *file);
 
+    void setVertexWeight(float weight);
 
-signals:
 
-public slots:
+
 
 protected:
     void initializeGL() override;
@@ -64,13 +64,6 @@ protected:
     void keyPressEvent(QKeyEvent *event) override;
 
 
-public slots:
-
-    void onOpenClicked();
-
-signals:
-
-    void openClicked();
 
 private:
 
@@ -90,15 +83,6 @@ private:
 
     glm::vec3 backgroundColor;
 
-
-
-
-
-    int xRot;
-    int yRot;
-    int zRot;
-
-    QPoint lastPos;
 
 };
 

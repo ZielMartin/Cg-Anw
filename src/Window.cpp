@@ -38,6 +38,18 @@ void Window::newFile() {
     glWidget->openMesh(nullptr);
 }
 
+void Window::vertexWeight() {
+
+    bool ok;
+    double input = QInputDialog::getDouble(this, tr("VertexWeight"),
+                                          tr("Vertex weight:"), 0, -2147483647, 2147483647, 1, &ok);
+    if (ok){
+        glWidget->setVertexWeight((float) input);
+    }
+
+
+}
+
 void Window::open() {
 
     QString fileName = QFileDialog::getOpenFileName(this,
@@ -89,6 +101,10 @@ void Window::createActions() {
     exitAct->setStatusTip(tr("Exit the application"));
     connect(exitAct, &QAction::triggered, this, &QWidget::close);
 
+    vertexWeightAct = new QAction(tr("&VertexWeight"), this);
+    vertexWeightAct->setStatusTip(tr("Change weight of selected vertices for subdivision"));
+    connect(vertexWeightAct, &QAction::triggered, this, &Window::vertexWeight);
+
 
 
 
@@ -101,6 +117,9 @@ void Window::createMenus() {
     fileMenu->addAction(saveAct);
     fileMenu->addSeparator();
     fileMenu->addAction(exitAct);
+
+    vertexMenu = menuBar()->addMenu(tr("&Vertex"));
+    vertexMenu->addAction(vertexWeightAct);
 
 
 
