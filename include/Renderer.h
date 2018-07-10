@@ -106,6 +106,9 @@ private:
 
 private:
 
+    glm::vec3 min, max;
+
+
     Shader shader;
 
     glm::vec3 gridPaneColor;
@@ -114,13 +117,16 @@ private:
     glm::vec3 gridColor;
     glm::vec3 faceColor;
     glm::vec3 meshLineColor;
+
+    glm::vec3 gridPosition;
     float grid_lenght;
+
     int pointSize;
 
     bool renderGrid, renderPoints;
 
 
-
+    void configureDimensions();
 };
 
 

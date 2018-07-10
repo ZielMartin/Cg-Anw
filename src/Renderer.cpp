@@ -26,7 +26,6 @@ Renderer::Renderer() : meshWrapper() {
     gridColor = vec3(1, 1, 1);
     faceColor = vec3(0.25, 0.4, 0.3);
     meshLineColor = vec3(0.2, 0.1, 0.1);
-    grid_lenght = 10;
 
 
     renderGrid = true;
@@ -40,16 +39,28 @@ void Renderer::initRenderer(Shader &shader, char *model_path) {
 
     meshWrapper.loadMesh(model_path);
 
-    glm::vec3 min, max;
-    meshWrapper.getDimensions(min, max);
-    float dx = max.x-min.x, dy = max.y-min.y, dz = max.z-min.z;
-    pointSize = dx+dy+dz == 0.0f ? 30.0f : 10.0f*((dx+dy+dz)/3.0f);
+    configureDimensions();
 
 
     this->shader = shader;
     initMesh();
     initGrid();
     initGridPane();
+}
+
+void Renderer::configureDimensions() {
+    meshWrapper.getDimensions(min, max);
+    float dx = max.x - min.x, dy = max.y - min.y, dz = max.z - min.z;
+    pointSize = dx + dy + dz == 0.0f ? 30.0f : 10.0f * ((dx + dy + dz) / 3.0f);
+
+    if(min.x == 0 && min.y == 0 && min.z == 0 && max.x == 0 && max.y == 0 && max.z == 0 ){
+        gridPosition = vec3(0.0f, 0.0f, 0.0f);
+        grid_lenght = 10;
+    }else{
+        gridPosition = vec3(0.0f, min.y, 0.0f);
+        float dx = max.x - min.x, dz = max.z - min.z;
+        dx > dz ? grid_lenght = dx * 1.5 : grid_lenght = dz * 1.5;
+    }
 }
 
 
@@ -90,7 +101,8 @@ void Renderer::renderObject(Object &object, int gl_draw_type) {
 void Renderer::initGrid() {
     clearObject(gridObject);
     glm::vec3 color = gridColor;
-    glm::vec3 gridPosition = glm::vec3(0.0f, 0.0f, 0.0f); //dimensions.getGridPosition();
+
+
 
     float stepsize = grid_lenght / 50;
     float i;
@@ -143,20 +155,19 @@ void Renderer::initGrid() {
 
 void Renderer::initGridPane() {
     clearObject(gridPaneObject);
-    glm::vec3 gridPosition = glm::vec3(0, -0.001, 0); //dimensions.getGridPosition();
 
 
 
     gridPaneObject.vertices.push_back(
-            vec3(gridPosition.x - grid_lenght / 2, gridPosition.y, gridPosition.z - grid_lenght / 2));
+            vec3(gridPosition.x - grid_lenght / 2, gridPosition.y-0.001, gridPosition.z - grid_lenght / 2));
     gridPaneObject.vertices.push_back(
-            vec3(gridPosition.x - grid_lenght / 2, gridPosition.y, gridPosition.z + grid_lenght / 2));
+            vec3(gridPosition.x - grid_lenght / 2, gridPosition.y-0.001, gridPosition.z + grid_lenght / 2));
 
     gridPaneObject.vertices.push_back(
-            vec3(gridPosition.x + grid_lenght / 2, gridPosition.y, gridPosition.z + grid_lenght / 2));
+            vec3(gridPosition.x + grid_lenght / 2, gridPosition.y-0.001, gridPosition.z + grid_lenght / 2));
 
     gridPaneObject.vertices.push_back(
-            vec3(gridPosition.x + grid_lenght / 2, gridPosition.y, gridPosition.z - grid_lenght / 2));
+            vec3(gridPosition.x + grid_lenght / 2, gridPosition.y-0.001, gridPosition.z - grid_lenght / 2));
 
 
     gridPaneObject.colors.push_back(gridPaneColor);
