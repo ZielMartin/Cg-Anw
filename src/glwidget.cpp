@@ -2,7 +2,7 @@
 
 #include "GL/glew.h"
 
-#include "myglwidget.h"
+#include "glwidget.h"
 
 #define _USE_MATH_DEFINES
 
@@ -14,7 +14,7 @@ using namespace glm;
 using namespace std;
 
 
-MyGLWidget::MyGLWidget(QWidget *parent, QGLFormat format)
+GLWidget::GLWidget(QWidget *parent, QGLFormat format)
         : QGLWidget(format, parent) {
 
 
@@ -26,18 +26,18 @@ MyGLWidget::MyGLWidget(QWidget *parent, QGLFormat format)
 
 }
 
-MyGLWidget::~MyGLWidget() {
+GLWidget::~GLWidget() {
 }
 
-QSize MyGLWidget::minimumSizeHint() const {
+QSize GLWidget::minimumSizeHint() const {
     return QSize(50, 50);
 }
 
-QSize MyGLWidget::sizeHint() const {
+QSize GLWidget::sizeHint() const {
     return QSize(400, 400);
 }
 
-void MyGLWidget::initializeGL() {
+void GLWidget::initializeGL() {
 
 
     char *vertexshader_path = (char *) "../shader/simpleShader.vert";
@@ -76,12 +76,12 @@ void MyGLWidget::initializeGL() {
 
 }
 
-void MyGLWidget::openMesh(char *model_path) {
+void GLWidget::openMesh(char *model_path) {
     renderer.initRenderer(shader, model_path);
 }
 
 
-void MyGLWidget::paintGL() {
+void GLWidget::paintGL() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -105,7 +105,7 @@ void MyGLWidget::paintGL() {
 }
 
 
-void MyGLWidget::resizeGL(int width, int height) {
+void GLWidget::resizeGL(int width, int height) {
     int side = qMin(width, height);
     glViewport(0, 0, width, height);
     camera->SetViewport(0, 0, width, height);
@@ -113,7 +113,7 @@ void MyGLWidget::resizeGL(int width, int height) {
 
 }
 
-void MyGLWidget::mousePressEvent(QMouseEvent *event) {
+void GLWidget::mousePressEvent(QMouseEvent *event) {
 
     if (event->modifiers().testFlag(Qt::ControlModifier) && event->buttons() & Qt::LeftButton) {
 
@@ -135,13 +135,13 @@ void MyGLWidget::mousePressEvent(QMouseEvent *event) {
 
 }
 
-void MyGLWidget::saveOBJ(char *file){
+void GLWidget::saveOBJ(char *file){
     renderer.getMeshWrapper().writeMesh(file);
 
 }
 
 
-void MyGLWidget::mouseMoveEvent(QMouseEvent *event) {
+void GLWidget::mouseMoveEvent(QMouseEvent *event) {
     if (event->buttons() & Qt::LeftButton) {
         camera->Move2D(event->x(), event->y());
         updateGL();
@@ -149,7 +149,7 @@ void MyGLWidget::mouseMoveEvent(QMouseEvent *event) {
 
 }
 
-void MyGLWidget::keyPressEvent(QKeyEvent *event) {
+void GLWidget::keyPressEvent(QKeyEvent *event) {
 
     float moveStepSize = 0.01;
 
@@ -250,12 +250,12 @@ void MyGLWidget::keyPressEvent(QKeyEvent *event) {
 }
 
 
-void MyGLWidget::setVertexWeight(float weight){
+void GLWidget::setVertexWeight(float weight){
     renderer.getMeshWrapper().setVertexWeightAllSelected(weight);
 }
 
 #define NORMALMATRIX {1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0}
-vec3 MyGLWidget::getWorldCoordinates(int x, int y) {
+vec3 GLWidget::getWorldCoordinates(int x, int y) {
 
     GLdouble obj[3];
     GLint viewport[4];

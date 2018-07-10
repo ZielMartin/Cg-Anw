@@ -30,12 +30,12 @@
 #include "scene_constants.h"
 
 
-class MyGLWidget : public QGLWidget {
+class GLWidget : public QGLWidget {
 Q_OBJECT
 public:
-    explicit MyGLWidget(QWidget *parent = 0, QGLFormat format = QGLFormat::defaultFormat());
+    explicit GLWidget(QWidget *parent = 0, QGLFormat format = QGLFormat::defaultFormat());
 
-    ~MyGLWidget() override;
+    ~GLWidget() override;
 
     void openMesh(char *model_path);
 

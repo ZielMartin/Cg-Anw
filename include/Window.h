@@ -4,7 +4,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "myglwidget.h"
+#include "glwidget.h"
 
 class QAction;
 class QActionGroup;
@@ -51,7 +51,7 @@ private:
 
 
 
-    MyGLWidget *glWidget;
+    GLWidget *glWidget;
 
 
 };

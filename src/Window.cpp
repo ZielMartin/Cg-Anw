@@ -14,7 +14,7 @@ Window::Window() {
     QWidget *topFiller = new QWidget;
     topFiller->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Ignored);
 
-    glWidget = new MyGLWidget(this);
+    glWidget = new GLWidget(this);
     glWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 
@@ -77,7 +77,9 @@ void Window::userControl() {
                    "Add new point:\t\tright-click on grid or object\n"
                    "Delete selected points:\t\tpress 'r'\n"
                    "Move selected points:\t\tarrow-keys,'+','-'\n\n"
-                   "Create Face:\t\t\tselect vertices in counterclockwise order and press 'f'\n"
+                   "Create Face:\t\t\tselect vertices in counterclockwise order and press 'f'\n\n"
+                   "CatmullClark subdivision:\tpress 'c' for one Step\n"
+                   "Undo subdivision step:\tCtrl + 'z'\n"
                     );
 
     msgBox.exec();
