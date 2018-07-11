@@ -1,13 +1,14 @@
-// Does the phong illumination calculation once per pixel
-#version 120
+#version 330 core
 
 uniform vec3 materialSpecular, lightSpecular, lightPosition;
 uniform float materialShininess, constantAttenuation, linearAttenuation;
 uniform int useTexture;
 uniform sampler2D texture0;
 
-varying vec3 diffuse, ambientGlobal, ambient, position, normal;
-varying vec2 uv;
+in vec3 diffuse, ambientGlobal, ambient, position, normal;
+in vec2 uv;
+
+out vec4 color;
 
 void main(void) {
     // do lighting computation
@@ -20,18 +21,18 @@ void main(void) {
 
     float attenuation = 1.0 / (constantAttenuation + length(L) * linearAttenuation);
 
-    vec3 color = ambientGlobal;
+    vec3 colorv3 = ambientGlobal;
     if (cosTheta > 0.0) {
-        color += attenuation * (diffuse * cosTheta + ambient);
-        color +=   attenuation
+        colorv3 += attenuation * (diffuse * cosTheta + ambient);
+        colorv3 +=   attenuation
                  * materialSpecular
                  * lightSpecular
                  * pow(cosAlpha, materialShininess);
     }
 
     // mix in texture color if required
-    if (useTexture != 0) color *= texture2D(texture0, uv.st).rgb;
+    //if (useTexture != 0) color *= texture2D(texture0, uv.st).rgb;
 
     // set pixel color in OpenGL
-    gl_FragColor = vec4(color, 1.0);
+    color = vec4(colorv3, 1.0);
 }

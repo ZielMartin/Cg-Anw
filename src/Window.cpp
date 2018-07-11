@@ -97,6 +97,23 @@ void Window::save() {
     glWidget->saveOBJ(cstr);
 }
 
+void Window::meshInfo(){
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("Mesh Info");
+    QString text;
+    std::vector<std::pair<std::string, int>> stats = glWidget->meshInfo();
+    for(std::pair<std::string, int> p : stats){
+        text.append(QString::fromStdString(p.first));
+        text.append(":");
+        text.append("\t");
+        text.append(QString::number(p.second));
+        text.append("\n");
+    }
+    msgBox.setText(text);
+
+    msgBox.exec();
+
+}
 
 void Window::createActions() {
     newAct = new QAction(tr("&New"), this);
@@ -128,6 +145,10 @@ void Window::createActions() {
     userControlAct->setStatusTip(tr("Help for user-interaction"));
     connect(userControlAct, &QAction::triggered, this, &Window::userControl);
 
+    meshInfoAct = new QAction(tr("&Mesh Info"), this);
+    meshInfoAct->setStatusTip(tr("Information about the mesh"));
+    connect(meshInfoAct, &QAction::triggered, this, &Window::meshInfo);
+
 
 
 
@@ -147,8 +168,10 @@ void Window::createMenus() {
 
 
 
-    helpMenu = menuBar()->addMenu(tr("&Help"));
-    helpMenu->addAction(userControlAct);
+    infoMenu = menuBar()->addMenu(tr("&Info"));
+    infoMenu->addAction(userControlAct);
+    infoMenu->addAction(meshInfoAct);
+
 
 
 }
