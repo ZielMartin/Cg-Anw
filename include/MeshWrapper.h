@@ -58,6 +58,8 @@ public:
 
     void getDimensions(glm::vec3 &min, glm::vec3 &max);
 
+    std::vector<std::pair<std::string, int>> getMeshInfo();
+
 
 private:
     HE_MESH mesh;

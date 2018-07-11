@@ -1,16 +1,17 @@
-// Does the phong illumination calculation once per pixel
-#version 120
+#version 330 core
+
 
 uniform mat4 projectionMatrix, viewMatrix, modelMatrix;
 uniform mat3 normalMatrix;
 uniform vec3 materialAmbient, materialDiffuse;
 uniform vec3 lightAmbient, lightDiffuse, lightPosition, lightGlobal;
 
-attribute vec3 vertex_position, vertex_normal;
-attribute vec2 vertex_uv;
+in vec3 vertex_position, vertex_normal;
+in vec2 vertex_uv;
+in float radius_attr;
 
-varying vec3 ambientGlobal, ambient, diffuse, position, normal;
-varying vec2 uv;
+out vec3 ambientGlobal, ambient, diffuse, position, normal;
+out vec2 uv;
 
 void main(void) {
     vec4 vertex = vec4(vertex_position, 1.0);

@@ -43,6 +43,8 @@ public:
 
     void setVertexWeight(float weight);
 
+    std::vector<std::pair<std::string, int>> meshInfo();
+
 
 
 

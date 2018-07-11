@@ -25,6 +25,7 @@ private slots:
     void save();
     void vertexWeight();
     void userControl();
+    void meshInfo();
 
 
 
@@ -43,8 +44,9 @@ private:
     QAction *vertexWeightAct;
 
 
-    QMenu *helpMenu;
+    QMenu *infoMenu;
     QAction *userControlAct;
+    QAction *meshInfoAct;
 
 
 

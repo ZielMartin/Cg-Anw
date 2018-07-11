@@ -27,6 +27,8 @@ void MeshWrapper::writeMesh(const char *path){
     }
 }
 
+
+
 //gets vertices in triangle order, if mesh should not be triangulated, an index array must be implemented with triangulated indices
 void MeshWrapper::getVerticesAndNormalsTriangulated(std::vector<glm::vec3> &vertices, std::vector<glm::vec3> &normals) {
 
@@ -261,6 +263,71 @@ void MeshWrapper::getDimensions(glm::vec3 &min, glm::vec3 &max){
         if(mesh.point(*v_it)[1] > max.y) max.y =  mesh.point(*v_it)[1];
         if(mesh.point(*v_it)[2] > max.z) max.z =  mesh.point(*v_it)[2];
     }
+}
+
+std::vector<std::pair<std::string, int>> MeshWrapper::getMeshInfo(){
+    std::vector<std::pair<std::string, int>> stats;
+
+    std::pair<std::string, int> faceCount;
+    faceCount.first = "Faces";
+    faceCount.second = mesh.n_faces();
+    stats.push_back(faceCount);
+
+    for (HE_MESH::FaceIter f_it = mesh.faces_begin(); f_it != mesh.faces_end(); ++f_it) {
+        int faceValence = mesh.valence(*f_it);
+        bool found = false;
+        for(std::pair<std::string, int> &p : stats){
+            std::string s = "FaceValence";
+            s += std::to_string(faceValence);
+            if(p.first == s){
+                p.second = p.second + 1;
+                found = true;
+            }
+        }if(!found){
+            std::pair<std::string, int> faceV;
+            faceV.first = "FaceValence";
+            faceV.first += std::to_string(faceValence);
+            faceV.second = 1;
+            stats.push_back(faceV);
+        }
+    }
+
+
+    std::pair<std::string, int> vertexCount;
+    vertexCount.first = "Vertices";
+    vertexCount.second = mesh.n_vertices();
+    stats.push_back(vertexCount);
+
+    for (HE_MESH::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it) {
+        int vertexValence = mesh.valence(*v_it);
+        bool found = false;
+        for(std::pair<std::string, int> &p : stats){
+            std::string s = "VertexValence";
+            s += std::to_string(vertexValence);
+            if(p.first == s){
+                p.second = p.second + 1;
+                found = true;
+            }
+        }if(!found){
+            std::pair<std::string, int> vertexV;
+            vertexV.first = "VertexValence";
+            vertexV.first += std::to_string(vertexValence);
+            vertexV.second = 1;
+            stats.push_back(vertexV);
+        }
+    }
+
+
+    std::pair<std::string, int> halfEdgeCount;
+    halfEdgeCount.first = "Half-Edges";
+    halfEdgeCount.second = mesh.n_halfedges();
+    stats.push_back(halfEdgeCount);
+
+
+
+    return stats;
+
+
 }
 
 

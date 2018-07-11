@@ -43,6 +43,9 @@ void GLWidget::initializeGL() {
     char *vertexshader_path = (char *) "../shader/simpleShader.vert";
     char *fragmentshader_path = (char *) "../shader/simpleShader.frag";
 
+    //char *vertexshader_path = (char *) "../shader/phongShader.vert";
+    //char *fragmentshader_path = (char *) "../shader/phongShader.frag";
+
     glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, 1);
 
 
@@ -139,6 +142,10 @@ void GLWidget::saveOBJ(char *file){
     renderer.getMeshWrapper().writeMesh(file);
 
 }
+
+std::vector<std::pair<std::string, int>> GLWidget::meshInfo(){
+    return renderer.getMeshWrapper().getMeshInfo();
+};
 
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event) {
