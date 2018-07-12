@@ -38,7 +38,7 @@ elseif (WIN32)
     #cmake link_libraries removes .dll and .dll.a ending, but not .dll.dll wtf
     set(GLEW_LIBRARIES "glew32.dll.dll")
     set(GLFW_STATIC_LIBRARIES "glfw3.dll.dll")
-    set(GLUT_LIBRARIES "freeglut.dll.dll" winmm gdi32)
+    #set(GLUT_LIBRARIES "freeglut.dll.dll" winmm gdi32)
     set(GTEST_LIBRARIES "gmock.dll.dll")
     set(OPENMESH_LIBRARIES "OpenMeshCored.dll.dll")
 
@@ -86,11 +86,11 @@ file(GLOB TEST_FILES
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${UI_FILES} ${INCLUDE_FILES})
 
-add_executable(${PROJECT_NAME}_TEST ${TEST_FILES})
+add_executable(${PROJECT_NAME}_TEST ${TEST_FILES} include/MyMesh.h)
 
 target_link_libraries(${PROJECT_NAME} ${GLEW_LIBRARIES} Qt5::Core Qt5::Widgets Qt5::OpenGL ${OPENGL_LIBRARIES} ${OPENMESH_LIBRARIES})
 
-target_link_libraries(${PROJECT_NAME}_TEST ${GTEST_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}_TEST ${GTEST_LIBRARIES}  ${OPENMESH_LIBRARIES})
 
 add_custom_command(
         TARGET ${PROJECT_NAME} POST_BUILD

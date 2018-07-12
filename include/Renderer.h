@@ -96,6 +96,9 @@ private:
 
     void bindBufferToShader(uint32_t &bufferID, uint32_t &location, int size);
 
+    void configureDimensions();
+
+
 
 
 private:
@@ -103,8 +106,6 @@ private:
     Object meshObject, gridObject, meshPointsObject, meshLinesObject, gridPaneObject;
 
     MeshWrapper meshWrapper;
-
-private:
 
     glm::vec3 min, max;
 
@@ -126,7 +127,8 @@ private:
     bool renderGrid, renderPoints;
 
 
-    void configureDimensions();
+
+
 };
 
 
