@@ -38,19 +38,19 @@ namespace cg {
             projection = ortho(-1.5f * float(aspect), 1.5f * float(aspect), -1.5f, 1.5f, -10.0f, 10.f);
 
         } else if (camera_mode == FREE) {
-            projection = perspective(glm::radians(field_of_view), aspect, near_clip, far_clip);
+            projection = glm::perspective(glm::radians(field_of_view), aspect, near_clip, far_clip);
 
             //detmine axis for pitch rotation
-            vec3 axis = cross(camera_direction, camera_up);
+            glm::vec3 axis = glm::cross(camera_direction, camera_up);
             //compute quaternion for pitch based on the camera pitch angle
-            quat pitch_quat = angleAxis(camera_pitch, axis);
+            glm::quat pitch_quat = glm::angleAxis(camera_pitch, axis);
             //determine heading quaternion from the camera up vector and the heading angle
-            quat heading_quat = angleAxis(camera_heading, camera_up);
+            glm::quat heading_quat = glm::angleAxis(camera_heading, camera_up);
             //add the two quaternions
-            quat temp = cross(pitch_quat, heading_quat);
-            temp = normalize(temp);
+            glm::quat temp = glm::cross(pitch_quat, heading_quat);
+            temp = glm::normalize(temp);
             //update the direction from the quaternion
-            camera_direction = rotate(temp, camera_direction);
+            camera_direction = glm::rotate(temp, camera_direction);
             //add the camera delta
             camera_position += camera_position_delta;
             //set the look at to be infront of the camera
@@ -58,11 +58,12 @@ namespace cg {
             //damping for smooth camera
             camera_heading *= .5;
             camera_pitch *= .5;
+
 //			camera_position_delta = camera_position_delta * .8f;
             camera_position_delta = glm::vec3(0);
         }
         //compute the MVP
-        view = lookAt(camera_position, camera_look_at, camera_up);
+        view = glm::lookAt(camera_position, camera_look_at, camera_up);
 
         glm::mat4 tempProjectionView =  this->projection * this->view;
 
@@ -72,7 +73,7 @@ namespace cg {
             }
         }
 
-        model = mat4(1.0f);
+        model = glm::mat4(1.0f);
         MVP = projection * view * model;
     }
 

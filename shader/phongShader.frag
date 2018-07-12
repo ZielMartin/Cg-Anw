@@ -27,12 +27,12 @@ void main(void) {
 
     float attenuation = 1.0 / (constantAttenuation + length(L) * linearAttenuation);
 
-    vec3 colorv3 = VertexIn.vertex_color + ambientGlobal;
+    vec3 tempColor = VertexIn.vertex_color + ambientGlobal;
 
 
     if (cosTheta > 0.0) {
-        colorv3 += attenuation * (diffuse * cosTheta + ambient);
-        colorv3 +=   attenuation
+        tempColor += attenuation * (diffuse * cosTheta + ambient);
+        tempColor +=   attenuation
                  * materialSpecular
                  * lightSpecular
                  * pow(cosAlpha, materialShininess);
@@ -51,5 +51,5 @@ void main(void) {
             }
 
     // set pixel color in OpenGL
-    color = vec4(colorv3, 1.0);
+    color = vec4(tempColor, 1.0);
 }

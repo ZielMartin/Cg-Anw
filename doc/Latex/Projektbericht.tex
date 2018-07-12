@@ -15,6 +15,8 @@
 % encoding
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
+
 % Encoding der Dateien (sonst funktionieren Umlaute nicht)
 \usepackage[utf8]{inputenc}
 
@@ -24,6 +26,22 @@
    filenameencoding=latin1, % Windows XP, Vista, 7
    % filenameencoding=utf8,   % Linux, OS X
 ]{grffile}
+
+%code snippets
+\usepackage{listings}
+\lstset{numbers=left, numberstyle=\tiny, numbersep=5pt}
+\lstset{language=C++,
+                keywordstyle=\color{blue},
+                stringstyle=\color{red},
+                commentstyle=\color{green},
+                morecomment=[l][\color{magenta}]{\#}
+}
+
+
+
+
+
+
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % Pakete und Stile

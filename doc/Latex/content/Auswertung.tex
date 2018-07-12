@@ -9,7 +9,7 @@ Zur Erstellung der Software wurde die Programmiersprache C/C++ genutzt unter Ver
 	\begin{labeling}[]{\textbf{Gewichtung der ausgewählte Punkte:}}%längster Wert 
 		\item [\textbf{OBJ-Datei laden:}] \textbf{File} $\rightarrow$ \textbf{Open} oder \textbf{Strg + O}
 		\item [\textbf{Neues Objekt:}] \textbf{File} $\rightarrow$ \textbf{New} oder \textbf{Strg + N}
-		\item [\textbf{Objekt als OBJ speichern:}] \textbf{File} $\rightarrow$ \textbf{Save} oder \textbf{Strg + S}
+hh		\item [\textbf{Objekt als OBJ speichern:}] \textbf{File} $\rightarrow$ \textbf{Save} oder \textbf{Strg + S}
 		\newline
 		\item [\textbf{Kamera Position verändern:}] '\textbf{w}',  '\textbf{a}', '\textbf{s}', '\textbf{d}', '\textbf{q}', '\textbf{e}' - Tasten
 		\item [\textbf{Kameraausrichtung ändern:}] \textbf{linke Maustaste} + bewegen der Maus
@@ -120,11 +120,67 @@ Für die Verwendung im Renderer liefert die Funktion \textbf{getVerticesAndNorma
 Für die Darstellung der Kanten werden alle Kanten des Meshes durchlaufen und die Anfangs-, sowie End-Vertices in einem std::vector gespeichert.\newline
 Um einen Vertex auszuwählen, werden die Welt-Koordinaten die in der Klasse GLWidget bestimmt wurden an die Funktion \textbf{selectVertex()} übergeben. Hier werden nun alle Vertices überprüft ob diese auf den Koordinaten liegen. In diesem Prozess wird eine kleine Abweichung toleriert. Ist der angeklickte Vertex schon in der Liste, wird er entfernt.
 		
+	
+	\section{\Large ALGORITHMEN}
+	
+\begin{lstlisting}
+
+projection = glm::perspective(glm::radians(field_of_view), aspect, near_clip, far_clip);
+
+/*
+ * Achse für Pitch-Rotation festlegen
+ */
+glm::vec3 axis = glm::cross(camera_direction, glm::vec3(0.0f, 1.0f, 0.0f););
+
+/*
+ * Quaternion für Pitch auf Basis des Kamera-Pitchwinkels berechnen
+ * pitch wird durch Mausbewegung in horizontaler Richtung beeinflusst
+ */
+glm::quat pitch_quat = glm::angleAxis(camera_pitch, axis);
+
+/*
+ * Bestimmung des Heading-Quaternions aus dem Kamera-Aufwärtsvektor und dem Heading-Winkel
+ * heading wird durch Mausbewegung in vertikaler Richtung beeinflusst
+ */
+glm::quat heading_quat = glm::angleAxis(camera_heading, glm::vec3(0.0f, 1.0f, 0.0f););
+
+/*
+ * Kreuzprodukt der beiden Quaternionen, normalisieren
+ */
+glm::quat temp = glm::cross(pitch_quat, heading_quat);
+temp = glm::normalize(temp);
+
+/*
+ * die Richtung der Kamera mit dem Quaternion aktualisieren
+ */
+camera_direction = glm::rotate(temp, camera_direction);
+
+/*
+ * Kamera position aktualisieren
+ */
+camera_position += camera_position_delta;
+
+/*
+ * lookAt aktualisieren
+ */
+camera_look_at = camera_position + camera_direction * 1.0f;
+
+
+
+\end{lstlisting}
+	
+	
+	
+	
+	
 	\section{\Large PROBLEME UND LÖSUNGEN}
 Um zu Beginn möglichst schnell einen Prototyp zu entwickeln, der das Testen und weiterarbeiten vereinfacht, setzte unser Team anfänglich auf die Verwendung des alten OpenGL Kontextes, der es ermöglicht direkt zu rendern ohne die Verwendung von Shadern und VAO, VBO, etc. Dieser Prototyp verwendete eine überarbeitete Version der Half-Edge Datenstruktur aus dem 4. Semester. Mit dem Prototyp konnten alle Anforderungen der ersten Milestones erfüllt werden. \newline
 Da die eigene Half-Edge Datenstruktur nicht über die Möglichkeit verfügte Vertices oder Faces zu löschen, entschieden wir uns für die Verwendung der OpenMesh Half-Edge-Datenstruktur.\newline
 Um unseren Ansprüchen Genüge zu tun, endschieden wir uns auf einen aktuellen OpenGL Kontext umzusteigen. Dieser Umstieg erforderte es ein völlig neues Projekt zu erzeugen, da wir viele Dinge selber implementieren mussten die vorher nicht notwendig waren. Beispielsweise die Darstellung der Punkte, welche sich im Prototyp auf die Nutzung der GLUT-Funktion glutSolidSphere() beschränkte, wurde zu einem umfangreicheren Unterfangen. Trotz einiger Schwierigkeiten und der Erzeugung von Mehraufwand bereuen wir diesen Schritt jedoch nicht, da wir unser Wissen aus dem ersten Computergrafik-Modul auffrischen konnten, was nötig und hilfreich für das Verständnis einiger Themen aus dem aktuellen Kurs war.\newline
 Als Entwicklungsumgebung setzten wir auf die IDE „CLion“ und achteten darauf das wir unabhängig vom Betriebssystem sind, um mit Windows sowie Linux an dem Projekt arbeiten zu können. Hierbei wurden wir vor einige Herausforderungen, mit welchen wir so nicht gerechnet hatten, gestellt. Diese Probleme beruhten zum großen Teil auf der Kompatibilität der Toolchain der einzelnen Module. So mussten wir die meisten Bibliotheken, die wir verwenden, selber kompilieren und hatten dennoch Schwierigkeiten ein fehlerfreies Zusammenspiel der Komponenten zu gewährleisten. Für zukünftige Projekte werden wir wahrscheinlich auf Visual-Studio und die Visual-Studio Toolchain setzen, da die meisten Bibliotheken im Computergrafik Bereich hierfür konfiguriert sind und so einiges an Problemen und Arbeit eingespart wird.
+
+
+
 
 	
 	\section{\Large BENUTZEROBERFLÄCHE}
