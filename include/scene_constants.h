@@ -1,14 +1,14 @@
 
 
 // properties of the model
-const float materialAmbient[3]  = {0.40f, 0.40f, 0.40f};
+const float materialAmbient[3]  = {0.4f, 0.4f, 0.4f};
 const float materialDiffuse[3]  = {0.55f, 0.55f, 0.55f};
 const float materialSpecular[3] = {0.99f, 0.99f, 0.99f};
 const float materialShininess   = 40.0f;
 
 // properties of the room
 const float constantAttenuation = 0.1f;
-const float linearAttenuation   = 0.4f;
+const float linearAttenuation   = 0.9f;
 
 // properties of the light
 const float lightPosition[3]    = {00.00f, 100.00f, 00.00f};

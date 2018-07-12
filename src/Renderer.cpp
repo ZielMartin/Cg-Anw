@@ -116,6 +116,10 @@ void Renderer::initGrid() {
             gridObject.colors.push_back(color);
             gridObject.colors.push_back(color);
 
+            gridObject.normals.push_back(glm::vec3(0,1,0));
+            gridObject.normals.push_back(glm::vec3(0,1,0));
+
+
             gridObject.radius.push_back(0);
             gridObject.radius.push_back(0);
         }
@@ -139,6 +143,9 @@ void Renderer::initGrid() {
 
             gridObject.colors.push_back(color);
             gridObject.colors.push_back(color);
+
+            gridObject.normals.push_back(glm::vec3(0,1,0));
+            gridObject.normals.push_back(glm::vec3(0,1,0));
 
             gridObject.radius.push_back(0);
             gridObject.radius.push_back(0);
@@ -348,6 +355,7 @@ void Renderer::fillMeshData(bool updatePointColor) {
             meshPointsObject.colors.push_back(pointsColor);
         }
         meshPointsObject.radius.push_back(pointSize);
+        meshPointsObject.normals.push_back(glm::vec3(0,1,0));
 
     }
     for (int i = 0; i < meshLinesObject.vertices.size(); i++) {

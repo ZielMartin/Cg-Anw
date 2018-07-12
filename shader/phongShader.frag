@@ -8,6 +8,12 @@ uniform sampler2D texture0;
 in vec3 diffuse, ambientGlobal, ambient, position, normal;
 in vec2 uv;
 
+in VertexData {
+    vec2 uv;
+    vec3 vertex_color;
+    float radius;
+} VertexIn;
+
 out vec4 color;
 
 void main(void) {
@@ -21,7 +27,9 @@ void main(void) {
 
     float attenuation = 1.0 / (constantAttenuation + length(L) * linearAttenuation);
 
-    vec3 colorv3 = ambientGlobal;
+    vec3 colorv3 = VertexIn.vertex_color + ambientGlobal;
+
+
     if (cosTheta > 0.0) {
         colorv3 += attenuation * (diffuse * cosTheta + ambient);
         colorv3 +=   attenuation
@@ -32,6 +40,15 @@ void main(void) {
 
     // mix in texture color if required
     //if (useTexture != 0) color *= texture2D(texture0, uv.st).rgb;
+
+     if(VertexIn.radius > 0){
+                vec3 N;
+                N.xy = gl_PointCoord* 2.0 - vec2(1.0);
+                float mag = dot(N.xy, N.xy);
+                if (mag > 1.0) discard;   // kill pixels outside circle
+                N.z = sqrt(1.0-mag);
+
+            }
 
     // set pixel color in OpenGL
     color = vec4(colorv3, 1.0);
