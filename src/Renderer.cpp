@@ -51,7 +51,11 @@ void Renderer::initRenderer(Shader &shader, char *model_path) {
 void Renderer::configureDimensions() {
     meshWrapper.getDimensions(min, max);
     float dx = max.x - min.x, dy = max.y - min.y, dz = max.z - min.z;
-    pointSize = dx + dy + dz == 0.0f ? 30.0f : 10.0f * ((dx + dy + dz) / 3.0f);
+    if(dx == 0 && dy == 0 && dz == 0){
+        pointSize = 30.0f;
+    }else{
+        pointSize = 10.0f * ((dx + dy + dz) / 3.0f);
+    }
 
     if(min.x == 0 && min.y == 0 && min.z == 0 && max.x == 0 && max.y == 0 && max.z == 0 ){
         gridPosition = vec3(0.0f, 0.0f, 0.0f);
@@ -277,7 +281,7 @@ void Renderer::updateBufferData(uint32 &bufferID, std::vector<T> &data) {
 
 
 bool Renderer::select(glm::vec3 pos) {
-    bool isSelected = meshWrapper.selectVertex(pos, 0.02);
+    bool isSelected = meshWrapper.selectVertex(pos, pointSize/4000.0);
 
     std::vector<glm::vec3> selected = meshWrapper.getSelectedVertices();
 
