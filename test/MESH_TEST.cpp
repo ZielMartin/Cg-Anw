@@ -52,7 +52,7 @@ namespace cg {
     TEST_F(MESH_TEST, TestPairs){
 
         for (HE_MESH::HalfedgeIter he_it = mesh.halfedges_begin(); he_it != mesh.halfedges_end(); ++he_it) {
-            ASSERT_EQ(mesh.opposite_halfedge_handle(*he_it),*he_it);
+            ASSERT_EQ(mesh.opposite_halfedge_handle(mesh.opposite_halfedge_handle(*he_it)),*he_it);
         }
 
     }
@@ -78,7 +78,7 @@ namespace cg {
             HE_MESH::HalfedgeHandle curr = mesh.halfedge_handle(*v_it);
             do{
                 ASSERT_EQ(*v_it, mesh.from_vertex_handle(curr));
-                curr = mesh.opposite_halfedge_handle(mesh.next_halfedge_handle(curr));
+                curr = mesh.next_halfedge_handle(mesh.opposite_halfedge_handle(curr));
             }while(curr != mesh.halfedge_handle(*v_it));
         }
 
