@@ -265,6 +265,41 @@ void MeshWrapper::getDimensions(glm::vec3 &min, glm::vec3 &max){
     }
 }
 
+void MeshWrapper::smoothMesh(){
+    backstack.push_back(mesh);
+    std::vector<HE_MESH::Point> newVertices;
+
+    for (HE_MESH::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it) {
+        HE_MESH::Point p(0,0,0);
+        int c = 0;
+        for(HE_MESH::VertexOHalfedgeIter voh_it = mesh.voh_iter(v_it); voh_it; ++voh_it) {
+            // Iterate over all outgoing halfedges..
+            p[0] += mesh.point(mesh.to_vertex_handle(*voh_it))[0];
+            p[1] += mesh.point(mesh.to_vertex_handle(*voh_it))[1];
+            p[2] += mesh.point(mesh.to_vertex_handle(*voh_it))[2];
+            c++;
+        }
+        if(c != 0){
+            p[0] = p[0] / c;
+            p[1] = p[1] / c;
+            p[2] = p[2] / c;
+        }else{
+            p = mesh.point(*v_it);
+        }
+        newVertices.push_back(p);
+    }
+
+    int i = 0;
+    for (HE_MESH::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it) {
+        mesh.point(*v_it) = newVertices.at(i);
+        i++;
+    }
+
+
+
+}
+
+
 std::vector<std::pair<std::string, int>> MeshWrapper::getMeshInfo(){
     std::vector<std::pair<std::string, int>> stats;
 

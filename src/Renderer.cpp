@@ -30,6 +30,7 @@ Renderer::Renderer() : meshWrapper() {
 
     renderGrid = true;
     renderPoints = true;
+    renderLines = true;
 }
 
 void Renderer::initRenderer(Shader &shader, char *model_path) {
@@ -69,8 +70,6 @@ void Renderer::configureDimensions() {
 
 
 void Renderer::render() {
-    renderObject(meshObject, GL_TRIANGLES);
-    renderObject(meshLinesObject, GL_LINES);
 
     if (renderPoints) {
         renderObject(meshPointsObject, GL_POINTS);
@@ -80,6 +79,12 @@ void Renderer::render() {
         renderObject(gridObject, GL_LINES);
         renderObject(gridPaneObject, GL_TRIANGLES);
     }
+
+    if(renderLines){
+        renderObject(meshLinesObject, GL_LINES);
+    }
+
+    renderObject(meshObject, GL_TRIANGLES);
 
 }
 
@@ -419,6 +424,14 @@ void Renderer::setRenderPoints(bool renderPoints) {
 
 MeshWrapper &Renderer::getMeshWrapper(){
     return meshWrapper;
+}
+
+bool Renderer::isRenderLines() const {
+    return renderLines;
+}
+
+void Renderer::setRenderLines(bool renderLines) {
+    Renderer::renderLines = renderLines;
 }
 
 

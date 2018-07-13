@@ -69,7 +69,9 @@ public:
 
     void recreateMesh();
 
+    bool isRenderLines() const;
 
+    void setRenderLines(bool renderLines);
 
 
 private:
@@ -124,9 +126,7 @@ private:
 
     int pointSize;
 
-    bool renderGrid, renderPoints;
-
-
+    bool renderGrid, renderPoints, renderLines;
 
 
 

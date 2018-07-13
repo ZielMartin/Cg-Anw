@@ -60,6 +60,8 @@ public:
 
     std::vector<std::pair<std::string, int>> getMeshInfo();
 
+    void smoothMesh();
+
 
 private:
     HE_MESH mesh;

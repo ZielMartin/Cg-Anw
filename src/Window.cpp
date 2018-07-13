@@ -42,7 +42,7 @@ void Window::vertexWeight() {
 
     bool ok;
     double input = QInputDialog::getDouble(this, tr("VertexWeight"),
-                                          tr("Vertex weight:"), 0, -2147483647, 2147483647, 1, &ok);
+                                          tr("Vertex weight:"), 1, -2147483647, 2147483647, 1, &ok);
     if (ok){
         glWidget->setVertexWeight((float) input);
     }

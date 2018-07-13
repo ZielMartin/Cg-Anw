@@ -202,6 +202,10 @@ void GLWidget::keyPressEvent(QKeyEvent *event) {
             renderer.setRenderPoints(!renderer.isRenderPoints());
             updateGL();
             break;
+        case Qt::Key_K:
+            renderer.setRenderLines(!renderer.isRenderLines());
+            updateGL();
+            break;
         case Qt::Key_R:
             renderer.getMeshWrapper().deleteSelectedVertices();
             renderer.updateMesh(true);
@@ -215,6 +219,12 @@ void GLWidget::keyPressEvent(QKeyEvent *event) {
             break;
         case Qt::Key_C:
             renderer.getMeshWrapper().subdivision();
+            renderer.getMeshWrapper().deselectAll();
+            renderer.recreateMesh();
+            updateGL();
+            break;
+        case Qt::Key_L:
+            renderer.getMeshWrapper().smoothMesh();
             renderer.getMeshWrapper().deselectAll();
             renderer.recreateMesh();
             updateGL();
