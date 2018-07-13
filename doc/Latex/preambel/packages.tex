@@ -68,7 +68,23 @@
 \usepackage{ragged2e}
 
 \usepackage{listings}
-\lstset{language=bash}
+\lstset{
+	language=C++,
+	basicstyle=\ttfamily,
+	columns=fullflexible,
+    	frame=single, % adds a frame around the code
+	rulecolor=\color{black},
+	breaklines=true,
+	literate=%
+    		{Ö}{{\"O}}1
+    		{Ä}{{\"A}}1
+    		{Ü}{{\"U}}1
+    		{ß}{{\ss}}1
+    		{ü}{{\"u}}1
+    		{ä}{{\"a}}1
+    		{ö}{{\"o}}1
+    		{~}{{\textasciitilde}}1
+}
 \usepackage{color}
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
