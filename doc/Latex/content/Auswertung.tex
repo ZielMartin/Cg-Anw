@@ -39,6 +39,9 @@ hh		\item [\textbf{Objekt als OBJ speichern:}] \textbf{File} $\rightarrow$ \text
 	\section{\Large KAMERA}
 	Um das Betrachten des Objektes von allen Seiten zu ermöglichen endschied sich das Team eine Lösung zu implementieren die \textbf{Quaternionen} nutzt. So wurde eine Computerspiel-artige Steuerung der Kamera entwickelt, welche es ermöglicht die Ausrichtung der Kamera mithilfe der Maus zu beeinflussen und die Position der Kamera mithilfe der Tasten w, a, s, d, q und e zu verändern. Beim Drücken der Linken Maustaste und ziehen in eine Richtung wird eine Achse definiert, welche senkrecht zu der gezogenen Bahn steht. Um diese Achse wird die Ausrichtung der Kamera während der Bewegung rotiert.
 		
+	\section{\Large CATMULL-CLARK UNTERTEILUNG}
+	Beim Catmull-Clark-Algorithmus werden beliebige Polygon-Gitter in Quad-Gitter unterteilt. Jedes n-Gon wird in n-Quads unterteilt. Zunächst wird für jedes Face ein Face-Punkt gesetzt, dieser wird aus dem Durchschnitt der Ausgangspunkte des jeweiligen Faces berechnet. Danach wird für jede Kante ein Kanten-Punkt hinzugefügt, der anhand der jeweiligen Endpunkte und der Nachbar Face Punkte und ebenfalls aus dem Durchschnitt dieser Punkte berechnet wird. Jeder neuberechnete Vertex wird mit den neuberechneten Kanten verbunden und weiter mit den Ausgangsvertices verbunden. Wenn das Ausgangsquad bereits zu einem Quad-Gitter unterteilt wurde, wird es erneut in vier weitere Quads unterteilt. Je öfter man den Algorithmus anwendet, desto feiner wird das Mesh.
+
 	\section{\Large ARCHITEKTUR}
 	
 	\begin{figure}[H]
@@ -73,11 +76,22 @@ hh		\item [\textbf{Objekt als OBJ speichern:}] \textbf{File} $\rightarrow$ \text
 	\end{figure}
 
 	\begin{labeling}[]{[\textbf{changeHeading()}}%längster Wert 
-	\item[\textbf{move()}] verändert die Position der Kamera und definiert die Richtung in die die Kamera sich bewegt bei den jeweiligen Tasteneingaben.
+	\item[\textbf{move()}] verändert die Position der Kamera und definiert die Richtung in die, die Kamera sich bewegt bei den jeweiligen Tasteneingaben.
 	\item[\textbf{changePitch()}] sorgt für die Drehung der Kamera und überprüft den Grad um die sich die Kamera wenden soll mit einem Maximalwert um so die Geschwindigkeit einzuschränken.
 	\item[\textbf{changeHeading()}] bestimmt die Richtung der Fortbewegung.
 	\item[\textbf{move2D()}] berechnet anhand der vorherigen Mausposition die Drehung und Fortbewegungsrichtung der Kamera durch die Maus.
 	\item[\textbf{update()}] Diese Funktion aktualisiert und adaptiert die Kamera und dessen Attribute wie z.B. die Richtung, Drehung und Bewegung der Kamera.
+	\end{labeling}
+
+\textcolor{red}{\textbf{CATMULL CLARK KLASSE IMAGE PLATZHALTER}}
+
+	\begin{labeling}[]{[\textbf{calc\_face\_centroid\_weighted()}}%längster Wert
+	\item[\textbf{operator()}] Zunächst werden die Gewichte auf 0 gesetzt wodurch die Kanten geglättet werden. Danach werden n-Unterteilungen durchgeführt und für jedes Face wird die Mitte berechnet. Dann werden die Positionen der neuen Kantenpunkte berechnet. Darauf folgt die mittige Teilung jeder Kante.
+	\item[\textbf{calc\_face\_centroid\_weighted()}] berechnet das Zentrum eines Faces anhand seiner Vertices.
+	\item[\textbf{compute\_midpoint()}] berechnet den Mittelpunkt einer Kante anhand des Endpunkte dieser Kante und den Nachbarkanten.
+	\item[\textbf{update\_vertex()}]
+	\item[\textbf{split\_face()}] Teilt ein n-Gon in n-Quads durch die Verbindung der neu erzeugten Vertices.
+	\item[\textbf{split\_edge()}] erstellt für die Mitte einer Kante einen neuen Vertex, dieser wird mit den Endpunkten neu verbunden.
 	\end{labeling}
 
 	\begin{figure}[H]
@@ -277,7 +291,13 @@ Als Entwicklungsumgebung setzten wir auf die IDE „CLion“ und achteten darauf
 
 	
 	\section{\Large BENUTZEROBERFLÄCHE}
-	
+
+	\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\linewidth]{GUI.png}
+	\caption{Benutzeroberfläche}
+	\label{fig8}
+	\end{figure}
 	
 
 	
