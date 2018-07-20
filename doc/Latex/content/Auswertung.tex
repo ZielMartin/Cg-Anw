@@ -72,7 +72,13 @@ hh		\item [\textbf{Objekt als OBJ speichern:}] \textbf{File} $\rightarrow$ \text
 	\label{fig3}
 	\end{figure}
 
-Kamera Text ...
+	\begin{labeling}[]{[\textbf{changeHeading()}}%längster Wert 
+	\item[\textbf{move()}] verändert die Position der Kamera und definiert die Richtung in die die Kamera sich bewegt bei den jeweiligen Tasteneingaben.
+	\item[\textbf{changePitch()}] sorgt für die Drehung der Kamera und überprüft den Grad um die sich die Kamera wenden soll mit einem Maximalwert um so die Geschwindigkeit einzuschränken.
+	\item[\textbf{changeHeading()}] bestimmt die Richtung der Fortbewegung.
+	\item[\textbf{move2D()}] berechnet anhand der vorherigen Mausposition die Drehung und Fortbewegungsrichtung der Kamera durch die Maus.
+	\item[\textbf{update()}] Diese Funktion aktualisiert und adaptiert die Kamera und dessen Attribute wie z.B. die Richtung, Drehung und Bewegung der Kamera.
+	\end{labeling}
 
 	\begin{figure}[H]
 	\centering
