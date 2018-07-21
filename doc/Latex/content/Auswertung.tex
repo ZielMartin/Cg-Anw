@@ -33,7 +33,7 @@ hh		\item [\textbf{Objekt als OBJ speichern:}] \textbf{File} $\rightarrow$ \text
 	\end{labeling}
 		
 	\section{\Large SHADER}
-	Das Programm verwedet einen \textbf{Vertex Shader} und einen \textbf{Fragment Shader} für die Umsetzung des \textbf{Goroud shadings}. In die Beleuchtungs-Berechnung fließen die Position der Primären Lichtquelle, die Farbe dieser Lichtquelle sowie weitere Faktoren wie die Farbe und Stärke des Umgebungslichtes und die Eigenschaften des Materials hinsichtlich der Spiegelungen. In Abhängigkeit des Betrachtungswinkels wird die Beleuchtung berechnet indem die Normalen an den Vertices interpoliert werden. Außerdem werden mithilfe der Shader die Vertices als Kreise dargestellt.\newline\newline
+	Das Programm verwedet einen \textbf{Vertex Shader} und einen \textbf{Fragment Shader} für die Umsetzung des \textbf{Phong shadings}. In die Beleuchtungs-Berechnung fließen die Position der Primären Lichtquelle, die Farbe dieser Lichtquelle sowie weitere Faktoren wie die Farbe und Stärke des Umgebungslichtes und die Eigenschaften des Materials hinsichtlich der Spiegelungen. In Abhängigkeit des Betrachtungswinkels wird die Beleuchtung berechnet indem die Normalen an den Vertices interpoliert werden. Außerdem werden mithilfe der Shader die Vertices als Kreise dargestellt.\newline\newline
  	Vorhergegangene Versuche zeigten deutlich, dass die Darstellung der Vertex-Punkte nicht effizient gelöst werden kann wenn jeder Punkt durch ein eigenes VAO repräsentiert wird. Im Zuge dieser Erkenntnis entschloss sich das Team die Punkte darzustellen indem alle Vertices mithilfe des Parameters GL\_POINTS als Point-Cloud gerendert werden. Diese Lösung ist effizient, jedoch ergab sich das Problem, dass die Punkte mit GL\_POINTS als Vierecke gerendert wurden. Die Lösung für dieses Problem besteht darin einen Radius zu definieren und alle Fragmente, die sich Außerhalb dieses Radius befinden, nicht zu rendern. Da die Größe dieser Kreise nicht in Raumkoordinatengrößen definiert werden, sondern in Pixelgröße, wurden die Punkte alle gleich groß, unabhängig von der Entfernung, gerendert. Um eine Dynamische Größe zu gewährleisten, wird die Entfernung der Kamera zu dem Punkt berechnet und der Radius des Punktes wird proportional zur Entfernung kleiner.
 	
 	\section{\Large KAMERA}
@@ -51,6 +51,9 @@ hh		\item [\textbf{Objekt als OBJ speichern:}] \textbf{File} $\rightarrow$ \text
 	\label{fig1}
 	\end{figure}
 
+\subsection{GLWidget}
+
+
 	\begin{figure}[H]
 	\centering
 	\includegraphics[width=0.7\linewidth]{GLWidget.png}
@@ -67,7 +70,9 @@ hh		\item [\textbf{Objekt als OBJ speichern:}] \textbf{File} $\rightarrow$ \text
 	\item[\textbf{getWorldCoodinates()}]  implementiert Ray-Picking verfahren mithilfe der Funktionen \textbf{gluUnProject()} und \textbf{glReadPixels()}. In dem Ray-Picking Verfahren wird ein Strahl durch die 3D-Welt zwischen Near- und Far-Pane projiziert. Die Koordinaten im 3D-Raum an denen zuerst ein gerendertes Objekt gekreuzt wird, werden als Rückgabewert der Funktion \textbf{getWorldCoordinates()} zurück geliefert. Aus diesem Grund bestand die Notwendigkeit eine Fläche in der 3D-Welt zu rendern die von einem Raster überlagert wird. Diese Fläche ermöglicht es Vertices per Mausklick mittels des Ray-Picking Verfahren hinzuzufügen. Die Fläche inklusive dem Raster können ausgeblendet werden, wenn sie beispielsweise beim Betrachten oder bearbeiten eines Objektes stören.
 	\item[\textbf{keyPressEvent()}] behandelt weitere Benutzerinteraktionen wie die Bewegung durch den Raum oder die Manipulation des Mesh und gibt diese an die jeweiligen Klassen weiter.
 	\end{labeling}
-		
+
+\subsection{Camera}
+				
 	\begin{figure}[H]
 	\centering
 	\includegraphics[width=0.7\linewidth]{camera.png}
@@ -82,8 +87,16 @@ hh		\item [\textbf{Objekt als OBJ speichern:}] \textbf{File} $\rightarrow$ \text
 	\item[\textbf{move2D()}] berechnet anhand der vorherigen Mausposition die Drehung und Fortbewegungsrichtung der Kamera durch die Maus.
 	\item[\textbf{update()}] Diese Funktion aktualisiert und adaptiert die Kamera und dessen Attribute wie z.B. die Richtung, Drehung und Bewegung der Kamera.
 	\end{labeling}
+	
+\subsection{CattmullClark}
 
-\textcolor{red}{\textbf{CATMULL CLARK KLASSE IMAGE PLATZHALTER}}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\linewidth]{CatmullClark.png}
+	\caption{Catmull-Clark}
+	\label{fig4}
+	\end{figure}
 
 	\begin{labeling}[]{[\textbf{calc\_face\_centroid\_weighted()}}%längster Wert
 	\item[\textbf{operator()}] Zunächst werden die Gewichte auf 0 gesetzt wodurch die Kanten geglättet werden. Danach werden n-Unterteilungen durchgeführt und für jedes Face wird die Mitte berechnet. Dann werden die Positionen der neuen Kantenpunkte berechnet. Darauf folgt die mittige Teilung jeder Kante.
@@ -94,20 +107,26 @@ hh		\item [\textbf{Objekt als OBJ speichern:}] \textbf{File} $\rightarrow$ \text
 	\item[\textbf{split\_edge()}] erstellt für die Mitte einer Kante einen neuen Vertex, dieser wird mit den Endpunkten neu verbunden.
 	\end{labeling}
 
+\subsection{Object}
+
 	\begin{figure}[H]
 	\centering
 	\includegraphics[width=0.7\linewidth]{object.png}
 	\caption{Object}
-	\label{fig4}
+	\label{fig5}
 	\end{figure}
 
 \noindent Die Klasse \textbf{Object} wird im Renderer benötigt. Hier werden alle Daten zu einem Objekt, welches gerendert werden soll, gespeichert. Die Daten bestehen aus den ID´s der unterschiedlichen Buffer-Objects, der ID des Vertex-Array-Objektes, sowie den Daten die dieses Objekt definieren. Der Renderer ist so Implementiert das nicht zwangsläufig alle Attribute des Objekts definiert sein müssen. Beispielsweise wird davon ausgegangen, dass die Vertices in Triangulierter-Form und Reihenfolge im vertex\_position\_buffer vorliegen, wenn der vertex\_index\_buffer nicht definiert ist.
+
+
+\subsection{Renderer}
+
 
 	\begin{figure}[H]
 	\centering
 	\includegraphics[width=0.7\linewidth]{renderer.png}
 	\caption{Renderer}
-	\label{fig5}
+	\label{fig6}
 	\end{figure}
 
 	\noindent In dieser Klasse werden alle Operationen ausgeführt die den Rendering-Prozess betreffen. Die Klasse hält verschieden Instanzen der Object Struktur. Das Mesh wird in dreifacher Variation als Object gehalten:
@@ -120,20 +139,24 @@ Außerdem werden Objects für das Raster sowie die Fläche unterhalb des Rasters
 Bei der Initialisierung der einzelnen Objekte werden die Daten-Attribute der Object Instanz belegt und für jedes Objekt wird ein VAO erstellt sowie die buffer\_objects der Daten-Attribute, die belegt sind, werden erzeugt. Hierfür werden die Template-Funktion \textbf{setup\_buffer\_data()} und \textbf{bindBufferToShader()} verwendet. \textbf{updateBufferData()} ist eine Template-Funktion, welche \textbf{glBufferSubData} nutzt um die gespeicherten Daten zu aktualisieren. Dies geschieht zum Beispiel, wenn ein Vertex-Punkt verschoben wird. Wird ein Punkt hinzugefügt, entfernt oder ein Face erstellt, wird die Größe des Buffer-Objects verändert. Für diesen Fall eignet sich \textbf{glBufferSubData} nicht mehr und die entsprechende Buffer-Objects werden mittels \textbf{recreateMesh()} neu erstellt.\newline
 Bei der Initialisierung der Renderer Instanz werden die Dimensionen des Mesh-Objektes berücksichtigt. Es werden die Minimalen und Maximalen Vertex-Positionen ermittelt und das Raster-Objekt wird unterhalb der niedrigsten Position auf der Y-Achse positioniert. Zusätzlich wird das Raster auf eine Größe, die 50\% größer als die Differenz aus der Maximalen X und Minimalen X Position oder, wenn diese größer ist, die Differenz auf der Z-Achse, beschränkt.
 
+\subsection{Shader}
+
 	\begin{figure}[H]
 	\centering
 	\includegraphics[width=0.7\linewidth]{shader.png}
 	\caption{Shader}
-	\label{fig6}
+	\label{fig7}
 	\end{figure}
 
-\noindent Die Shader-Klasse bindet die übergebenen zwei GLSL-Shader an die Grafikkarte. Hierfür werden die übergebenen Shader ausgelesen und die benötigten Parameter an die Shader weitergeleitet. In unserem Programm beschränken wir uns auf die Verwendung eines \textbf{Vertex-Shaders} und eines \textbf{Fragment-Shaders}, welche das \textbf{Gouroud-Shading} umsetzen und für die korrekte Darstellung der Punkte zuständig sind.
+\noindent Die Shader-Klasse bindet die übergebenen zwei GLSL-Shader an die Grafikkarte. Hierfür werden die übergebenen Shader ausgelesen und die benötigten Parameter an die Shader weitergeleitet. In unserem Programm beschränken wir uns auf die Verwendung eines \textbf{Vertex-Shaders} und eines \textbf{Fragment-Shaders}, welche das \textbf{Phong-Shading} umsetzen und für die korrekte Darstellung der Punkte zuständig sind.
+
+\subsection{MeshWrapper}
 
 	\begin{figure}[H]
 	\centering
 	\includegraphics[width=0.7\linewidth]{meshWrapper.png}
 	\caption{Meshwrapper}
-	\label{fig7}
+	\label{fig8}
 	\end{figure}
 
 \noindent Der \textbf{MeshWrapper} schachtelt die OpenMesh-Funktionalitäten und schafft eine Schnittstelle um die Interaktion mit dem Mesh zu ermöglichen. Für die Konfiguration des Meshes wird ein struct verwendet welches festlegt, dass die Punkte und Normalen als float gespeichert werden. Somit ist die Integration in die Umgebung, welche vorwiegend mit dem Datentyp float arbeitet gewährleistet. Da für die Gewichtung der Vertices bei der Berechnung der Unterteilungsflächen eine vierte Komponente benötigt wird, wird die Klasse \textbf{HE\_MESH} genutzt, welche von der Klasse PolyMesh, aus der OpenMesh-Bibliothek, abgeleitet wird.\newline
@@ -192,6 +215,16 @@ camera_look_at = camera_position + camera_direction * 1.0f;
 
 
 \end{lstlisting}
+
+\subsection{Smoothing}
+
+Die Glättung wird erreicht indem jeder Vertex an die Position verschoben wird, die dem Durchschnittswert seiner benachbarten Vertices entspricht. Um dies zu erreichen werden die neuen Positionen der Vertices zwischengespeichert. Nachdem jeder Vertex neu errechnet wurde werden die alten Werte durch die zwischengespeicherten Werte ersetzt.
+
+    \[\overline{x}_i\] = \frac{1}N \sum_{j=1}{N}{\[\overline{x}_j\]}
+    
+    wobei \[\overline{x}_i\] die neue Position des Vertex und N die Anzahl der benachbarten Vertices ist.
+
+
 	
 	\subsection{Shader}
 	
@@ -296,7 +329,7 @@ Als Entwicklungsumgebung setzten wir auf die IDE „CLion“ und achteten darauf
 	\centering
 	\includegraphics[width=0.7\linewidth]{GUI.png}
 	\caption{Benutzeroberfläche}
-	\label{fig8}
+	\label{fig9}
 	\end{figure}
 	
 
