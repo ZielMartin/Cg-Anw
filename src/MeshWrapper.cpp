@@ -19,6 +19,8 @@ void MeshWrapper::loadMesh(const char *path) {
     }else{
         mesh.clear();
     }
+
+    smoothMesh();
 }
 
 void MeshWrapper::writeMesh(const char *path){
@@ -108,6 +110,8 @@ void MeshWrapper::moveVertex(HE_MESH::VertexHandle v_h, glm::vec3 relativeMoveme
     OpenMesh::Vec3f newPoint =
             mesh.point(v_h) + HE_MESH::Point(relativeMovement.x, relativeMovement.y, relativeMovement.z);
     mesh.set_point(v_h, newPoint);
+
+    smoothMesh();
 
 }
 
@@ -204,6 +208,7 @@ void MeshWrapper::moveSelectedVertices(glm::vec3 relativeMovement) {
     for (HE_MESH::VertexHandle v_h : selectedVertices) {
         moveVertex(v_h, relativeMovement);
     }
+    smoothMesh();
 
 }
 
@@ -218,6 +223,7 @@ void MeshWrapper::deleteSelectedVertices() {
     }
     mesh.garbage_collection();
     deselectAll();
+    smoothMesh();
 
 }
 
@@ -230,12 +236,15 @@ void MeshWrapper::makeSelectedFace() {
     if (selectedVertices.size() == 3) {
         mesh.add_face(selectedVertices);
     }
+    smoothMesh();
 }
 
 void MeshWrapper::subdivision() {
     backstack.push_back(mesh);
 
     this->mesh = catmull(this->mesh, 1);
+
+    smoothMesh();
 }
 
 void MeshWrapper::undo() {
@@ -243,6 +252,7 @@ void MeshWrapper::undo() {
         mesh = backstack.at(backstack.size() - 1);
         backstack.pop_back();
     }
+    smoothMesh();
 }
 
 void MeshWrapper::setVertexWeight(HE_MESH::VertexHandle vertexHandle, float weight) {
@@ -267,7 +277,9 @@ void MeshWrapper::getDimensions(glm::vec3 &min, glm::vec3 &max){
 
 void MeshWrapper::smoothMesh(){
     backstack.push_back(mesh);
-    std::vector<HE_MESH::Point> newVertices;
+
+    smoothedVertices.clear();
+    unSmoothedVertices.clear();
 
     for (HE_MESH::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it) {
         HE_MESH::Point p(0,0,0);
@@ -286,17 +298,22 @@ void MeshWrapper::smoothMesh(){
         }else{
             p = mesh.point(*v_it);
         }
-        newVertices.push_back(p);
+        smoothedVertices.push_back(p);
+        unSmoothedVertices.push_back(mesh.point(*v_it));
     }
+}
 
+void MeshWrapper::applySmoothedVertices(int interpolationValue){
     int i = 0;
-    for (HE_MESH::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it) {
-        mesh.point(*v_it) = newVertices.at(i);
+    for (OpenMesh::PolyConnectivity::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it){
+        //vector from old to new vertex
+        glm::vec3 vec = glm::vec3(smoothedVertices.at(i)[0] - unSmoothedVertices.at(i)[0], smoothedVertices.at(i)[1] - unSmoothedVertices.at(i)[1], smoothedVertices.at(i)[2] - unSmoothedVertices.at(i)[2]);
+        //float lenght = (vec.length()/99)*interpolationValue;
+        mesh.point(*v_it)[0] = unSmoothedVertices.at(i)[0] + (vec.x/99)*interpolationValue;
+        mesh.point(*v_it)[1] = unSmoothedVertices.at(i)[1] + (vec.y/99)*interpolationValue;
+        mesh.point(*v_it)[2] = unSmoothedVertices.at(i)[2] + (vec.z/99)*interpolationValue;
         i++;
     }
-
-
-
 }
 
 

@@ -143,6 +143,13 @@ void GLWidget::saveOBJ(char *file){
 
 }
 
+void GLWidget::applySmoothedVertices(int interpolationValue){
+    renderer.getMeshWrapper().applySmoothedVertices(interpolationValue);
+    renderer.recreateMesh();
+    updateGL();
+
+}
+
 std::vector<std::pair<std::string, int>> GLWidget::meshInfo(){
     return renderer.getMeshWrapper().getMeshInfo();
 };
@@ -225,6 +232,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event) {
             break;
         case Qt::Key_L:
             renderer.getMeshWrapper().smoothMesh();
+            renderer.getMeshWrapper().applySmoothedVertices(99);
             renderer.getMeshWrapper().deselectAll();
             renderer.recreateMesh();
             updateGL();

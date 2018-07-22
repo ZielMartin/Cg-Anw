@@ -4,6 +4,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QtWidgets/QSlider>
 #include "glwidget.h"
 
 class QAction;
@@ -26,6 +27,7 @@ private slots:
     void vertexWeight();
     void userControl();
     void meshInfo();
+    void sliderValueChanged(int);
 
 
 
@@ -49,7 +51,7 @@ private:
     QAction *meshInfoAct;
 
 
-
+    QSlider *slider;
 
 
 

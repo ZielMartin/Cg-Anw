@@ -14,14 +14,24 @@ Window::Window() {
     QWidget *topFiller = new QWidget;
     topFiller->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Ignored);
 
+
     glWidget = new GLWidget(this);
     glWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+
+    slider = new QSlider(Qt::Horizontal, this);
+    slider->setFocusPolicy(Qt::StrongFocus);
+    connect(slider, SIGNAL(valueChanged(int)), this, SLOT(sliderValueChanged(int)));
+
+    QLabel *smoothingLabel = new QLabel("Smoothing");
 
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(5);
     layout->addWidget(topFiller);
     layout->addWidget(glWidget);
+    layout->addWidget(smoothingLabel);
+    layout->addWidget(slider);
     widget->setLayout(layout);
 
     createActions();
@@ -33,6 +43,9 @@ Window::Window() {
     resize(480, 320);
 }
 
+void Window::sliderValueChanged(int k) {
+    glWidget->applySmoothedVertices(k);
+}
 
 void Window::newFile() {
     glWidget->openMesh(nullptr);

@@ -62,6 +62,9 @@ public:
 
     void smoothMesh();
 
+    void applySmoothedVertices(int interpolationValue);
+
+
 
 private:
     HE_MESH mesh;
@@ -73,6 +76,10 @@ private:
     OpenMesh::IO::Options opt;
 
     std::vector<HE_MESH::VertexHandle> selectedVertices;
+
+    std::vector<HE_MESH::Point> smoothedVertices;
+    std::vector<HE_MESH::Point> unSmoothedVertices;
+
 
     /*
      * selecting order determines which half-edge is selected
@@ -89,8 +96,6 @@ private:
     void setVertexWeight(HE_MESH::VertexHandle, float);
 
     float getVertexWeight(HE_MESH::VertexHandle);
-
-
 
 
 };

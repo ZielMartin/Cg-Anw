@@ -45,6 +45,8 @@ public:
 
     std::vector<std::pair<std::string, int>> meshInfo();
 
+    void applySmoothedVertices(int interpolationValue);
+
 
 
 
