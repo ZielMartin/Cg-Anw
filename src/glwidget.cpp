@@ -271,6 +271,10 @@ void GLWidget::setVertexWeight(float weight){
     renderer.getMeshWrapper().setVertexWeightAllSelected(weight);
 }
 
+void GLWidget::setLimitRules(bool LR){
+    renderer.getMeshWrapper().limit = LR;
+}
+
 #define NORMALMATRIX {1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0}
 vec3 GLWidget::getWorldCoordinates(int x, int y) {
 

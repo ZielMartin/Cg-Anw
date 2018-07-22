@@ -61,12 +61,12 @@ public:
     std::vector<std::pair<std::string, int>> getMeshInfo();
 
     void smoothMesh();
-
+    bool limit;
 
 private:
-    HE_MESH mesh;
-
-    std::vector<HE_MESH> backstack;
+    HE_MESH mesh, conmesh;
+    int subdivisionLvl;
+    std::vector<HE_MESH> backstack, backstackLimit, backstackH;
 
     CatmullClark1 catmull;
 

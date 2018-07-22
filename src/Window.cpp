@@ -115,6 +115,18 @@ void Window::meshInfo(){
 
 }
 
+void Window::limitCecked()
+{
+   if(limitCeckedBtn->isChecked())
+   {
+      glWidget->setLimitRules(true);
+   }
+   else
+   {
+      glWidget->setLimitRules(false);
+   }
+}
+
 void Window::createActions() {
     newAct = new QAction(tr("&New"), this);
     newAct->setShortcuts(QKeySequence::New);
@@ -149,7 +161,10 @@ void Window::createActions() {
     meshInfoAct->setStatusTip(tr("Information about the mesh"));
     connect(meshInfoAct, &QAction::triggered, this, &Window::meshInfo);
 
-
+    limitCeckedBtn = new QAction("Limit Rules", this);
+    limitCeckedBtn->setCheckable(true);
+    limitCeckedBtn->setChecked(false);
+    connect(limitCeckedBtn, SIGNAL(triggered()), this, SLOT(limitCecked()));
 
 
 
@@ -165,7 +180,7 @@ void Window::createMenus() {
 
     vertexMenu = menuBar()->addMenu(tr("&Vertex"));
     vertexMenu->addAction(vertexWeightAct);
-
+    vertexMenu->addAction(limitCeckedBtn);
 
 
     infoMenu = menuBar()->addMenu(tr("&Info"));

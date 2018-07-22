@@ -42,7 +42,7 @@ public:
     void saveOBJ(char *file);
 
     void setVertexWeight(float weight);
-
+    void setLimitRules(bool LR);
     std::vector<std::pair<std::string, int>> meshInfo();
 
 

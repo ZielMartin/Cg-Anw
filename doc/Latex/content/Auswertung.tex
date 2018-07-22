@@ -42,6 +42,11 @@ hh		\item [\textbf{Objekt als OBJ speichern:}] \textbf{File} $\rightarrow$ \text
 	\section{\Large CATMULL-CLARK UNTERTEILUNG}
 	Beim Catmull-Clark-Algorithmus werden beliebige Polygon-Gitter in Quad-Gitter unterteilt. Jedes n-Gon wird in n-Quads unterteilt. Zunächst wird für jedes Face ein Face-Punkt gesetzt, dieser wird aus dem Durchschnitt der Ausgangspunkte des jeweiligen Faces berechnet. Danach wird für jede Kante ein Kanten-Punkt hinzugefügt, der anhand der jeweiligen Endpunkte und der Nachbar Face Punkte und ebenfalls aus dem Durchschnitt dieser Punkte berechnet wird. Jeder neu berechnete Vertex wird mit den neu berechneten Kanten verbunden und weiter mit den Ausgangsvertices verbunden. Wenn das Ausgangsquad bereits zu einem Quad-Gitter unterteilt wurde, wird es erneut in vier weitere Quads unterteilt. Je öfter man den Algorithmus anwendet, desto feiner wird das Mesh.
 
+\subsection{Limitpunkte und Limitnormalen}
+Bei unendlich ofter Anwendung der Unterteilungsregeln auf ein Mesh wird die Limitfläche erzeugt. Durch Anwendendung der Limitpunktregeln lässt sich für jeden Kontrollpunkt eines Kontrollgitters der entsprechende Punkt auf der Limitfläche bestimmen. Die Normale eines Limitpunktes erhält man durch das Kreuzprodukt der Oberflächentangenten an ebendieser Stelle des Limitpunktes.\par In der Implementierung wird mit der Berechnung der Limitpunkte begonnen, nachdem man die Kontrollpunkte des neuen Meshes durch einen Unterteilungsschritt erhalten hat. Nun wird für jeden einzelnen Kontrollpunkt die Limitpunktregel angewandt. Dazu wird zunächst überprüft, ob und wie viele scharfe Kanten/Ränder mit dem Kontrollpunkt verbunden sind und entsprechend die Regel für glatte oder scharfe Kanten verwendet. Die Informationen über Valenz k und 1-Nachbarschaft erhält man durch geschicktes Manövrieren innerhalb der Halfedge-Datenstruktur.
+%für glatte Kanten
+
+
 	\section{\Large ARCHITEKTUR}
 	
 	\begin{figure}[H]

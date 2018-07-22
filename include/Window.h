@@ -4,6 +4,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QPointer>
 #include "glwidget.h"
 
 class QAction;
@@ -26,7 +27,7 @@ private slots:
     void vertexWeight();
     void userControl();
     void meshInfo();
-
+    void limitCecked();
 
 
 private:
@@ -47,7 +48,7 @@ private:
     QMenu *infoMenu;
     QAction *userControlAct;
     QAction *meshInfoAct;
-
+    QPointer<QAction> limitCeckedBtn;
 
 
 
