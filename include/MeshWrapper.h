@@ -60,7 +60,7 @@ public:
 
     std::vector<std::pair<std::string, int>> getMeshInfo();
 
-    void smoothMesh();
+    void smoothMesh(bool pushToBackstack);
 
     void applySmoothedVertices(int interpolationValue);
 

@@ -22,7 +22,7 @@ void MeshWrapper::loadMesh(const char *path) {
         mesh.clear();
     }
 
-    smoothMesh();
+    smoothMesh(false);
 }
 
 void MeshWrapper::writeMesh(const char *path){
@@ -113,7 +113,7 @@ void MeshWrapper::moveVertex(HE_MESH::VertexHandle v_h, glm::vec3 relativeMoveme
             mesh.point(v_h) + HE_MESH::Point(relativeMovement.x, relativeMovement.y, relativeMovement.z);
     mesh.set_point(v_h, newPoint);
 
-    smoothMesh();
+    smoothMesh(false);
 
 }
 
@@ -210,7 +210,7 @@ void MeshWrapper::moveSelectedVertices(glm::vec3 relativeMovement) {
     for (HE_MESH::VertexHandle v_h : selectedVertices) {
         moveVertex(v_h, relativeMovement);
     }
-    smoothMesh();
+    smoothMesh(false);
 
 }
 
@@ -225,7 +225,7 @@ void MeshWrapper::deleteSelectedVertices() {
     }
     mesh.garbage_collection();
     deselectAll();
-    smoothMesh();
+    smoothMesh(false);
 
 }
 
@@ -238,8 +238,9 @@ void MeshWrapper::makeSelectedFace() {
     if (selectedVertices.size() == 3) {
         mesh.add_face(selectedVertices);
     }
-    smoothMesh();
+    smoothMesh(false);
 }
+
 
 void MeshWrapper::subdivision() {
     if(subdivisionLvl == 0) {
@@ -271,11 +272,11 @@ void MeshWrapper::subdivision() {
         HE_MESH::Point LP(0.0, 0.0, 0.0);
         std::vector<HE_MESH::HalfedgeHandle> halfEdges;
 
-       /* HE_MESH::VertexOHalfedgeIter voh_it = _m.voh_iter(*v_itr);
-        for(++voh_it; voh_it != newMesh.voh_iter(*v_itr) ; ++voh_it) {
-                // Iterate over all outgoing halfedges...
-                halfEdges.push_back(*voh_it);
-        }*/
+        /* HE_MESH::VertexOHalfedgeIter voh_it = _m.voh_iter(*v_itr);
+         for(++voh_it; voh_it != newMesh.voh_iter(*v_itr) ; ++voh_it) {
+                 // Iterate over all outgoing halfedges...
+                 halfEdges.push_back(*voh_it);
+         }*/
 
 
         start = newMesh.halfedge_handle(*v_itr);
@@ -291,7 +292,6 @@ void MeshWrapper::subdivision() {
 
 
         int k = (int) vertices.size();
-
 
         // weights
         float alpha = 1.0f - 5.0f / (k + 5.0f);
@@ -318,7 +318,7 @@ void MeshWrapper::subdivision() {
         // alpha
         LP += VP * alpha;
         newMesh.set_point(*v_itr, LP);
-      }
+    }
     backstackLimit.push_back(newMesh);
     /*if(subdivisionLvl > 0) {
         backstackH
@@ -326,7 +326,7 @@ void MeshWrapper::subdivision() {
 
     this->mesh = limit ? backstackLimit.back() : backstack.back();
 
-    smoothMesh();
+    smoothMesh(false);
 }
 
 void MeshWrapper::undo() {
@@ -347,9 +347,8 @@ void MeshWrapper::undo() {
         mesh = backstack.back();
         subdivisionLvl--;
     }
-    smoothMesh();
 
-
+    smoothMesh(false);
 }
 
 void MeshWrapper::setVertexWeight(HE_MESH::VertexHandle vertexHandle, float weight) {
@@ -372,8 +371,10 @@ void MeshWrapper::getDimensions(glm::vec3 &min, glm::vec3 &max){
     }
 }
 
-void MeshWrapper::smoothMesh(){
-    backstack.push_back(mesh);
+void MeshWrapper::smoothMesh(bool pushToBackstack) {
+    if(pushToBackstack){
+        //backstack.push_back(mesh);
+    }
 
     smoothedVertices.clear();
     unSmoothedVertices.clear();

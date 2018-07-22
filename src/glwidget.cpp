@@ -231,7 +231,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event) {
             updateGL();
             break;
         case Qt::Key_L:
-            renderer.getMeshWrapper().smoothMesh();
+            renderer.getMeshWrapper().smoothMesh(true);
             renderer.getMeshWrapper().applySmoothedVertices(99);
             renderer.getMeshWrapper().deselectAll();
             renderer.recreateMesh();
