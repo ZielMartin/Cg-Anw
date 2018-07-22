@@ -7,7 +7,7 @@ Zur Erstellung der Software wurde die Programmiersprache C/C++ genutzt unter Ver
 \begin{labeling}[]{\textbf{Gewichtung der ausgewählte Punkte:}}%längster Wert
 \item [\textbf{OBJ-Datei laden:}] \textbf{File} $\rightarrow$ \textbf{Open} oder \textbf{Strg + O}
 \item [\textbf{Neues Objekt:}] \textbf{File} $\rightarrow$ \textbf{New} oder \textbf{Strg + N}
-hh \item [\textbf{Objekt als OBJ speichern:}] \textbf{File} $\rightarrow$ \textbf{Save} oder \textbf{Strg + S}
+\item [\textbf{Objekt als OBJ speichern:}] \textbf{File} $\rightarrow$ \textbf{Save} oder \textbf{Strg + S}
 \newline
 \item [\textbf{Kamera Position verändern:}] '\textbf{w}', '\textbf{a}', '\textbf{s}', '\textbf{d}', '\textbf{q}', '\textbf{e}' - Tasten
 \item [\textbf{Kameraausrichtung ändern:}] \textbf{linke Maustaste} + bewegen der Maus
@@ -300,6 +300,29 @@ N.z = sqrt( 1.0 - mag);
 */
 color = vec4(tempColor, 1.0);
 
+\end{lstlisting}
+
+\subsection{Catmull und vierte Komponente}
+
+Durch Nutzung der OpenMesh Bibliotheken wurden neben den vielen Vorteilen welche sie liefern einige Einschränkungen auferlegt. So können die Implementierungen des ArrayKernels nur mit Typen von Punkten arbeiten, welche drei Komponenten haben. Um diesen nicht vollständig neu implementieren zu müssen, entschieden wir uns eine sogenannte "property" zu nutzen. Diese beschreibt eine weitere Variable die jeder Vertex zusätzlich zwischenspeichert. So können wir die Gewichte für die ausgewählten Punkte setzen um diese später im Catmull-Clark Algorithmus mit in die Rechnung aufnehmen zu können.
+
+\begin{lstlisting}
+struct Traits : OpenMesh::DefaultTraits
+{
+    // Let Point and Normal be a float vec3
+    typedef OpenMesh::Vec3f Point;
+    typedef OpenMesh::Vec3f Normal;
+
+};
+
+
+class HE_MESH : public OpenMesh::PolyMesh_ArrayKernelT<Traits> {
+public:
+    HE_MESH() {
+        this->add_property(this->vp_fourth);
+    }
+    OpenMesh::VPropHandleT<float> vp_fourth;
+};
 \end{lstlisting}
 
 \section{\Large PROBLEME UND LÖSUNGEN}
