@@ -266,7 +266,7 @@ void MeshWrapper::subdivision() {
             he = newMesh.next_halfedge_handle(he);
         } while (he != start);
 
-        std::cout << vertices.size() << std::endl;
+        //std::cout << vertices.size() << std::endl;
 
         HE_MESH::Point LP(0.0, 0.0, 0.0);
         std::vector<HE_MESH::HalfedgeHandle> halfEdges;
@@ -292,8 +292,6 @@ void MeshWrapper::subdivision() {
 
         int k = (int) vertices.size();
 
-    this->mesh = catmull(this->mesh, 1);
-
 
         // weights
         float alpha = 1.0f - 5.0f / (k + 5.0f);
@@ -311,7 +309,7 @@ void MeshWrapper::subdivision() {
 
             // beta
             LP += newMesh.point(newMesh.from_vertex_handle(nHE)) * beta;
-            std::cout << newMesh.point(newMesh.from_vertex_handle(nHE)) << std::endl;
+            //std::cout << newMesh.point(newMesh.from_vertex_handle(nHE)) << std::endl;
 
             // gamma
             LP += newMesh.point(newMesh.from_vertex_handle(nnHE)) * gamma;
