@@ -5,6 +5,8 @@
 
 #include <QMainWindow>
 #include <QtWidgets/QSlider>
+
+#include <QPointer>
 #include "glwidget.h"
 
 class QAction;
@@ -28,6 +30,7 @@ private slots:
     void userControl();
     void meshInfo();
     void sliderValueChanged(int);
+    void limitCecked();
 
 
 
@@ -49,7 +52,7 @@ private:
     QMenu *infoMenu;
     QAction *userControlAct;
     QAction *meshInfoAct;
-
+    QPointer<QAction> limitCeckedBtn;
 
     QSlider *slider;
 

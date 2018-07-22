@@ -64,12 +64,12 @@ public:
 
     void applySmoothedVertices(int interpolationValue);
 
-
+    bool limit;
 
 private:
-    HE_MESH mesh;
-
-    std::vector<HE_MESH> backstack;
+    HE_MESH mesh, conmesh;
+    int subdivisionLvl;
+    std::vector<HE_MESH> backstack, backstackLimit, backstackH;
 
     CatmullClark1 catmull;
 

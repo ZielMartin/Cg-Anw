@@ -7,6 +7,8 @@
 #include "MeshWrapper.h"
 
 MeshWrapper::MeshWrapper() {
+    subdivisionLvl = 0;
+    limit = false;
 }
 
 
@@ -240,19 +242,116 @@ void MeshWrapper::makeSelectedFace() {
 }
 
 void MeshWrapper::subdivision() {
-    backstack.push_back(mesh);
+    if(subdivisionLvl == 0) {
+        backstack.push_back(mesh);
+    }
+    HE_MESH newMesh = catmull(backstack.back(), 1);
+    subdivisionLvl++;
+    backstack.push_back(newMesh);
+
+    HE_MESH::VertexIter v_itr = newMesh.vertices_begin();
+    HE_MESH::VertexIter v_end = newMesh.vertices_end();
+    for (; v_itr != v_end; ++v_itr) {
+        HE_MESH::Point VP(0.0, 0.0, 0.0);
+        VP = newMesh.point(*v_itr);
+        std::vector<HE_MESH::VertexHandle> vertices;
+
+        HE_MESH::HalfedgeHandle start = newMesh.halfedge_handle(*v_itr);
+        HE_MESH::HalfedgeHandle he = start;
+
+        do
+        {
+            he = newMesh.opposite_halfedge_handle(he);
+            vertices.push_back(newMesh.from_vertex_handle(he));
+            he = newMesh.next_halfedge_handle(he);
+        } while (he != start);
+
+        std::cout << vertices.size() << std::endl;
+
+        HE_MESH::Point LP(0.0, 0.0, 0.0);
+        std::vector<HE_MESH::HalfedgeHandle> halfEdges;
+
+       /* HE_MESH::VertexOHalfedgeIter voh_it = _m.voh_iter(*v_itr);
+        for(++voh_it; voh_it != newMesh.voh_iter(*v_itr) ; ++voh_it) {
+                // Iterate over all outgoing halfedges...
+                halfEdges.push_back(*voh_it);
+        }*/
+
+
+        start = newMesh.halfedge_handle(*v_itr);
+        he = start;
+
+        do
+        {
+            halfEdges.push_back(he);
+
+            he = newMesh.opposite_halfedge_handle(he);
+            he = newMesh.next_halfedge_handle(he);
+        } while (he != start);
+
+
+        int k = (int) vertices.size();
 
     this->mesh = catmull(this->mesh, 1);
+
+
+        // weights
+        float alpha = 1.0f - 5.0f / (k + 5.0f);
+        float beta  = 4.0f / ((k + 5.0f) * k);
+        float gamma = 1.0f / ((k + 5.0f) * k);
+
+        // calculate new point
+        for (HE_MESH::HalfedgeHandle halfEdge : halfEdges)
+        {
+            // next half edge
+            HE_MESH::HalfedgeHandle nHE = newMesh.next_halfedge_handle(halfEdge);
+
+            // next next half edge
+            HE_MESH::HalfedgeHandle nnHE = newMesh.next_halfedge_handle(nHE);
+
+            // beta
+            LP += newMesh.point(newMesh.from_vertex_handle(nHE)) * beta;
+            std::cout << newMesh.point(newMesh.from_vertex_handle(nHE)) << std::endl;
+
+            // gamma
+            LP += newMesh.point(newMesh.from_vertex_handle(nnHE)) * gamma;
+        }
+
+        // alpha
+        LP += VP * alpha;
+        newMesh.set_point(*v_itr, LP);
+      }
+    backstackLimit.push_back(newMesh);
+    /*if(subdivisionLvl > 0) {
+        backstackH
+    }*/
+
+    this->mesh = limit ? backstackLimit.back() : backstack.back();
 
     smoothMesh();
 }
 
 void MeshWrapper::undo() {
-    if(backstack.size() > 0) {
+    /*if(backstack.size() > 0) {
         mesh = backstack.at(backstack.size() - 1);
         backstack.pop_back();
+    }*/
+    if(subdivisionLvl == 1) {
+        backstack.pop_back();
+        backstackLimit.pop_back();
+        mesh = backstack.back();
+        backstack.pop_back();
+        subdivisionLvl--;
+    }
+    else if(subdivisionLvl > 1) {
+        backstack.pop_back();
+        backstackLimit.pop_back();
+        mesh = backstack.back();
+        subdivisionLvl--;
     }
     smoothMesh();
+
+
 }
 
 void MeshWrapper::setVertexWeight(HE_MESH::VertexHandle vertexHandle, float weight) {
