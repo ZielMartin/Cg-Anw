@@ -368,10 +368,8 @@ void CatmullClark1::calcLimitNormal(HE_MESH &newMesh, const OpenMesh::VertexHand
     }
 
      //HE_MESH::Normal LimitNormal = OpenMesh::VectorT<OpenMesh::Vec3f, 3>::cross(tangent2, tangent1);
+    QVector3D normal = QVector3D::normal(tangent2, tangent1);
 
-    //newMesh.set_property
-    //newMesh.set_point(newMesh, newMesh.property(limitNormal, _eh));
-
-
+    newMesh.property(newMesh.limitnormal, vertex) = HE_MESH::Normal(normal.x(), normal.y(), normal.z());
 
 }

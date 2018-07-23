@@ -33,7 +33,7 @@ public:
     void getVerticesAndNormalsTriangulated(std::vector<glm::vec3> &vertices, std::vector<glm::vec3> &normals);
 
     void getVertices(std::vector<glm::vec3> &vertices);
-
+    void getLimitNormals(std::vector<glm::vec3> &vertices);
     void getLineVertices(std::vector<glm::vec3> &vertices, std::vector<bool> &selected);
 
     bool selectVertex(glm::vec3 pos, float radius);
