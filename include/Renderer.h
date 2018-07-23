@@ -105,7 +105,7 @@ private:
 
 private:
 
-    Object meshObject, gridObject, meshPointsObject, meshLinesObject, gridPaneObject;
+    Object meshObject, gridObject, meshPointsObject, meshLinesObject, gridPaneObject, limitNormalsObject;
 
     MeshWrapper meshWrapper;
 

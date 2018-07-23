@@ -47,6 +47,7 @@ void Renderer::initRenderer(Shader &shader, char *model_path) {
     initMesh();
     initGrid();
     initGridPane();
+
 }
 
 void Renderer::configureDimensions() {
@@ -83,6 +84,8 @@ void Renderer::render() {
     if(renderLines){
         renderObject(meshLinesObject, GL_LINES);
     }
+
+    renderObject(limitNormalsObject, GL_LINES);
 
     renderObject(meshObject, GL_TRIANGLES);
 
@@ -209,9 +212,11 @@ void Renderer::initMesh() {
     clearObject(meshLinesObject);
     clearObject(meshPointsObject);
     clearObject(meshObject);
+    clearObject(limitNormalsObject);
 
     fillMeshData(true);
 
+    setup_vao(limitNormalsObject);
     setup_vao(meshObject);
     setup_vao(meshLinesObject);
     setup_vao(meshPointsObject);
@@ -328,6 +333,7 @@ void Renderer::updateMesh(bool updatePointColor) {
         meshPointsObject.vertices.clear();
     }
     clearObject(meshLinesObject);
+    clearObject(limitNormalsObject);
 
 
     fillMeshData(updatePointColor);
@@ -345,6 +351,10 @@ void Renderer::updateMesh(bool updatePointColor) {
     updateBufferData(meshLinesObject.vertex_position_buffer, meshLinesObject.vertices);
     updateBufferData(meshLinesObject.vertex_color_buffer, meshLinesObject.colors);
     updateBufferData(meshLinesObject.vertex_radius_buffer, meshLinesObject.radius);
+
+    updateBufferData(meshLinesObject.vertex_position_buffer, limitNormalsObject.vertices);
+    updateBufferData(meshLinesObject.vertex_color_buffer, limitNormalsObject.colors);
+    updateBufferData(meshLinesObject.vertex_radius_buffer, limitNormalsObject.radius);
 }
 
 void Renderer::fillMeshData(bool updatePointColor) {
@@ -376,6 +386,12 @@ void Renderer::fillMeshData(bool updatePointColor) {
         }
     }
 
+    meshWrapper.getLimitNormals(limitNormalsObject.vertices);
+    for (int i = 0; i < limitNormalsObject.vertices.size(); i++) {
+        limitNormalsObject.radius.push_back(0);
+        limitNormalsObject.colors.push_back(glm::vec3(1,0,0));
+    }
+
 
 }
 
@@ -395,7 +411,7 @@ void Renderer::recreateMesh() {
     clearObject(meshObject);
     clearObject(meshPointsObject);
     clearObject(meshLinesObject);
-
+    clearObject(limitNormalsObject);
 
     initMesh();
 }
