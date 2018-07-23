@@ -22,8 +22,10 @@ class HE_MESH : public OpenMesh::PolyMesh_ArrayKernelT<Traits> {
 public:
     HE_MESH() {
         this->add_property(this->vp_fourth);
+        this->add_property(this->limitnormal);
     }
     OpenMesh::VPropHandleT<float> vp_fourth;
+    OpenMesh::VPropHandleT<Normal> limitnormal;
 };
 
 #endif //CG_ANW_MYMESH_H
