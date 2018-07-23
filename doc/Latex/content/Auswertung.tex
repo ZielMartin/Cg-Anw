@@ -1,7 +1,7 @@
 \newpage
 \section{\Large EINLEITUNG}
-Die in diesem Dokument beschriebene Software, ist eine Modellier-Software, die dazu imstande ist Körper und Flächen zu erstellen. Außerdem lassen sich die erstellten Modelle als OBJ-Datei speichern. Gespeicherte Modelle können geladen und auch bearbeitet werden.\newline
-Zur Erstellung der Software wurde die Programmiersprache C/C++ genutzt unter Verwendung von OpenGL und ist mit Linux als auch mit Windows kompatibel.
+Die in diesem Dokument beschriebene Software ist eine Modellier-Software, die dazu imstande ist, Körper und Flächen zu erstellen. Außerdem lassen sich die erstellten Modelle als OBJ-Datei speichern. Gespeicherte Modelle können geladen und auch bearbeitet werden.\newline
+Zur Erstellung der Software wurde die Programmiersprache C/C++ genutzt unter Verwendung von OpenGL und ist sowohl mit Linux als auch Windows kompatibel.
 
 \section{\Large BEDIENUNG}
 \begin{labeling}[]{\textbf{Gewichtung der ausgewählte Punkte:}}%längster Wert
@@ -36,13 +36,14 @@ Das Programm verwendet einen \textbf{Vertex Shader} und einen \textbf{Fragment S
 Vorhergegangene Versuche zeigten deutlich, dass die Darstellung der Vertex-Punkte nicht effizient gelöst werden kann, wenn jeder Punkt durch ein eigenes VAO repräsentiert wird. Im Zuge dieser Erkenntnis entschloss sich das Team die Punkte darzustellen, indem alle Vertices mithilfe des Parameters GL\_POINTS als Point-Cloud gerendert werden. Diese Lösung ist effizient, jedoch ergab sich das Problem, dass die Punkte mit GL\_POINTS als Vierecke gerendert wurden. Die Lösung für dieses Problem besteht darin einen Radius zu definieren und alle Fragmente, die sich Außerhalb dieses Radius befinden, nicht zu rendern. Da die Größe dieser Kreise nicht in Raumkoordinatengrößen definiert werden, sondern in Pixelgröße, wurden die Punkte alle gleich groß, unabhängig von der Entfernung, gerendert. Um eine dynamische Größe zu gewährleisten, wird die Entfernung der Kamera zu dem Punkt berechnet und der Radius des Punktes wird proportional zur Entfernung kleiner.
 
 \section{\Large KAMERA}
-Um das Betrachten des Objektes von allen Seiten zu ermöglichen entschied sich das Team eine Lösung zu implementieren die \textbf{Quaternionen} nutzt. So wurde eine Computerspiel-artige Steuerung der Kamera entwickelt, welche es ermöglicht die Ausrichtung der Kamera mithilfe der Maus zu beeinflussen und die Position der Kamera mithilfe der Tasten w, a, s, d, q und e zu verändern. Beim Drücken der Linken Maustaste und ziehen in eine Richtung wird eine Achse definiert, welche senkrecht zu der gezogenen Bahn steht. Um diese Achse wird die Ausrichtung der Kamera während der Bewegung rotiert.
+Um das Betrachten des Objektes von allen Seiten zu ermöglichen, entschied sich das Team eine Lösung zu implementieren, die \textbf{Quaternionen} nutzt. So wurde eine computerspielartige Steuerung der Kamera entwickelt, welche es ermöglicht die Ausrichtung der Kamera mithilfe der Maus zu beeinflussen und die Position der Kamera mithilfe der Tasten w, a, s, d, q und e zu verändern. Beim Drücken der linken Maustaste und Ziehen in eine Richtung wird eine Achse definiert, welche senkrecht zu der gezogenen Bahn steht. Um diese Achse wird die Ausrichtung der Kamera während der Bewegung rotiert.
 
 \section{\Large CATMULL-CLARK UNTERTEILUNG}
 Beim Catmull-Clark-Algorithmus werden beliebige Polygon-Gitter in Quad-Gitter unterteilt. Jedes n-Gon wird in n-Quads unterteilt. Zunächst wird für jedes Face ein Face-Punkt gesetzt, dieser wird aus dem Durchschnitt der Ausgangspunkte des jeweiligen Faces berechnet. Danach wird für jede Kante ein Kanten-Punkt hinzugefügt, der anhand der jeweiligen Endpunkte und der Nachbar Face Punkte und ebenfalls aus dem Durchschnitt dieser Punkte berechnet wird. Jeder neu berechnete Vertex wird mit den neu berechneten Kanten verbunden und weiter mit den Ausgangsvertices verbunden. Wenn das Ausgangsquad bereits zu einem Quad-Gitter unterteilt wurde, wird es erneut in vier weitere Quads unterteilt. Je öfter man den Algorithmus anwendet, desto feiner wird das Mesh.
 
 \subsection{Limitpunkte und Limitnormalen}
-Bei unendlich ofter Anwendung der Unterteilungsregeln auf ein Mesh wird die Limitfläche erzeugt. Durch Anwendung der Limitpunktregeln lässt sich für jeden Kontrollpunkt eines Kontrollgitters der entsprechende Punkt auf der Limitfläche bestimmen. Die Normale eines Limitpunktes erhält man durch das Kreuzprodukt der Oberflächentangenten an ebendieser Stelle des Limitpunktes.\newline In der Implementierung wird mit der Berechnung der Limitpunkte begonnen, nachdem man die Kontrollpunkte des neuen Meshes durch einen Unterteilungsschritt erhalten hat. Nun wird für jeden einzelnen Kontrollpunkt die Limitpunktregel angewandt. Dazu wird zunächst überprüft, ob und wie viele scharfe Kanten/Ränder mit dem Kontrollpunkt verbunden sind und entsprechend die Regel für glatte oder scharfe Kanten verwendet. Die Informationen über Valenz k und 1-Nachbarschaft erhält man durch geschicktes Manövrieren innerhalb der Halfedge-Datenstruktur.
+Bei unendlich ofter Anwendung der Unterteilungsregeln auf ein Mesh wird die Limitfläche erzeugt. Durch Anwendung der Limitpunktregeln lässt sich für jeden Kontrollpunkt eines Kontrollgitters der entsprechende Punkt auf der Limitfläche bestimmen. Die Normale eines Limitpunktes erhält man durch das Kreuzprodukt der Oberflächentangenten an ebendieser Stelle des Limitpunktes.\\
+In der Implementierung wird mit der Berechnung der Limitpunkte begonnen, nachdem man die Kontrollpunkte des neuen Meshes durch einen Unterteilungsschritt erhalten hat. Nun wird für jeden einzelnen Kontrollpunkt die Limitpunktregel angewandt. Dazu wird zunächst überprüft, ob und wie viele scharfe Kanten/Ränder mit dem Kontrollpunkt verbunden sind und entsprechend die Regel für glatte oder scharfe Kanten verwendet. Die Informationen über Valenz k und 1-Nachbarschaft erhält man durch geschicktes Manövrieren innerhalb der Halfedge-Datenstruktur.
 %für glatte Kanten
 
 \section{\Large ARCHITEKTUR}
@@ -103,7 +104,7 @@ Die Klasse \textbf{GLWidget} erweitert die QT-Klasee \textbf{QGLWidget} und gibt
 \item[\textbf{operator()}] Zunächst werden die Gewichte auf 0 gesetzt, wodurch die Kanten geglättet werden. Danach werden n-Unterteilungen durchgeführt und für jedes Face wird die Mitte berechnet. Dann werden die Positionen der neuen Kantenpunkte berechnet. Darauf folgt die mittige Teilung jeder Kante.
 \item[\textbf{calc\_face\_centroid\_weighted()}] berechnet das Zentrum eines Faces anhand seiner Vertices.
 \item[\textbf{compute\_midpoint()}] berechnet den Mittelpunkt einer Kante anhand der Endpunkte dieser Kante und den Nachbarkanten.
-\item[\textbf{update\_vertex()}]
+\item[\textbf{update\_vertex()}] berechnet die neuen Positionen für die alten Vertices.
 \item[\textbf{split\_face()}] Teilt ein n-Gon in n-Quads durch die Verbindung der neu erzeugten Vertices.
 \item[\textbf{split\_edge()}] erstellt für die Mitte einer Kante einen neuen Vertex, dieser wird mit den Endpunkten neu verbunden.
 \end{labeling}
@@ -128,7 +129,7 @@ Die Klasse \textbf{GLWidget} erweitert die QT-Klasee \textbf{QGLWidget} und gibt
 \label{fig6}
 \end{figure}
 
-\noindent In dieser Klasse werden alle Operationen ausgeführt die den Rendering-Prozess betreffen. Die Klasse hält verschieden Instanzen der Object Struktur. Das Mesh wird in dreifacher Variation als Object gehalten:
+\noindent In dieser Klasse werden alle Operationen ausgeführt, die den Rendering-Prozess betreffen. Die Klasse hält verschieden Instanzen der Object Struktur. Das Mesh wird in dreifacher Variation als Object gehalten:
 \begin{enumerate}
 \item für die Darstellung der Flächen
 \item für die Darstellung der Punkte
@@ -304,7 +305,7 @@ color = vec4(tempColor, 1.0);
 
 \subsection{Catmull und vierte Komponente}
 
-Durch Nutzung der OpenMesh Bibliotheken wurden neben den vielen Vorteilen welche sie liefern einige Einschränkungen auferlegt. So können die Implementierungen des ArrayKernels nur mit Typen von Punkten arbeiten, welche drei Komponenten haben. Um diesen nicht vollständig neu implementieren zu müssen, entschieden wir uns eine sogenannte "property" zu nutzen. Diese beschreibt eine weitere Variable die jeder Vertex zusätzlich zwischenspeichert. So können wir die Gewichte für die ausgewählten Punkte setzen um diese später im Catmull-Clark Algorithmus mit in die Rechnung aufnehmen zu können.
+Durch Nutzung der OpenMesh Bibliotheken wurden neben den vielen Vorteilen welche sie liefern einige Einschränkungen auferlegt. So können die Implementierungen des ArrayKernels nur mit Typen von Punkten arbeiten, welche drei Komponenten haben. Um diesen nicht vollständig neu implementieren zu müssen, entschieden wir uns eine sogenannte ``property'' zu nutzen. Diese beschreibt eine weitere Variable die jeder Vertex zusätzlich zwischenspeichert. So können wir die Gewichte für die ausgewählten Punkte setzen um diese später im Catmull-Clark Algorithmus mit in die Rechnung aufnehmen zu können.
 
 \begin{lstlisting}
 struct Traits : OpenMesh::DefaultTraits

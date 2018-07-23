@@ -25,9 +25,9 @@ public:
     HE_MESH operator()(HE_MESH &_m, size_t _n, bool _update_points = true);
 
     HE_MESH::Point calc_face_centroid_weighted(const HE_MESH::FaceHandle &);
-
+    void calcLimitNormal(HE_MESH &newMesh, const OpenMesh::VertexHandle &vertex);
 private:
-    HE_MESH mesh;
+    HE_MESH mesh, limitmesh;
 
     void compute_midpoint(HE_MESH &, const OpenMesh::EdgeHandle &, bool);
     void update_vertex(HE_MESH &, const OpenMesh::VertexHandle &);

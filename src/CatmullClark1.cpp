@@ -1,11 +1,16 @@
 //
 // Created by ZielM on 13.06.2018.
 //
+#include <iostream>
+#include <cmath>
+#include <math.h>
+#include <QVector3D>
 
 #include "CatmullClark1.h"
 #include "MeshWrapper.h"
 #include <OpenMesh/Tools/Utils/MeshCheckerT.hh>
 #include <OpenMesh/Core/Utils/vector_traits.hh>
+#include <OpenMesh/Core/Geometry/VectorT.hh>
 
 CatmullClark1::CatmullClark1() {
 
@@ -279,4 +284,94 @@ void CatmullClark1::split_edge(HE_MESH &_m, const HE_MESH::EdgeHandle &_eh) {
 // Never forget this, when playing with the topology
     _m.adjust_outgoing_halfedge(vh);
     _m.adjust_outgoing_halfedge(vh1);
+}
+
+void CatmullClark1::calcLimitNormal(HE_MESH &newMesh, const OpenMesh::VertexHandle &vertex) {
+    HE_MESH::Point VP(0.0, 0.0, 0.0);
+    VP = newMesh.point(vertex);
+    std::vector<HE_MESH::VertexHandle> vertices;
+
+    HE_MESH::HalfedgeHandle start = newMesh.halfedge_handle(vertex);
+    HE_MESH::HalfedgeHandle he = start;
+
+    do
+    {
+        he = newMesh.opposite_halfedge_handle(he);
+        vertices.push_back(newMesh.from_vertex_handle(he));
+        he = newMesh.next_halfedge_handle(he);
+    } while (he != start);
+
+
+    HE_MESH::Point LP(0.0, 0.0, 0.0);
+    std::vector<HE_MESH::HalfedgeHandle> halfEdges;
+
+    /* HE_MESH::VertexOHalfedgeIter voh_it = _m.voh_iter(*v_itr);
+     for(++voh_it; voh_it != newMesh.voh_iter(*v_itr) ; ++voh_it) {
+             // Iterate over all outgoing halfedges...
+             halfEdges.push_back(*voh_it);
+     }*/
+
+
+    start = newMesh.halfedge_handle(vertex);
+    he = start;
+
+    do
+    {
+        halfEdges.push_back(he);
+
+        he = newMesh.opposite_halfedge_handle(he);
+        he = newMesh.next_halfedge_handle(he);
+    } while (he != start);
+
+    QVector3D tangent0(0, 0, 0); //tangent
+    QVector3D tangent1(0, 0, 0); //HE_MESH::Normal
+    QVector3D tangent2(0, 0, 0);
+
+    int k = (int) vertices.size();
+
+    float a = 1.0f + std::cos(2.0f * M_PI / k) + std::cos(M_PI / k) * std::sqrt(2.0f * (9.0f + std::cos(2.0f * M_PI / k)));
+
+    int i = 0;
+
+    for (HE_MESH::HalfedgeHandle halfEdge : halfEdges)
+    {
+        float beta1 = a * std::cos(2.0f * M_PI * (i + 1) / k);
+        float gamma1 = std::cos(2.0f * M_PI * (i + 1) / k) + std::cos(2.0f * M_PI * (i + 2) / k);
+
+        float beta2 = a * std::cos(2.0f * M_PI * i / k);
+        float gamma2 = std::cos(2.0f * M_PI * i / k) + std::cos(2.0f * M_PI * (i + 1) / k);
+
+        // beta
+        HE_MESH::HalfedgeHandle nextHE = newMesh.next_halfedge_handle(halfEdge);
+        HE_MESH::Point nextPoint = newMesh.point(newMesh.from_vertex_handle(nextHE));
+
+        HE_MESH::HalfedgeHandle nextNextHE = newMesh.next_halfedge_handle(nextHE);
+        HE_MESH::Point nextNextPoint = newMesh.point(newMesh.from_vertex_handle(nextNextHE));
+
+        tangent1.setX(nextPoint[0] * beta1 + nextNextPoint[0] * gamma1); //nextPoint[0]
+        tangent1.setY(nextPoint[1] * beta1 + nextNextPoint[2] * gamma1);
+        tangent1.setZ(nextPoint[2] * beta1 + nextNextPoint[2] * gamma1);
+
+        tangent2.setX(nextPoint[0] * beta2 + nextNextPoint[0] * gamma2); //nextPoint[0]
+        tangent2.setY(nextPoint[1] * beta2 + nextNextPoint[1] * gamma2);
+        tangent2.setZ(nextPoint[2] * beta2 + nextNextPoint[2] * gamma2);
+        //tangent2 += nextPoint * beta2;
+
+        // gamma
+        //HE_MESH::HalfedgeHandle nextNextHE = newMesh.next_halfedge_handle(nextHE);
+        //HE_MESH::Point nextNextPoint = newMesh.point(newMesh.from_vertex_handle(nextNextHE));
+
+        //tangent1 += nextNextPoint * gamma1;
+        //tangent2 += nextNextPoint * gamma2;
+
+        i++;
+    }
+
+     //HE_MESH::Normal LimitNormal = OpenMesh::VectorT<OpenMesh::Vec3f, 3>::cross(tangent2, tangent1);
+
+    //newMesh.set_property
+    //newMesh.set_point(newMesh, newMesh.property(limitNormal, _eh));
+
+
+
 }

@@ -319,6 +319,12 @@ void MeshWrapper::subdivision() {
         LP += VP * alpha;
         newMesh.set_point(*v_itr, LP);
     }
+
+    v_itr = newMesh.vertices_begin();
+    for (; v_itr != v_end; ++v_itr) {
+        catmull.calcLimitNormal(newMesh, *v_itr);
+    }
+
     backstackLimit.push_back(newMesh);
     /*if(subdivisionLvl > 0) {
         backstackH
