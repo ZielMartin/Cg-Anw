@@ -7,6 +7,9 @@
 #include <QtWidgets/QSlider>
 
 #include <QPointer>
+#include <QGridLayout>
+#include <QCheckBox>
+
 #include "glwidget.h"
 
 class QAction;
@@ -55,7 +58,7 @@ private:
     QPointer<QAction> limitCeckedBtn;
 
     QSlider *slider;
-
+    QCheckBox *checkbox;
 
 
     GLWidget *glWidget;

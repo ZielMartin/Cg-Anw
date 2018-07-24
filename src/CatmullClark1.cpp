@@ -332,6 +332,7 @@ void CatmullClark1::calcLimitNormal(HE_MESH &newMesh, const OpenMesh::VertexHand
     float a = 1.0f + std::cos(2.0f * M_PI / k) + std::cos(M_PI / k) * std::sqrt(2.0f * (9.0f + std::cos(2.0f * M_PI / k)));
 
     int i = 0;
+    std::cout << VP << std::endl;
 
     for (HE_MESH::HalfedgeHandle halfEdge : halfEdges)
     {
@@ -344,18 +345,25 @@ void CatmullClark1::calcLimitNormal(HE_MESH &newMesh, const OpenMesh::VertexHand
         // beta
         HE_MESH::HalfedgeHandle nextHE = newMesh.next_halfedge_handle(halfEdge);
         HE_MESH::Point nextPoint = newMesh.point(newMesh.from_vertex_handle(nextHE));
-
+    std::cout << nextPoint << std::endl;
         HE_MESH::HalfedgeHandle nextNextHE = newMesh.next_halfedge_handle(nextHE);
         HE_MESH::Point nextNextPoint = newMesh.point(newMesh.from_vertex_handle(nextNextHE));
 
-        tangent1.setX(nextPoint[0] * beta1 + nextNextPoint[0] * gamma1); //nextPoint[0]
-        tangent1.setY(nextPoint[1] * beta1 + nextNextPoint[2] * gamma1);
-        tangent1.setZ(nextPoint[2] * beta1 + nextNextPoint[2] * gamma1);
+        QVector3D p1 = {nextPoint[0], nextPoint[1], nextPoint[2]};
+        QVector3D p2 = {nextNextPoint[0], nextNextPoint[1], nextNextPoint[2]};
 
-        tangent2.setX(nextPoint[0] * beta2 + nextNextPoint[0] * gamma2); //nextPoint[0]
-        tangent2.setY(nextPoint[1] * beta2 + nextNextPoint[1] * gamma2);
-        tangent2.setZ(nextPoint[2] * beta2 + nextNextPoint[2] * gamma2);
-        //tangent2 += nextPoint * beta2;
+     //   tangent1.setX((nextPoint[0] * beta1) + (nextNextPoint[0] * gamma1)); //nextPoint[0]
+        std::cout << nextNextPoint << std::endl;
+std::cout << nextPoint[0] << " + " << nextNextPoint[0] << std::endl;
+     //   tangent1.setY((nextPoint[1] * beta1 )+ (nextNextPoint[1] * gamma1));
+     //   tangent1.setZ((nextPoint[2] * beta1) + (nextNextPoint[2] * gamma1));
+
+        tangent1 += p1 * beta1 + p2 * gamma1;
+
+     //   tangent2.setX((nextPoint[0] * beta2) + (nextNextPoint[0] * gamma2)); //nextPoint[0]
+     //   tangent2.setY((nextPoint[1] * beta2) + (nextNextPoint[1] * gamma2));
+    //    tangent2.setZ((nextPoint[2] * beta2) + (nextNextPoint[2] * gamma2));
+        tangent2 += p1 * beta2 + p2 * gamma2;
 
         // gamma
         //HE_MESH::HalfedgeHandle nextNextHE = newMesh.next_halfedge_handle(nextHE);
@@ -369,7 +377,8 @@ void CatmullClark1::calcLimitNormal(HE_MESH &newMesh, const OpenMesh::VertexHand
 
      //HE_MESH::Normal LimitNormal = OpenMesh::VectorT<OpenMesh::Vec3f, 3>::cross(tangent2, tangent1);
     QVector3D normal = QVector3D::normal(tangent2, tangent1);
-
+    //std::cout <<  HE_MESH::Normal(normal.x(), normal.y(), normal.z()) << std::endl;
     newMesh.property(newMesh.limitnormal, vertex) = HE_MESH::Normal(normal.x(), normal.y(), normal.z());
-
+    //HE_MESH::Normal g = newMesh.property(newMesh.limitnormal, vertex);
+    //std::cout << g << std::endl;
 }

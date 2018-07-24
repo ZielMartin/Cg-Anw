@@ -25,13 +25,18 @@ Window::Window() {
 
     QLabel *smoothingLabel = new QLabel("Smoothing");
 
+    checkbox = new QCheckBox("Sharp Edge", this);
 
-    QVBoxLayout *layout = new QVBoxLayout;
+
+    //QVBoxLayout *layout = new QVBoxLayout;
+    QGridLayout *layout = new QGridLayout;
     layout->setMargin(5);
-    layout->addWidget(topFiller);
-    layout->addWidget(glWidget);
-    layout->addWidget(smoothingLabel);
-    layout->addWidget(slider);
+    //layout->addWidget(topFiller);
+    layout->addWidget(glWidget,0,0);
+    layout->addWidget(checkbox,0,1);
+    layout->addWidget(smoothingLabel,1,1);
+    layout->addWidget(slider,1,2);
+    layout->setColumnStretch(0,5);
     widget->setLayout(layout);
 
     createActions();

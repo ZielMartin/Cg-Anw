@@ -43,8 +43,8 @@ void GLWidget::initializeGL() {
     //char *vertexshader_path = (char *) "../shader/simpleShader.vert";
     //char *fragmentshader_path = (char *) "../shader/simpleShader.frag";
 
-    char *vertexshader_path = (char *) "../shader/phongShader.vert";
-    char *fragmentshader_path = (char *) "../shader/phongShader.frag";
+    char *vertexshader_path = (char *) "shader/phongShader.vert";
+    char *fragmentshader_path = (char *) "shader/phongShader.frag";
 
     glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, 1);
 

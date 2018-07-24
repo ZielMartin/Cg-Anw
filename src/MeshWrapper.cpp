@@ -76,9 +76,9 @@ void MeshWrapper::getLimitNormals(std::vector<glm::vec3> &vertices) {
 
     for (HE_MESH::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it) {
         OpenMesh::Vec3f v = mesh.point(*v_it);
-        HE_MESH::Normal limitnormal = this->mesh.property(this->mesh.limitnormal, v_it);
+        HE_MESH::Normal limitnormal = this->mesh.property(this->mesh.limitnormal, v_it);//  + mesh.point(*v_it);
         vertices.push_back(glm::vec3(v[0], v[1], v[2]));
-        vertices.push_back(glm::vec3(limitnormal[0], limitnormal[1], limitnormal[2]));
+        vertices.push_back(glm::vec3(limitnormal[0] * 0.2f +v[0], limitnormal[1]* 0.2f+v[1], limitnormal[2]* 0.2f+v[2] ));
     }
 
 }
@@ -263,6 +263,14 @@ void MeshWrapper::subdivision() {
 
     HE_MESH::VertexIter v_itr = newMesh.vertices_begin();
     HE_MESH::VertexIter v_end = newMesh.vertices_end();
+
+    for (; v_itr != v_end; ++v_itr) {
+        catmull.calcLimitNormal(newMesh, *v_itr);
+       // newMesh.property(newMesh.limitnormal, *v_itr) = HE_MESH::Normal(0.0f, 0.0f, 0.0f);
+       // std::cout << newMesh.property(newMesh.limitnormal, *v_itr) << std::endl;
+    }
+
+    v_itr = newMesh.vertices_begin();
     for (; v_itr != v_end; ++v_itr) {
         HE_MESH::Point VP(0.0, 0.0, 0.0);
         VP = newMesh.point(*v_itr);
@@ -329,12 +337,11 @@ void MeshWrapper::subdivision() {
         // alpha
         LP += VP * alpha;
         newMesh.set_point(*v_itr, LP);
+        newMesh.property(newMesh.limitpoint, v_itr) = LP;
+       // HE_MESH::Point g = newMesh.property(newMesh.limitpoint, vertex);
+       // std::cout << g << std::endl;
     }
 
-    v_itr = newMesh.vertices_begin();
-    for (; v_itr != v_end; ++v_itr) {
-        catmull.calcLimitNormal(newMesh, *v_itr);
-    }
 
     backstackLimit.push_back(newMesh);
     /*if(subdivisionLvl > 0) {
