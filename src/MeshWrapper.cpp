@@ -84,9 +84,9 @@ void MeshWrapper::getLimitNormals(std::vector<glm::vec3> &vertices) {
             OpenMesh::Vec3f v = mesh.point(*v_it);
             HE_MESH::Normal limitnormal = this->mesh.property(this->mesh.limitnormal, v_it);//  + mesh.point(*v_it);
             vertices.push_back(glm::vec3(v[0], v[1], v[2]));
-            //vertices.push_back(glm::vec3(limitnormal[0] * 0.2f +v[0], limitnormal[1]* 0.2f+v[1], limitnormal[2]* 0.2f+v[2] ));
-            vertices.push_back(
-                    glm::normalize(glm::vec3(limitnormal[0] + v[0], limitnormal[1] + v[1], limitnormal[2] + v[2])));
+            vertices.push_back(glm::vec3(limitnormal[0] * 0.2f +v[0], limitnormal[1]* 0.2f+v[1], limitnormal[2]* 0.2f+v[2] ));
+            /*vertices.push_back(
+                    glm::normalize(glm::vec3(limitnormal[0] + v[0], limitnormal[1] + v[1], limitnormal[2] + v[2]))); */
         }
     }
 

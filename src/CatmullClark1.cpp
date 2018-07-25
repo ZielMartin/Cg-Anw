@@ -116,16 +116,60 @@ void CatmullClark1::compute_midpoint(HE_MESH &_m, const HE_MESH::EdgeHandle &_eh
 }
 
 void CatmullClark1::update_vertex(HE_MESH &_m, const HE_MESH::VertexHandle &_vh) {
-    HE_MESH::Point pos(0.0, 0.0, 0.0);
+    HE_MESH::Point pos(0.0, 0.0, 0.0), result(0.0, 0.0, 0.0), point = _m.point(_vh);
+    HE_MESH::HalfedgeHandle heh = _m.halfedge_handle(_vh);
 
-    if (_m.is_boundary(_vh)) {
+    std::vector<HE_MESH::HalfedgeHandle> edgesSharp;
+
+    HE_MESH::HalfedgeHandle start = heh;
+    HE_MESH::HalfedgeHandle he = start;
+
+    do
+    {
+        //HE_MESH::EdgeHandle currentEdge = edge(he);
+
+        //if (sharp(currentEdge))
+          //  result.push_back(currentEdge);
+        if(_m.property(_m.sharpedge, he) == true)
+            edgesSharp.push_back(he);
+
+        he = _m.opposite_halfedge_handle(he);
+        he = _m.next_halfedge_handle(he);
+    } while (he != start);
+
+    if (_m.is_boundary(_vh) || edgesSharp.size() == 2) { //|| _m.property(_m.sharpedge, heh) == true) {
+
+        //switch (edgesSharp.size()) {
+        //case 2:
+        //{
+            // alpha
+            pos += 3.0f / 4.0f * point;
+
+            float weight = 1.0f / 8.0f;
+
+            // beta
+            //HE_MESH::Point point0A = point(start(edgesSharp[0]));
+            //HE_MESH::Point point0B = point(end(edgesSharp[0]));
+            HE_MESH::Point point0A = _m.point(_m.to_vertex_handle(edgesSharp[0]));
+            pos += weight * point0A; //(point == point0A ? point0B : point0A);
+
+            HE_MESH::Point point1A = _m.point(_m.to_vertex_handle(edgesSharp[1])); //point(start(edgesSharp[1]));
+            //HE_MESH::Point point1B = point(end(edgesSharp[1]));
+            //result += weight * (point == point1A ? point1B : point1A);
+            pos += weight * point1A;
+
+            //break;
+        //}
+
+
+/*
         HE_MESH::Normal Vec;
         pos = _m.point(_vh);
         HE_MESH::VertexEdgeIter ve_itr;
         for (ve_itr = _m.ve_iter(_vh); ve_itr.is_valid(); ++ve_itr)
             if (_m.is_boundary(*ve_itr))
                 pos += _m.property(ep_pos_, *ve_itr);
-        pos /= static_cast<typename OpenMesh::vector_traits<typename HE_MESH::Point>::value_type>(3.0);
+        pos /= static_cast<typename OpenMesh::vector_traits<typename HE_MESH::Point>::value_type>(3.0); */
     } else // inner vertex
     {
         /* For each (non boundary) vertex V, introduce a new vertex whose
@@ -150,6 +194,8 @@ void CatmullClark1::update_vertex(HE_MESH &_m, const HE_MESH::VertexHandle &_vh)
         pos /= valence*valence;
         */
 
+
+
         double valence(0.0);
         HE_MESH::VOHIter voh_it = _m.voh_iter(_vh);
         for (; voh_it.is_valid(); ++voh_it) {
@@ -171,7 +217,11 @@ void CatmullClark1::update_vertex(HE_MESH &_m, const HE_MESH::VertexHandle &_vh)
         pos += _m.point(_vh) * (valence - 2.0) / valence + Q;
         //      pos = vector_cast<Vec>(_m.point(_vh));
     }
-
+        /*default:
+            //result = point;
+            std::cout << "tutu" << std::endl;
+            break;
+        }*/
     _m.property(vp_pos_, _vh) = pos;
 }
 
