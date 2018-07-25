@@ -56,7 +56,7 @@ void Renderer::configureDimensions() {
     if(dx == 0 && dy == 0 && dz == 0){
         pointSize = 30.0f;
     }else{
-        pointSize = 10.0f * ((dx + dy + dz) / 3.0f);
+        pointSize = 20.0f * ((dx + dy + dz) / 3.0f);
     }
 
     if(min.x == 0 && min.y == 0 && min.z == 0 && max.x == 0 && max.y == 0 && max.z == 0 ){
