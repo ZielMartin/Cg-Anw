@@ -373,7 +373,7 @@ void MeshWrapper::undo() {
     } else if (subdivisionLvl > 1) {
         backstack.pop_back();
         backstackLimit.pop_back();
-        mesh = backstack.back();
+        mesh =  limit ? backstackLimit.back() : backstack.back();
         subdivisionLvl--;
     }
 

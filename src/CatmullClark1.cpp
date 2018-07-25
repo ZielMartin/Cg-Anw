@@ -25,6 +25,22 @@ HE_MESH CatmullClark1::operator()(HE_MESH &_m, size_t _n, const bool _update_poi
     newMesh.add_property(fp_pos_);
     newMesh.add_property(creaseWeights_);
 
+    for (HE_MESH::VertexIter v_it = _m.vertices_begin(); v_it != _m.vertices_end(); ++v_it) {
+        HE_MESH::HalfedgeHandle start = newMesh.halfedge_handle(v_it);
+        HE_MESH::HalfedgeHandle he = start;
+        int sharpNeighbours = 0;
+        do
+        {
+            if(_m.property(_m.sharpedge, he) == true) {
+                sharpNeighbours++;
+            }
+
+            he = _m.opposite_halfedge_handle(he);
+            he = _m.next_halfedge_handle(he);
+        } while (he != start);
+        _m.property(_m.sharpneighbours, *v_it) = sharpNeighbours;
+    }
+
     // initialize all weights to 0 (= smooth edge)
     for (HE_MESH::EdgeIter e_it = newMesh.edges_begin(); e_it != newMesh.edges_end(); ++e_it)
         newMesh.property(creaseWeights_, *e_it) = 0.0;
@@ -100,10 +116,34 @@ void CatmullClark1::compute_midpoint(HE_MESH &_m, const HE_MESH::EdgeHandle &_eh
     HE_MESH::Point pos(_m.point(_m.to_vertex_handle(heh)));
 
     pos += _m.point(_m.to_vertex_handle(opp_heh));
+    //========
+
+    //========
+    std::vector<HE_MESH::HalfedgeHandle> edgesSharp;
+
+    HE_MESH::HalfedgeHandle start = heh; //_eh;
+    HE_MESH::HalfedgeHandle he = start;
+
+    do
+    {
+        //HE_MESH::EdgeHandle currentEdge = edge(he);
+
+        //if (sharp(currentEdge))
+          //  result.push_back(currentEdge);
+        if(_m.property(_m.sharpedge, he) == true
+            && _m.property(_m.sharpneighbours, _m.to_vertex_handle(he)) == 2
+            && _m.property(_m.sharpneighbours, _m.from_vertex_handle(he)) == 2) {
+                edgesSharp.push_back(he);
+        }
+       // HE_MESH::Point nextPoint = newMesh.point(_m.from_vertex_handle(nextHE));
+    //std::cout << nextPoint << std::endl;
+        he = _m.opposite_halfedge_handle(he);
+        he = _m.next_halfedge_handle(he);
+    } while (he != start);
 
     // boundary edge: just average vertex positions
     // this yields the [1/2 1/2] mask
-    if (_m.is_boundary(_eh) || !_update_points || _m.property(_m.sharpedge, heh) == true) {
+    if (_m.is_boundary(_eh) || !_update_points || edgesSharp.size() == 2) { //|| _m.property(_m.sharpedge, heh) == true) {
         pos *= 0.5f;
     } else // inner edge: add neighbouring Vertices to sum
         // this yields the [1/16 1/16; 3/8 3/8; 1/16 1/16] mask
@@ -130,7 +170,9 @@ void CatmullClark1::update_vertex(HE_MESH &_m, const HE_MESH::VertexHandle &_vh)
 
         //if (sharp(currentEdge))
           //  result.push_back(currentEdge);
-        if(_m.property(_m.sharpedge, he) == true)
+        if(_m.property(_m.sharpedge, he) == true
+            && _m.property(_m.sharpneighbours, _m.to_vertex_handle(he)) == 2
+            && _m.property(_m.sharpneighbours, _m.from_vertex_handle(he)) == 2)
             edgesSharp.push_back(he);
 
         he = _m.opposite_halfedge_handle(he);

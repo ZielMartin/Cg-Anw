@@ -26,6 +26,7 @@ public:
         this->add_property(this->limitnormal);
         this->add_property(this->sharpedge);
         this->add_property(this->he_selected);
+        this->add_property(this->sharpneighbours);
     }
     OpenMesh::VPropHandleT<float> vp_fourth;
     OpenMesh::VPropHandleT<Point> limitpoint;
@@ -33,6 +34,7 @@ public:
     //OpenMesh::EPropHandleT<bool> sharpedge;
     OpenMesh::HPropHandleT<bool> sharpedge;
     OpenMesh::HPropHandleT<bool> he_selected;
+    OpenMesh::VPropHandleT<int> sharpneighbours;
 };
 
 #endif //CG_ANW_MYMESH_H
