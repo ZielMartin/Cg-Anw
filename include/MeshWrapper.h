@@ -66,6 +66,7 @@ public:
 
     bool limit;
 
+    HE_MESH &getMesh();
 private:
     HE_MESH mesh, conmesh;
     int subdivisionLvl;

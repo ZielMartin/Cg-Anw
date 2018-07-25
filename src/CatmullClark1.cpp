@@ -103,7 +103,7 @@ void CatmullClark1::compute_midpoint(HE_MESH &_m, const HE_MESH::EdgeHandle &_eh
 
     // boundary edge: just average vertex positions
     // this yields the [1/2 1/2] mask
-    if (_m.is_boundary(_eh) || !_update_points) {
+    if (_m.is_boundary(_eh) || !_update_points || _m.property(_m.sharpedge, heh) == true) {
         pos *= 0.5f;
     } else // inner edge: add neighbouring Vertices to sum
         // this yields the [1/16 1/16; 3/8 3/8; 1/16 1/16] mask
@@ -332,7 +332,7 @@ void CatmullClark1::calcLimitNormal(HE_MESH &newMesh, const OpenMesh::VertexHand
     float a = 1.0f + std::cos(2.0f * M_PI / k) + std::cos(M_PI / k) * std::sqrt(2.0f * (9.0f + std::cos(2.0f * M_PI / k)));
 
     int i = 0;
-    std::cout << VP << std::endl;
+   // std::cout << VP << std::endl;
 
     for (HE_MESH::HalfedgeHandle halfEdge : halfEdges)
     {
@@ -345,7 +345,7 @@ void CatmullClark1::calcLimitNormal(HE_MESH &newMesh, const OpenMesh::VertexHand
         // beta
         HE_MESH::HalfedgeHandle nextHE = newMesh.next_halfedge_handle(halfEdge);
         HE_MESH::Point nextPoint = newMesh.point(newMesh.from_vertex_handle(nextHE));
-    std::cout << nextPoint << std::endl;
+    //std::cout << nextPoint << std::endl;
         HE_MESH::HalfedgeHandle nextNextHE = newMesh.next_halfedge_handle(nextHE);
         HE_MESH::Point nextNextPoint = newMesh.point(newMesh.from_vertex_handle(nextNextHE));
 
@@ -353,8 +353,8 @@ void CatmullClark1::calcLimitNormal(HE_MESH &newMesh, const OpenMesh::VertexHand
         QVector3D p2 = {nextNextPoint[0], nextNextPoint[1], nextNextPoint[2]};
 
      //   tangent1.setX((nextPoint[0] * beta1) + (nextNextPoint[0] * gamma1)); //nextPoint[0]
-        std::cout << nextNextPoint << std::endl;
-std::cout << nextPoint[0] << " + " << nextNextPoint[0] << std::endl;
+       // std::cout << nextNextPoint << std::endl;
+//std::cout << nextPoint[0] << " + " << nextNextPoint[0] << std::endl;
      //   tangent1.setY((nextPoint[1] * beta1 )+ (nextNextPoint[1] * gamma1));
      //   tangent1.setZ((nextPoint[2] * beta1) + (nextNextPoint[2] * gamma1));
 

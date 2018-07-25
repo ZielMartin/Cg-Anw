@@ -9,7 +9,7 @@
 #include <QPointer>
 #include <QGridLayout>
 #include <QCheckBox>
-
+//#include "ui_window.h"
 #include "glwidget.h"
 
 class QAction;
@@ -17,13 +17,20 @@ class QActionGroup;
 class QLabel;
 class QMenu;
 
+namespace Ui {
+    class Window;
+}
+
 class Window : public QMainWindow
 {
 Q_OBJECT
 
 public:
-    Window();
+    explicit Window(QWidget *parent = Q_NULLPTR);
 
+public slots:
+    void sharp(bool sharp);
+    void setCheckBox(bool sharp);
 
 private slots:
     void newFile();
@@ -56,13 +63,14 @@ private:
     QAction *userControlAct;
     QAction *meshInfoAct;
     QPointer<QAction> limitCeckedBtn;
+    QPointer<QAction> sharpEdgeChecked;
 
     QSlider *slider;
     QCheckBox *checkbox;
 
 
     GLWidget *glWidget;
-
+    //Ui::Window ui;
 
 };
 

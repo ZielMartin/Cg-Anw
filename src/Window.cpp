@@ -7,7 +7,8 @@
 
 
 
-Window::Window() {
+Window::Window(QWidget *parent) {
+    //ui.setupUi(this);
     QWidget *widget = new QWidget;
     setCentralWidget(widget);
 
@@ -26,7 +27,11 @@ Window::Window() {
     QLabel *smoothingLabel = new QLabel("Smoothing");
 
     checkbox = new QCheckBox("Sharp Edge", this);
-
+    //sharpEdgeChecked = new QAction("")
+    checkbox->setChecked(false);
+    checkbox->setCheckable(false);
+    connect(checkbox, SIGNAL(clicked(bool)), this, SLOT(sharp(bool)));
+    connect(glWidget, SIGNAL(valueChanged(bool)), this, SLOT(setCheckBox(bool)));
 
     //QVBoxLayout *layout = new QVBoxLayout;
     QGridLayout *layout = new QGridLayout;
@@ -46,6 +51,26 @@ Window::Window() {
     setWindowTitle(tr("Menus"));
     setMinimumSize(160, 160);
     resize(480, 320);
+}
+
+void Window::sharp(bool sharp) {
+    std::cout << "blah: "<< sharp <<std::endl;
+    glWidget->setSharpEdge(sharp);
+    /*if (glWidget->selectedEdge) {
+        std::cout << "2dh" <<std::endl;
+
+        HE_MESH &mesh = glWidget->renderer.getMeshWrapper().getMesh();
+        mesh.property(mesh.sharpedge, glWidget->selectedEdge) = sharp;
+        mesh.property(mesh.sharpedge, mesh.opposite_halfedge_handle(glWidget->selectedEdge)) = sharp;
+        //ui.openGLWidget->dirtyHarry = true;
+        emit ui.openGLWidget->repaint();
+    }*/
+}
+
+void Window::setCheckBox(bool sharp) {
+    std::cout << sharp << std::endl;
+    checkbox->setChecked(sharp);
+    checkbox->setCheckable(true);
 }
 
 void Window::sliderValueChanged(int k) {

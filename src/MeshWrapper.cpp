@@ -63,6 +63,10 @@ void MeshWrapper::getVerticesAndNormalsTriangulated(std::vector<glm::vec3> &vert
     }
 }
 
+HE_MESH& MeshWrapper::getMesh() {
+    return mesh;
+}
+
 void MeshWrapper::getVertices(std::vector<glm::vec3> &vertices) {
 
     for (HE_MESH::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it) {

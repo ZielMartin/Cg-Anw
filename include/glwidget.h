@@ -23,6 +23,7 @@
 
 #include "Renderer.h"
 #include <QGLWidget>
+#include <QVector4D>
 #include "camera.h"
 
 #include "Shader.h"
@@ -32,6 +33,10 @@
 
 class GLWidget : public QGLWidget {
 Q_OBJECT
+
+signals:
+    void valueChanged(bool sharp);
+
 public:
     explicit GLWidget(QWidget *parent = 0, QGLFormat format = QGLFormat::defaultFormat());
 
@@ -47,9 +52,10 @@ public:
 
     void applySmoothedVertices(int interpolationValue);
 
-
-
-
+    void intersect(const QVector3D& origin, const QVector3D& direction) ;
+    void setSharpEdge(bool sharp);
+    Renderer renderer;
+    HE_MESH::HalfedgeHandle selectedEdge;
 protected:
     void initializeGL() override;
 
@@ -76,12 +82,12 @@ private:
 
 
 
-    Renderer renderer;
+
     cg::Camera *camera;
 
     glm::mat4 projectionMatrix, viewMatrix, modelMatrix;
     glm::mat3 normalMatrix;
-
+    QVector4D viewport;
 
     Shader shader;
 
