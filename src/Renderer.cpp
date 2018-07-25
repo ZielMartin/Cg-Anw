@@ -352,9 +352,9 @@ void Renderer::updateMesh(bool updatePointColor) {
     updateBufferData(meshLinesObject.vertex_color_buffer, meshLinesObject.colors);
     updateBufferData(meshLinesObject.vertex_radius_buffer, meshLinesObject.radius);
 
-    updateBufferData(meshLinesObject.vertex_position_buffer, limitNormalsObject.vertices);
-    updateBufferData(meshLinesObject.vertex_color_buffer, limitNormalsObject.colors);
-    updateBufferData(meshLinesObject.vertex_radius_buffer, limitNormalsObject.radius);
+    updateBufferData(limitNormalsObject.vertex_position_buffer, limitNormalsObject.vertices);
+    updateBufferData(limitNormalsObject.vertex_color_buffer, limitNormalsObject.colors);
+    updateBufferData(limitNormalsObject.vertex_radius_buffer, limitNormalsObject.radius);
 }
 
 void Renderer::fillMeshData(bool updatePointColor) {
