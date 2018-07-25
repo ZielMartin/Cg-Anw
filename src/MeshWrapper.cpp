@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <QtWidgets/QInputDialog>
+#include <libs/glm-0.9.7.2/glm/geometric.hpp>
 #include "MeshWrapper.h"
 
 MeshWrapper::MeshWrapper() {
@@ -14,23 +15,22 @@ MeshWrapper::MeshWrapper() {
 
 void MeshWrapper::loadMesh(const char *path) {
 
-    if(path != nullptr) {
+    if (path != nullptr) {
         if (!OpenMesh::IO::read_mesh(mesh, path, opt)) {
             std::cerr << "Error loading mesh from file " << path << std::endl;
         }
-    }else{
+    } else {
         mesh.clear();
     }
 
     smoothMesh(false);
 }
 
-void MeshWrapper::writeMesh(const char *path){
-    if (!OpenMesh::IO::write_mesh(mesh, path))    {
+void MeshWrapper::writeMesh(const char *path) {
+    if (!OpenMesh::IO::write_mesh(mesh, path)) {
         std::cerr << "Error writing mesh to file " << path << std::endl;
     }
 }
-
 
 
 //gets vertices in triangle order, if mesh should not be triangulated, an index array must be implemented with triangulated indices
@@ -53,7 +53,8 @@ void MeshWrapper::getVerticesAndNormalsTriangulated(std::vector<glm::vec3> &vert
     //run throught each face(witch is a triangle)
     for (HE_MESH::FaceIter f_it = meshTriangulated.faces_begin(); f_it != meshTriangulated.faces_end(); ++f_it) {
         //run throught each vertex in this face
-        for (HE_MESH::FaceVertexIter fv_it = meshTriangulated.fv_begin(*f_it); fv_it != meshTriangulated.fv_end(*f_it); ++fv_it) {
+        for (HE_MESH::FaceVertexIter fv_it = meshTriangulated.fv_begin(*f_it);
+             fv_it != meshTriangulated.fv_end(*f_it); ++fv_it) {
             v = meshTriangulated.point(*fv_it);
             vertices.push_back(glm::vec3(v[0], v[1], v[2]));
             n = meshTriangulated.normal(*fv_it);
@@ -63,7 +64,7 @@ void MeshWrapper::getVerticesAndNormalsTriangulated(std::vector<glm::vec3> &vert
     }
 }
 
-HE_MESH& MeshWrapper::getMesh() {
+HE_MESH &MeshWrapper::getMesh() {
     return mesh;
 }
 
@@ -78,11 +79,15 @@ void MeshWrapper::getVertices(std::vector<glm::vec3> &vertices) {
 
 void MeshWrapper::getLimitNormals(std::vector<glm::vec3> &vertices) {
 
-    for (HE_MESH::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it) {
-        OpenMesh::Vec3f v = mesh.point(*v_it);
-        HE_MESH::Normal limitnormal = this->mesh.property(this->mesh.limitnormal, v_it);//  + mesh.point(*v_it);
-        vertices.push_back(glm::vec3(v[0], v[1], v[2]));
-        vertices.push_back(glm::vec3(limitnormal[0] * 0.2f +v[0], limitnormal[1]* 0.2f+v[1], limitnormal[2]* 0.2f+v[2] ));
+    if (limit) {
+        for (HE_MESH::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it) {
+            OpenMesh::Vec3f v = mesh.point(*v_it);
+            HE_MESH::Normal limitnormal = this->mesh.property(this->mesh.limitnormal, v_it);//  + mesh.point(*v_it);
+            vertices.push_back(glm::vec3(v[0], v[1], v[2]));
+            //vertices.push_back(glm::vec3(limitnormal[0] * 0.2f +v[0], limitnormal[1]* 0.2f+v[1], limitnormal[2]* 0.2f+v[2] ));
+            vertices.push_back(
+                    glm::normalize(glm::vec3(limitnormal[0] + v[0], limitnormal[1] + v[1], limitnormal[2] + v[2])));
+        }
     }
 
 }
@@ -90,7 +95,7 @@ void MeshWrapper::getLimitNormals(std::vector<glm::vec3> &vertices) {
 void MeshWrapper::getLineVertices(std::vector<glm::vec3> &vertices, std::vector<bool> &selected) {
 
 
-    for(HE_MESH::EdgeIter e_it = mesh.edges_begin(); e_it != mesh.edges_end(); ++e_it){
+    for (HE_MESH::EdgeIter e_it = mesh.edges_begin(); e_it != mesh.edges_end(); ++e_it) {
         HE_MESH::VertexHandle vh1 = mesh.to_vertex_handle(mesh.halfedge_handle(*e_it, 0));
         HE_MESH::VertexHandle vh2 = mesh.from_vertex_handle(mesh.halfedge_handle(*e_it, 0));
 
@@ -100,10 +105,10 @@ void MeshWrapper::getLineVertices(std::vector<glm::vec3> &vertices, std::vector<
         vertices.push_back(glm::vec3(v1[0], v1[1], v1[2]));
         vertices.push_back(glm::vec3(v2[0], v2[1], v2[2]));
 
-        if(checkSelectedHalfEdges(vh1, vh2)){
+        if (checkSelectedHalfEdges(vh1, vh2)) {
             selected.push_back(true);
             selected.push_back(true);
-        }else{
+        } else {
             selected.push_back(false);
             selected.push_back(false);
         }
@@ -111,16 +116,15 @@ void MeshWrapper::getLineVertices(std::vector<glm::vec3> &vertices, std::vector<
     }
 }
 
-bool MeshWrapper::checkSelectedHalfEdges(HE_MESH::VertexHandle v1, HE_MESH::VertexHandle v2){
-    for(HE_MESH::HalfedgeHandle heh : selectedHalfEdges){
+bool MeshWrapper::checkSelectedHalfEdges(HE_MESH::VertexHandle v1, HE_MESH::VertexHandle v2) {
+    for (HE_MESH::HalfedgeHandle heh : selectedHalfEdges) {
         std::pair<HE_MESH::VertexHandle, HE_MESH::VertexHandle> vertices = getVerticesFromHalfEdge(heh);
-        if((vertices.first == v1 && vertices.second == v2) || (vertices.first == v2 && vertices.second == v1)){
+        if ((vertices.first == v1 && vertices.second == v2) || (vertices.first == v2 && vertices.second == v1)) {
             return true;
         }
     }
     return false;
 }
-
 
 
 void MeshWrapper::moveVertex(HE_MESH::VertexHandle v_h, glm::vec3 relativeMovement) {
@@ -165,8 +169,8 @@ bool MeshWrapper::selectVertex(glm::vec3 pos, float radius) {
     }
 
     selectedHalfEdges.clear();
-    if(selectedVertices.size() >= 2){
-        for(int i = 0; i < selectedVertices.size()-1; i++){
+    if (selectedVertices.size() >= 2) {
+        for (int i = 0; i < selectedVertices.size() - 1; i++) {
             selectHalfEdge(selectedVertices.at(i), selectedVertices.at(i + 1));
         }
     }
@@ -174,37 +178,37 @@ bool MeshWrapper::selectVertex(glm::vec3 pos, float radius) {
 }
 
 void MeshWrapper::setVertexWeightAllSelected(float weight) {
-    for(HE_MESH::VertexHandle vh : selectedVertices){
+    for (HE_MESH::VertexHandle vh : selectedVertices) {
         this->setVertexWeight(vh, weight);
     }
 
 }
 
-void MeshWrapper::selectHalfEdge(HE_MESH::VertexHandle v1, HE_MESH::VertexHandle v2){
+void MeshWrapper::selectHalfEdge(HE_MESH::VertexHandle v1, HE_MESH::VertexHandle v2) {
 
-    for(HE_MESH::VertexOHalfedgeIter voh_it = mesh.voh_iter(v1); voh_it.is_valid(); ++voh_it) {
+    for (HE_MESH::VertexOHalfedgeIter voh_it = mesh.voh_iter(v1); voh_it.is_valid(); ++voh_it) {
         // Iterate over all outgoing halfedges...
 
         HE_MESH::VertexHandle vh = mesh.to_vertex_handle(*voh_it);
 
-        if(vh == v2){
+        if (vh == v2) {
             selectedHalfEdges.push_back(*voh_it);
 
         }
     }
 }
 
-void MeshWrapper::clearSelectedEdges(){
+void MeshWrapper::clearSelectedEdges() {
     selectedHalfEdges.clear();
 }
 
-std::pair<HE_MESH::VertexHandle, HE_MESH::VertexHandle> MeshWrapper::getVerticesFromHalfEdge(HE_MESH::HalfedgeHandle heh){
+std::pair<HE_MESH::VertexHandle, HE_MESH::VertexHandle>
+MeshWrapper::getVerticesFromHalfEdge(HE_MESH::HalfedgeHandle heh) {
     std::pair<HE_MESH::VertexHandle, HE_MESH::VertexHandle> vertices;
-    vertices.first =  mesh.from_vertex_handle(heh);
-    vertices.second =  mesh.to_vertex_handle(heh);
-    return  vertices;
+    vertices.first = mesh.from_vertex_handle(heh);
+    vertices.second = mesh.to_vertex_handle(heh);
+    return vertices;
 }
-
 
 
 void MeshWrapper::deselectAll() {
@@ -259,7 +263,7 @@ void MeshWrapper::makeSelectedFace() {
 
 
 void MeshWrapper::subdivision() {
-    if(subdivisionLvl == 0) {
+    if (subdivisionLvl == 0) {
         backstack.push_back(mesh);
     }
     HE_MESH newMesh = catmull(backstack.back(), 1);
@@ -271,8 +275,8 @@ void MeshWrapper::subdivision() {
 
     for (; v_itr != v_end; ++v_itr) {
         catmull.calcLimitNormal(newMesh, *v_itr);
-       // newMesh.property(newMesh.limitnormal, *v_itr) = HE_MESH::Normal(0.0f, 0.0f, 0.0f);
-       // std::cout << newMesh.property(newMesh.limitnormal, *v_itr) << std::endl;
+        // newMesh.property(newMesh.limitnormal, *v_itr) = HE_MESH::Normal(0.0f, 0.0f, 0.0f);
+        // std::cout << newMesh.property(newMesh.limitnormal, *v_itr) << std::endl;
     }
 
     v_itr = newMesh.vertices_begin();
@@ -284,8 +288,7 @@ void MeshWrapper::subdivision() {
         HE_MESH::HalfedgeHandle start = newMesh.halfedge_handle(*v_itr);
         HE_MESH::HalfedgeHandle he = start;
 
-        do
-        {
+        do {
             he = newMesh.opposite_halfedge_handle(he);
             vertices.push_back(newMesh.from_vertex_handle(he));
             he = newMesh.next_halfedge_handle(he);
@@ -306,8 +309,7 @@ void MeshWrapper::subdivision() {
         start = newMesh.halfedge_handle(*v_itr);
         he = start;
 
-        do
-        {
+        do {
             halfEdges.push_back(he);
 
             he = newMesh.opposite_halfedge_handle(he);
@@ -319,12 +321,11 @@ void MeshWrapper::subdivision() {
 
         // weights
         float alpha = 1.0f - 5.0f / (k + 5.0f);
-        float beta  = 4.0f / ((k + 5.0f) * k);
+        float beta = 4.0f / ((k + 5.0f) * k);
         float gamma = 1.0f / ((k + 5.0f) * k);
 
         // calculate new point
-        for (HE_MESH::HalfedgeHandle halfEdge : halfEdges)
-        {
+        for (HE_MESH::HalfedgeHandle halfEdge : halfEdges) {
             // next half edge
             HE_MESH::HalfedgeHandle nHE = newMesh.next_halfedge_handle(halfEdge);
 
@@ -343,8 +344,8 @@ void MeshWrapper::subdivision() {
         LP += VP * alpha;
         newMesh.set_point(*v_itr, LP);
         newMesh.property(newMesh.limitpoint, v_itr) = LP;
-       // HE_MESH::Point g = newMesh.property(newMesh.limitpoint, vertex);
-       // std::cout << g << std::endl;
+        // HE_MESH::Point g = newMesh.property(newMesh.limitpoint, vertex);
+        // std::cout << g << std::endl;
     }
 
 
@@ -363,14 +364,13 @@ void MeshWrapper::undo() {
         mesh = backstack.at(backstack.size() - 1);
         backstack.pop_back();
     }*/
-    if(subdivisionLvl == 1) {
+    if (subdivisionLvl == 1) {
         backstack.pop_back();
         backstackLimit.pop_back();
         mesh = backstack.back();
         backstack.pop_back();
         subdivisionLvl--;
-    }
-    else if(subdivisionLvl > 1) {
+    } else if (subdivisionLvl > 1) {
         backstack.pop_back();
         backstackLimit.pop_back();
         mesh = backstack.back();
@@ -388,20 +388,20 @@ float MeshWrapper::getVertexWeight(HE_MESH::VertexHandle vertexHandle) {
     return this->mesh.property(this->mesh.vp_fourth, vertexHandle);
 }
 
-void MeshWrapper::getDimensions(glm::vec3 &min, glm::vec3 &max){
+void MeshWrapper::getDimensions(glm::vec3 &min, glm::vec3 &max) {
     for (HE_MESH::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it) {
-        if(mesh.point(*v_it)[0] < min.x) min.x =  mesh.point(*v_it)[0];
-        if(mesh.point(*v_it)[1] < min.y) min.y =  mesh.point(*v_it)[1];
-        if(mesh.point(*v_it)[2] < min.z) min.z =  mesh.point(*v_it)[2];
+        if (mesh.point(*v_it)[0] < min.x) min.x = mesh.point(*v_it)[0];
+        if (mesh.point(*v_it)[1] < min.y) min.y = mesh.point(*v_it)[1];
+        if (mesh.point(*v_it)[2] < min.z) min.z = mesh.point(*v_it)[2];
 
-        if(mesh.point(*v_it)[0] > max.x) max.x =  mesh.point(*v_it)[0];
-        if(mesh.point(*v_it)[1] > max.y) max.y =  mesh.point(*v_it)[1];
-        if(mesh.point(*v_it)[2] > max.z) max.z =  mesh.point(*v_it)[2];
+        if (mesh.point(*v_it)[0] > max.x) max.x = mesh.point(*v_it)[0];
+        if (mesh.point(*v_it)[1] > max.y) max.y = mesh.point(*v_it)[1];
+        if (mesh.point(*v_it)[2] > max.z) max.z = mesh.point(*v_it)[2];
     }
 }
 
 void MeshWrapper::smoothMesh(bool pushToBackstack) {
-    if(pushToBackstack){
+    if (pushToBackstack) {
         //backstack.push_back(mesh);
     }
 
@@ -409,20 +409,20 @@ void MeshWrapper::smoothMesh(bool pushToBackstack) {
     unSmoothedVertices.clear();
 
     for (HE_MESH::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it) {
-        HE_MESH::Point p(0,0,0);
+        HE_MESH::Point p(0, 0, 0);
         int c = 0;
-        for(HE_MESH::VertexOHalfedgeIter voh_it = mesh.voh_iter(v_it); voh_it; ++voh_it) {
+        for (HE_MESH::VertexOHalfedgeIter voh_it = mesh.voh_iter(v_it); voh_it; ++voh_it) {
             // Iterate over all outgoing halfedges..
             p[0] += mesh.point(mesh.to_vertex_handle(*voh_it))[0];
             p[1] += mesh.point(mesh.to_vertex_handle(*voh_it))[1];
             p[2] += mesh.point(mesh.to_vertex_handle(*voh_it))[2];
             c++;
         }
-        if(c != 0){
+        if (c != 0) {
             p[0] = p[0] / c;
             p[1] = p[1] / c;
             p[2] = p[2] / c;
-        }else{
+        } else {
             p = mesh.point(*v_it);
         }
         smoothedVertices.push_back(p);
@@ -430,21 +430,23 @@ void MeshWrapper::smoothMesh(bool pushToBackstack) {
     }
 }
 
-void MeshWrapper::applySmoothedVertices(int interpolationValue){
+void MeshWrapper::applySmoothedVertices(int interpolationValue) {
     int i = 0;
-    for (OpenMesh::PolyConnectivity::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it){
+    for (OpenMesh::PolyConnectivity::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it) {
         //vector from old to new vertex
-        glm::vec3 vec = glm::vec3(smoothedVertices.at(i)[0] - unSmoothedVertices.at(i)[0], smoothedVertices.at(i)[1] - unSmoothedVertices.at(i)[1], smoothedVertices.at(i)[2] - unSmoothedVertices.at(i)[2]);
+        glm::vec3 vec = glm::vec3(smoothedVertices.at(i)[0] - unSmoothedVertices.at(i)[0],
+                                  smoothedVertices.at(i)[1] - unSmoothedVertices.at(i)[1],
+                                  smoothedVertices.at(i)[2] - unSmoothedVertices.at(i)[2]);
         //float lenght = (vec.length()/99)*interpolationValue;
-        mesh.point(*v_it)[0] = unSmoothedVertices.at(i)[0] + (vec.x/99)*interpolationValue;
-        mesh.point(*v_it)[1] = unSmoothedVertices.at(i)[1] + (vec.y/99)*interpolationValue;
-        mesh.point(*v_it)[2] = unSmoothedVertices.at(i)[2] + (vec.z/99)*interpolationValue;
+        mesh.point(*v_it)[0] = unSmoothedVertices.at(i)[0] + (vec.x / 99) * interpolationValue;
+        mesh.point(*v_it)[1] = unSmoothedVertices.at(i)[1] + (vec.y / 99) * interpolationValue;
+        mesh.point(*v_it)[2] = unSmoothedVertices.at(i)[2] + (vec.z / 99) * interpolationValue;
         i++;
     }
 }
 
 void MeshWrapper::setSelectedEdgesSharp(bool sharp) {
-    for(HE_MESH::HalfedgeHandle heh : selectedHalfEdges){
+    for (HE_MESH::HalfedgeHandle heh : selectedHalfEdges) {
         mesh.property(mesh.sharpedge, heh) = sharp;
         mesh.property(mesh.sharpedge, mesh.opposite_halfedge_handle(heh)) = sharp;
 
@@ -452,7 +454,7 @@ void MeshWrapper::setSelectedEdgesSharp(bool sharp) {
 }
 
 
-std::vector<std::pair<std::string, int>> MeshWrapper::getMeshInfo(){
+std::vector<std::pair<std::string, int>> MeshWrapper::getMeshInfo() {
     std::vector<std::pair<std::string, int>> stats;
 
     std::pair<std::string, int> faceCount;
@@ -463,14 +465,15 @@ std::vector<std::pair<std::string, int>> MeshWrapper::getMeshInfo(){
     for (HE_MESH::FaceIter f_it = mesh.faces_begin(); f_it != mesh.faces_end(); ++f_it) {
         int faceValence = mesh.valence(*f_it);
         bool found = false;
-        for(std::pair<std::string, int> &p : stats){
+        for (std::pair<std::string, int> &p : stats) {
             std::string s = "FaceValence";
             s += std::to_string(faceValence);
-            if(p.first == s){
+            if (p.first == s) {
                 p.second = p.second + 1;
                 found = true;
             }
-        }if(!found){
+        }
+        if (!found) {
             std::pair<std::string, int> faceV;
             faceV.first = "FaceValence";
             faceV.first += std::to_string(faceValence);
@@ -488,14 +491,15 @@ std::vector<std::pair<std::string, int>> MeshWrapper::getMeshInfo(){
     for (HE_MESH::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it) {
         int vertexValence = mesh.valence(*v_it);
         bool found = false;
-        for(std::pair<std::string, int> &p : stats){
+        for (std::pair<std::string, int> &p : stats) {
             std::string s = "VertexValence";
             s += std::to_string(vertexValence);
-            if(p.first == s){
+            if (p.first == s) {
                 p.second = p.second + 1;
                 found = true;
             }
-        }if(!found){
+        }
+        if (!found) {
             std::pair<std::string, int> vertexV;
             vertexV.first = "VertexValence";
             vertexV.first += std::to_string(vertexValence);
@@ -509,7 +513,6 @@ std::vector<std::pair<std::string, int>> MeshWrapper::getMeshInfo(){
     halfEdgeCount.first = "Half-Edges";
     halfEdgeCount.second = mesh.n_halfedges();
     stats.push_back(halfEdgeCount);
-
 
 
     return stats;
