@@ -38,9 +38,9 @@ Window::Window(QWidget *parent) {
     layout->setMargin(5);
     //layout->addWidget(topFiller);
     layout->addWidget(glWidget,0,0);
-    layout->addWidget(checkbox,0,1);
-    layout->addWidget(smoothingLabel,1,1);
-    layout->addWidget(slider,1,2);
+    layout->addWidget(checkbox,1,0);
+    layout->addWidget(smoothingLabel,2,0);
+    layout->addWidget(slider,3,0);
     layout->setColumnStretch(0,5);
     widget->setLayout(layout);
 
