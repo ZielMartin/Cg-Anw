@@ -18,6 +18,8 @@
 
 
 class MeshWrapper {
+
+
 public:
 
     MeshWrapper();
@@ -64,6 +66,10 @@ public:
 
     void applySmoothedVertices(int interpolationValue);
 
+    void setSelectedEdgesSharp(bool sharp);
+
+    std::vector<OpenMesh::HalfedgeHandle> &getSelectedHalfEdges();
+
     bool limit;
 
     HE_MESH &getMesh();
@@ -86,6 +92,9 @@ private:
      * selecting order determines which half-edge is selected
      */
     std::vector<HE_MESH::HalfedgeHandle> selectedHalfEdges;
+
+
+private:
 
 
     std::pair<HE_MESH::VertexHandle, HE_MESH::VertexHandle> getVerticesFromHalfEdge(HE_MESH::HalfedgeHandle heh);

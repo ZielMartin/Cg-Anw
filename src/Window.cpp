@@ -54,17 +54,8 @@ Window::Window(QWidget *parent) {
 }
 
 void Window::sharp(bool sharp) {
-    std::cout << "blah: "<< sharp <<std::endl;
     glWidget->setSharpEdge(sharp);
-    /*if (glWidget->selectedEdge) {
-        std::cout << "2dh" <<std::endl;
 
-        HE_MESH &mesh = glWidget->renderer.getMeshWrapper().getMesh();
-        mesh.property(mesh.sharpedge, glWidget->selectedEdge) = sharp;
-        mesh.property(mesh.sharpedge, mesh.opposite_halfedge_handle(glWidget->selectedEdge)) = sharp;
-        //ui.openGLWidget->dirtyHarry = true;
-        emit ui.openGLWidget->repaint();
-    }*/
 }
 
 void Window::setCheckBox(bool sharp) {

@@ -52,7 +52,6 @@ public:
 
     void applySmoothedVertices(int interpolationValue);
 
-    void intersect(const QVector3D& origin, const QVector3D& direction) ;
     void setSharpEdge(bool sharp);
     Renderer renderer;
     HE_MESH::HalfedgeHandle selectedEdge;

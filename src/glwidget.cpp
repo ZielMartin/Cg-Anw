@@ -77,8 +77,6 @@ void GLWidget::initializeGL() {
     camera->SetFOV(45);
 
 
-
-
 }
 
 void GLWidget::openMesh(char *model_path) {
@@ -123,29 +121,12 @@ void GLWidget::mousePressEvent(QMouseEvent *event) {
 
     if (event->modifiers().testFlag(Qt::ControlModifier) && event->buttons() & Qt::LeftButton) {
 
-        //renderer.select(getWorldCoordinates(event->pos().x(), event->pos().y()));
+        renderer.select(getWorldCoordinates(event->pos().x(), event->pos().y()));
 
-        QRect viewp(viewport.x(), viewport.y(), viewport.z(), viewport.w());
-
-        QMatrix4x4 qviewMatrix = { viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0], viewMatrix[3][0],
-                                   viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1], viewMatrix[3][1],
-                                   viewMatrix[0][2], viewMatrix[1][2], viewMatrix[2][2], viewMatrix[3][2],
-                                   viewMatrix[0][3], viewMatrix[1][3], viewMatrix[2][3], viewMatrix[3][3],};
-        QMatrix4x4 qprojectionMatrix = { projectionMatrix[0][0], projectionMatrix[1][0], projectionMatrix[2][0], projectionMatrix[3][0],
-                                         projectionMatrix[0][1], projectionMatrix[1][1], projectionMatrix[2][1], projectionMatrix[3][1],
-                                         projectionMatrix[0][2], projectionMatrix[1][2], projectionMatrix[2][2], projectionMatrix[3][2],
-                                         projectionMatrix[0][3], projectionMatrix[1][3], projectionMatrix[2][3], projectionMatrix[3][3],};
-
-        QVector3D begin = QVector3D(event->pos().x(), height() - 1 - event->pos().y(), 0.0f).unproject(qviewMatrix, qprojectionMatrix, viewp);
-        QVector3D end = QVector3D(event->pos().x(), height() - 1 - event->pos().y(), 1.0f).unproject(qviewMatrix, qprojectionMatrix, viewp);
-
-        // Create ray.
-        QVector3D origin = begin;
-        QVector3D direction = (end - begin).normalized();
-
-        intersect(origin, direction);
-
-        emit repaint();
+        //checkbox represents first selectedf half-edge
+        if(renderer.getMeshWrapper().getSelectedHalfEdges().size() >= 1){
+            emit valueChanged(renderer.getMeshWrapper().getMesh().property(renderer.getMeshWrapper().getMesh().sharpedge, renderer.getMeshWrapper().getSelectedHalfEdges().at(0)));
+        }
 
         updateGL();
     } else if (event->buttons() & Qt::RightButton) {
@@ -163,76 +144,20 @@ void GLWidget::mousePressEvent(QMouseEvent *event) {
 
 }
 
-void GLWidget::intersect(const QVector3D& origin, const QVector3D& direction) {
-    std::cout << "B";
 
-    float minimum = std::numeric_limits<float>::max(); //0.5 / 1.0f; //mesh->scale;
-    HE_MESH::HalfedgeHandle closest;
-    HE_MESH mesh = renderer.getMeshWrapper().getMesh();
-    HE_MESH::HalfedgeIter hiter = renderer.getMeshWrapper().getMesh().halfedges_begin();
-    HE_MESH::HalfedgeIter end = renderer.getMeshWrapper().getMesh().halfedges_end();
-    //(HE_MESH::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it)
-    for (; hiter != end; ++hiter) {
-        HE_MESH::Point start = mesh.point(mesh.from_vertex_handle(hiter));
-        HE_MESH::Point end = mesh.point(mesh.from_vertex_handle(mesh.next_halfedge_handle(hiter))); //h->next->vert;
-        //std::cout << start << std::endl;         std::cout << end << std::endl;
-
-        /*for (float t = 0; t <= 1; t += 0.1f) {
-            QVector4D p = (1-t)*start->location + t*end->location;
-            QVector3D op = QVector3D(p.x(), p.y(), p.z()) - origin;
-            QVector3D cross = QVector3D::crossProduct(direction, op);
-
-            float distance = cross.length() / direction.length();
-
-            if (minimum > distance)
-            {
-                minimum = distance;
-                closest = hiter;
-            }
-        }*/
-        const int n = 32;
-
-        for (int i = 0; i < n + 1; i++)
-        {
-            float t = (float) i / n;
-
-            HE_MESH::Point mid = (1.0f - t) * start + t * end;
-            QVector3D midd = {mid[0], mid[1], mid[2]};
-            float distance = midd.distanceToLine(origin, direction);
-
-            if (minimum > distance)
-            {
-                minimum = distance;
-                closest = *hiter;
-                std::cout << "HA";
-            }
-        }
-
-    }
-    mesh.property(mesh.he_selected, closest) = true;
-    mesh.property(mesh.he_selected, mesh.opposite_halfedge_handle(closest)) = true;
-    selectedEdge = closest;
-    HE_MESH::Point ev = mesh.point(mesh.from_vertex_handle(closest));
-    HE_MESH::Point ev1 = mesh.point(mesh.to_vertex_handle(closest));
-    std::cout << "Punkt: "; std::cout << ev << std::endl;;
-    renderer.select(glm::vec3(ev[0],ev[1],ev[2]) ); renderer.select(glm::vec3(ev1[0],ev1[1],ev1[2]) );
-    emit valueChanged(mesh.property(mesh.sharpedge, closest));
-    std::cout << "Sharp: "; std::cout << mesh.property(mesh.sharpedge, closest) << std::endl;;
-}
-
-void GLWidget::saveOBJ(char *file){
+void GLWidget::saveOBJ(char *file) {
     renderer.getMeshWrapper().writeMesh(file);
 
 }
 
-void GLWidget::applySmoothedVertices(int interpolationValue){
+void GLWidget::applySmoothedVertices(int interpolationValue) {
     renderer.getMeshWrapper().applySmoothedVertices(interpolationValue);
     renderer.recreateMesh();
     updateGL();
 
 }
 
-std::vector<std::pair<std::string, int>> GLWidget::meshInfo(){
+std::vector<std::pair<std::string, int>> GLWidget::meshInfo() {
     return renderer.getMeshWrapper().getMeshInfo();
 };
 
@@ -357,36 +282,20 @@ void GLWidget::keyPressEvent(QKeyEvent *event) {
 }
 
 
-void GLWidget::setVertexWeight(float weight){
+void GLWidget::setVertexWeight(float weight) {
     renderer.getMeshWrapper().setVertexWeightAllSelected(weight);
 }
 
-void GLWidget::setLimitRules(bool LR){
+void GLWidget::setLimitRules(bool LR) {
     renderer.getMeshWrapper().limit = LR;
 }
 
 void GLWidget::setSharpEdge(bool sharp) {
-    std::cout << "blah" <<std::endl;
-    if (selectedEdge.is_valid()) {
-        std::cout << "2dh" <<std::endl;
-
-        HE_MESH &mesh = renderer.getMeshWrapper().getMesh();
-        mesh.property(mesh.sharpedge, selectedEdge) = sharp;
-        mesh.property(mesh.sharpedge, mesh.opposite_halfedge_handle(selectedEdge)) = sharp;
-        //ui.openGLWidget->dirtyHarry = true;
-        //emit ui.openGLWidget->repaint();
-
-        HE_MESH::HalfedgeIter hiter = renderer.getMeshWrapper().getMesh().halfedges_begin();
-        HE_MESH::HalfedgeIter end = renderer.getMeshWrapper().getMesh().halfedges_end();
-        //(HE_MESH::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it)
-        for (; hiter != end; ++hiter) {
-            std::cout << "Sharper: " << mesh.property(mesh.sharpedge, *hiter) ;
-        }
-        std::cout << std::endl;
-    }
+    renderer.getMeshWrapper().setSelectedEdgesSharp(sharp);
 }
 
 #define NORMALMATRIX {1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0}
+
 vec3 GLWidget::getWorldCoordinates(int x, int y) {
 
     GLdouble obj[3];

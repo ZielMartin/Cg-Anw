@@ -189,6 +189,7 @@ void MeshWrapper::selectHalfEdge(HE_MESH::VertexHandle v1, HE_MESH::VertexHandle
 
         if(vh == v2){
             selectedHalfEdges.push_back(*voh_it);
+
         }
     }
 }
@@ -442,6 +443,14 @@ void MeshWrapper::applySmoothedVertices(int interpolationValue){
     }
 }
 
+void MeshWrapper::setSelectedEdgesSharp(bool sharp) {
+    for(HE_MESH::HalfedgeHandle heh : selectedHalfEdges){
+        mesh.property(mesh.sharpedge, heh) = sharp;
+        mesh.property(mesh.sharpedge, mesh.opposite_halfedge_handle(heh)) = sharp;
+
+    }
+}
+
 
 std::vector<std::pair<std::string, int>> MeshWrapper::getMeshInfo(){
     std::vector<std::pair<std::string, int>> stats;
@@ -507,6 +516,12 @@ std::vector<std::pair<std::string, int>> MeshWrapper::getMeshInfo(){
 
 
 }
+
+std::vector<OpenMesh::HalfedgeHandle> &MeshWrapper::getSelectedHalfEdges() {
+    return selectedHalfEdges;
+}
+
+
 
 
 
