@@ -301,7 +301,6 @@ bool Renderer::select(glm::vec3 pos) {
         bool found = false;
         for (glm::vec3 selectedVert : selected) {
             if (vert.x - selectedVert.x == 0 && vert.y - selectedVert.y == 0 && vert.z - selectedVert.z == 0) {
-                std::cout << "Selected Vertex: " << selectedVert <<std::endl;
                 found = true;
             }
         }

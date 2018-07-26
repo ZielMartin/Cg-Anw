@@ -22,7 +22,7 @@ Window::Window(QWidget *parent) {
 
     slider = new QSlider(Qt::Horizontal, this);
     slider->setFocusPolicy(Qt::StrongFocus);
-    connect(slider, SIGNAL(valueChanged(float)), this, SLOT(sliderValueChanged(int)));
+    connect(slider, SIGNAL(valueChanged(int)), this, SLOT(sliderValueChanged(int)));
 
     QLabel *smoothingLabel = new QLabel("Smoothing");
 
@@ -59,12 +59,11 @@ void Window::sharp(bool sharp) {
 }
 
 void Window::setCheckBox(bool sharp) {
-    std::cout << sharp << std::endl;
     checkbox->setChecked(sharp);
     checkbox->setCheckable(true);
 }
 
-void Window::sliderValueChanged(float k) {
+void Window::sliderValueChanged(int k) {
     glWidget->applySmoothedVertices(k);
 }
 

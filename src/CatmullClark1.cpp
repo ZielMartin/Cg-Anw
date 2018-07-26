@@ -1,6 +1,3 @@
-//
-// Created by ZielM on 13.06.2018.
-//
 #include <iostream>
 #include <cmath>
 #include <math.h>
@@ -40,54 +37,41 @@ HE_MESH CatmullClark1::operator()(HE_MESH &_m, size_t _n, const bool _update_poi
             he = _m.next_halfedge_handle(he);
         } while (he != start);
         newMesh.property(newMesh.sharpneighbours, *v_it) = sharpNeighbours;
-        HE_MESH::Point nextPoint = _m.point(*v_it);
-    std::cout << nextPoint << " : " << sharpNeighbours << " == " << _m.property(_m.sharpneighbours, *v_it) << std::endl;
+
     }
 
     // initialize all weights to 0 (= smooth edge)
     for (HE_MESH::EdgeIter e_it = newMesh.edges_begin(); e_it != newMesh.edges_end(); ++e_it)
         newMesh.property(creaseWeights_, *e_it) = 0.0;
 
-    // Do _n subdivisions
     for (size_t i = 0; i < _n; ++i) {
 
-        // Compute face centroid
         HE_MESH::FaceIter f_itr = newMesh.faces_begin();
         HE_MESH::FaceIter f_end = newMesh.faces_end();
         for (; f_itr != f_end; ++f_itr) {
             newMesh.property(fp_pos_, *f_itr) = this->calc_face_centroid_weighted(*f_itr);
         }
 
-        // Compute position for new (edge-) vertices
         HE_MESH::EdgeIter e_itr = newMesh.edges_begin();
         HE_MESH::EdgeIter e_end = newMesh.edges_end();
         for (; e_itr != e_end; ++e_itr)
             compute_midpoint(newMesh, *e_itr, _update_points);
 
-        // position updates activated?
         if (_update_points) {
-            // compute new positions for old vertices
             HE_MESH::VertexIter v_itr = newMesh.vertices_begin();
             HE_MESH::VertexIter v_end = newMesh.vertices_end();
             for (; v_itr != v_end; ++v_itr)
- //std::cout  << " REEEE " << _m.property(_m.sharpneighbours, *v_itr) << std::endl;
-
                 update_vertex(newMesh, *v_itr);
 
-            // Commit changes in geometry
             v_itr = newMesh.vertices_begin();
             for (; v_itr != v_end; ++v_itr)
                 newMesh.set_point(*v_itr, newMesh.property(vp_pos_, *v_itr));
         }
 
-        // Split each edge at midpoint stored in edge property ep_pos_;
-        // Attention! Creating new edges, hence make sure the loop ends correctly.
         e_itr = newMesh.edges_begin();
         for (; e_itr != e_end; ++e_itr)
             split_edge(newMesh, *e_itr);
 
-        // Commit changes in topology and reconsitute consistency
-        // Attention! Creating new faces, hence make sure the loop ends correctly.
         f_itr = newMesh.faces_begin();
         for (; f_itr != f_end; ++f_itr)
             split_face(newMesh, *f_itr);
@@ -113,7 +97,8 @@ HE_MESH::Point CatmullClark1::calc_face_centroid_weighted(const HE_MESH::FaceHan
 }
 
 void CatmullClark1::compute_midpoint(HE_MESH &_m, const HE_MESH::EdgeHandle &_eh, const bool _update_points) {
-    const HE_MESH::HalfedgeHandle &heh = _m.halfedge_handle(_eh, 0); HE_MESH::HalfedgeHandle opp_heh;
+    const HE_MESH::HalfedgeHandle &heh = _m.halfedge_handle(_eh, 0);
+    HE_MESH::HalfedgeHandle opp_heh;
 
     //heh = _m.halfedge_handle(_eh, 0);
     opp_heh = _m.halfedge_handle(_eh, 1);
@@ -127,29 +112,12 @@ void CatmullClark1::compute_midpoint(HE_MESH &_m, const HE_MESH::EdgeHandle &_eh
     HE_MESH::HalfedgeHandle start = heh; //_eh;
     HE_MESH::HalfedgeHandle he = start;
 
-    //do
-    //{
-        //HE_MESH::EdgeHandle currentEdge = edge(he);
 
-        //if (sharp(currentEdge))
-          //  result.push_back(currentEdge);
-        if(_m.property(_m.sharpedge, he) == true
-            && _m.property(_m.sharpneighbours, _m.to_vertex_handle(he)) == 2
-            && _m.property(_m.sharpneighbours, _m.from_vertex_handle(he)) == 2) {
-                edgesSharp.push_back(he);
-        }
-        HE_MESH::Point nextPoint = _m.point(_m.from_vertex_handle(he));
-    //std::cout << nextPoint << std::endl;
-       // he = _m.opposite_halfedge_handle(he);
-        //he = _m.next_halfedge_handle(he);
-    //} while (he != start);
-
-    // boundary edge: just average vertex positions
-    // this yields the [1/2 1/2] mask
-
-   // std::cout << _m.property(_m.sharpneighbours, _m.to_vertex_handle(heh)) << " + " <<
-       //                               _m.property(_m.sharpneighbours, _m.from_vertex_handle(heh)) << std::endl;
-
+    if(_m.property(_m.sharpedge, he) == true
+        && _m.property(_m.sharpneighbours, _m.to_vertex_handle(he)) == 2
+        && _m.property(_m.sharpneighbours, _m.from_vertex_handle(he)) == 2) {
+            edgesSharp.push_back(he);
+    }
 
     if (_m.is_boundary(_eh) || !_update_points
             || (
@@ -158,10 +126,8 @@ void CatmullClark1::compute_midpoint(HE_MESH &_m, const HE_MESH::EdgeHandle &_eh
                             && _m.property(_m.sharpneighbours, _m.from_vertex_handle(heh)) == 2)
             ){
             //|| edgesSharp.size() == 2) { //|| _m.property(_m.sharpedge, heh) == true) {
-        pos *= 0.5f; std::cout << _m.property(_m.sharpneighbours, _m.to_vertex_handle(he)) << " + " <<
-                                  _m.property(_m.sharpneighbours, _m.from_vertex_handle(he)) << std::endl;
-    } else // inner edge: add neighbouring Vertices to sum
-        // this yields the [1/16 1/16; 3/8 3/8; 1/16 1/16] mask
+        pos *= 0.5f;
+    } else
     {
         pos += _m.property(fp_pos_, _m.face_handle(heh));
         pos += _m.property(fp_pos_, _m.face_handle(opp_heh));
@@ -171,7 +137,7 @@ void CatmullClark1::compute_midpoint(HE_MESH &_m, const HE_MESH::EdgeHandle &_eh
 }
 
 void CatmullClark1::update_vertex(HE_MESH &_m, const HE_MESH::VertexHandle &_vh) {
-    HE_MESH::Point pos(0.0, 0.0, 0.0), result(0.0, 0.0, 0.0), point = _m.point(_vh);
+    HE_MESH::Point pos(0.0, 0.0, 0.0), point = _m.point(_vh);
     HE_MESH::HalfedgeHandle heh = _m.halfedge_handle(_vh);
 
     std::vector<HE_MESH::HalfedgeHandle> edgesSharp;
@@ -179,46 +145,25 @@ void CatmullClark1::update_vertex(HE_MESH &_m, const HE_MESH::VertexHandle &_vh)
     HE_MESH::HalfedgeHandle start = heh;
     HE_MESH::HalfedgeHandle he = start;
 
-    do
-    {
-        //HE_MESH::EdgeHandle currentEdge = edge(he);
-
-        //if (sharp(currentEdge))
-          //  result.push_back(currentEdge);
+    do {
         if(_m.property(_m.sharpedge, he) == true
             && _m.property(_m.sharpneighbours, _m.to_vertex_handle(he)) == 2
             && _m.property(_m.sharpneighbours, _m.from_vertex_handle(he)) == 2)
             edgesSharp.push_back(he);
-        std::cout <<  " 666 " << _m.property(_m.sharpneighbours, _m.to_vertex_handle(he)) << " ZZZ "
-                                             << _m.property(_m.sharpneighbours, _m.from_vertex_handle(he)) << std::endl;
 
         he = _m.opposite_halfedge_handle(he);
         he = _m.next_halfedge_handle(he);
     } while (he != start);
 
-    if (edgesSharp.size() == 2) { //|| _m.property(_m.sharpedge, heh) == true) {
-std::cout << "REEEEEEEEEEEEEEEEEEEEEEEEEE" << std::endl;
-        //switch (edgesSharp.size()) {
-        //case 2:
-        //{
-            // alpha
+    if (edgesSharp.size() == 2) {
             pos += 3.0f / 4.0f * point;
-
             float weight = 1.0f / 8.0f;
 
-            // beta
-            //HE_MESH::Point point0A = point(start(edgesSharp[0]));
-            //HE_MESH::Point point0B = point(end(edgesSharp[0]));
             HE_MESH::Point point0A = _m.point(_m.to_vertex_handle(edgesSharp[0]));
-            pos += weight * point0A; //(point == point0A ? point0B : point0A);
+            pos += weight * point0A;
 
-            HE_MESH::Point point1A = _m.point(_m.to_vertex_handle(edgesSharp[1])); //point(start(edgesSharp[1]));
-            //HE_MESH::Point point1B = point(end(edgesSharp[1]));
-            //result += weight * (point == point1A ? point1B : point1A);
+            HE_MESH::Point point1A = _m.point(_m.to_vertex_handle(edgesSharp[1]));
             pos += weight * point1A;
-
-            //break;
-        //}
 
         } else if(_m.is_boundary(_vh)) {
 
@@ -252,11 +197,7 @@ std::cout << "REEEEEEEEEEEEEEEEEEEEEEEEEE" << std::endl;
         pos += _m.point(_vh) * (valence - 2.0) / valence + Q;
         //      pos = vector_cast<Vec>(_m.point(_vh));
     }
-        /*default:
-            //result = point;
-            std::cout << "tutu" << std::endl;
-            break;
-        }*/
+
     _m.property(vp_pos_, _vh) = pos;
 }
 

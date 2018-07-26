@@ -39,7 +39,7 @@ private slots:
     void vertexWeight();
     void userControl();
     void meshInfo();
-    void sliderValueChanged(float);
+    void sliderValueChanged(int);
     void limitCecked();
 
 

@@ -50,7 +50,7 @@ public:
     void setLimitRules(bool LR);
     std::vector<std::pair<std::string, int>> meshInfo();
 
-    void applySmoothedVertices(float interpolationValue);
+    void applySmoothedVertices(int interpolationValue);
     void intersect(const QVector3D& origin, const QVector3D& direction) ;
     void setSharpEdge(bool sharp);
     Renderer renderer;

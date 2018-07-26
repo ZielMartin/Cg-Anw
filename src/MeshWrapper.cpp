@@ -325,19 +325,12 @@ void MeshWrapper::subdivision() {
         float beta = 4.0f / ((k + 5.0f) * k);
         float gamma = 1.0f / ((k + 5.0f) * k);
 
-        // calculate new point
         for (HE_MESH::HalfedgeHandle halfEdge : halfEdges) {
-            // next half edge
-            HE_MESH::HalfedgeHandle nHE = newMesh.next_halfedge_handle(halfEdge);
 
-            // next next half edge
+            HE_MESH::HalfedgeHandle nHE = newMesh.next_halfedge_handle(halfEdge);
             HE_MESH::HalfedgeHandle nnHE = newMesh.next_halfedge_handle(nHE);
 
-            // beta
             LP += newMesh.point(newMesh.from_vertex_handle(nHE)) * beta;
-            //std::cout << newMesh.point(newMesh.from_vertex_handle(nHE)) << std::endl;
-
-            // gamma
             LP += newMesh.point(newMesh.from_vertex_handle(nnHE)) * gamma;
         }
 
@@ -345,8 +338,6 @@ void MeshWrapper::subdivision() {
         LP += VP * alpha;
         newMesh.set_point(*v_itr, LP);
         newMesh.property(newMesh.limitpoint, v_itr) = LP;
-        // HE_MESH::Point g = newMesh.property(newMesh.limitpoint, vertex);
-        // std::cout << g << std::endl;
     }
 
 
@@ -431,7 +422,7 @@ void MeshWrapper::smoothMesh(bool pushToBackstack) {
     }
 }
 
-void MeshWrapper::applySmoothedVertices(float interpolationValue) {
+void MeshWrapper::applySmoothedVertices(int interpolationValue) {
     int i = 0;
     for (OpenMesh::PolyConnectivity::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it) {
         //vector from old to new vertex
@@ -439,12 +430,9 @@ void MeshWrapper::applySmoothedVertices(float interpolationValue) {
                                   smoothedVertices.at(i)[1] - unSmoothedVertices.at(i)[1],
                                   smoothedVertices.at(i)[2] - unSmoothedVertices.at(i)[2]);
         //float lenght = (vec.length()/99)*interpolationValue;
-        mesh.point(*v_it)[0] = (1-interpolationValue)*unSmoothedVertices.at(i)[0] + (vec.x * interpolationValue);
-        mesh.point(*v_it)[1] = (1-interpolationValue)*unSmoothedVertices.at(i)[1] + (vec.y * interpolationValue);
-        mesh.point(*v_it)[2] = (1-interpolationValue)*unSmoothedVertices.at(i)[2] + (vec.z * interpolationValue);
-        //mesh.point(*v_it)[0] = unSmoothedVertices.at(i)[0] + (vec.x / 99) * interpolationValue;
-        //mesh.point(*v_it)[1] = unSmoothedVertices.at(i)[1] + (vec.y / 99) * interpolationValue;
-        //mesh.point(*v_it)[2] = unSmoothedVertices.at(i)[2] + (vec.z / 99) * interpolationValue;
+        mesh.point(*v_it)[0] = unSmoothedVertices.at(i)[0] + (vec.x / 99) * interpolationValue;
+        mesh.point(*v_it)[1] = unSmoothedVertices.at(i)[1] + (vec.y / 99) * interpolationValue;
+        mesh.point(*v_it)[2] = unSmoothedVertices.at(i)[2] + (vec.z / 99) * interpolationValue;
         i++;
     }
 }
@@ -531,7 +519,6 @@ std::vector<OpenMesh::HalfedgeHandle> &MeshWrapper::getSelectedHalfEdges() {
 void MeshWrapper::test() {
     for (HE_MESH::HalfedgeIter he_it = mesh.halfedges_begin(); he_it != mesh.halfedges_end(); ++he_it) {
         assert(mesh.opposite_halfedge_handle(mesh.opposite_halfedge_handle(*he_it)) == *he_it);
-        std::cout << "dasölk" << std::endl;
     }
 
     for (HE_MESH::FaceIter f_it = mesh.faces_begin(); f_it != mesh.faces_end(); ++f_it) {

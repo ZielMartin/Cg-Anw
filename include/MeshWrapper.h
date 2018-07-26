@@ -64,7 +64,7 @@ public:
 
     void smoothMesh(bool pushToBackstack);
 
-    void applySmoothedVertices(float interpolationValue);
+    void applySmoothedVertices(int interpolationValue);
 
     void setSelectedEdgesSharp(bool sharp);
     void test();

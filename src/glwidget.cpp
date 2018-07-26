@@ -199,7 +199,6 @@ void GLWidget::intersect(const QVector3D& origin, const QVector3D& direction) {
     mesh.property(mesh.he_selected, mesh.opposite_halfedge_handle(closest)) = true;
     selectedEdge = closest;
     emit valueChanged(mesh.property(mesh.sharpedge, closest));
-    std::cout << "Sharp: "; std::cout << mesh.property(mesh.sharpedge, closest) << std::endl;;
 }
 
 
@@ -208,7 +207,7 @@ void GLWidget::saveOBJ(char *file) {
 
 }
 
-void GLWidget::applySmoothedVertices(float interpolationValue) {
+void GLWidget::applySmoothedVertices(int interpolationValue) {
     renderer.getMeshWrapper().applySmoothedVertices(interpolationValue);
     renderer.recreateMesh();
     updateGL();
