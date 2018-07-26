@@ -39,6 +39,7 @@ private:
     OpenMesh::EPropHandleT<HE_MESH::Point> ep_pos_; // new edge pts
     OpenMesh::FPropHandleT<HE_MESH::Point> fp_pos_; // new face pts
     OpenMesh::EPropHandleT<double> creaseWeights_;// crease weights
+    OpenMesh::VPropHandleT<int> sharpneighbours;
 };
 
 #endif //CG_ANW_CATMULLCLARK1_H
