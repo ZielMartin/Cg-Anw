@@ -9,6 +9,13 @@
 #include <OpenMesh/Core/Utils/vector_traits.hh>
 #include <OpenMesh/Core/Geometry/VectorT.hh>
 
+float getFourthComponent(HE_MESH &mesh, HE_MESH::VertexHandle v) {
+    float fourthComp = mesh.property(mesh.vp_fourth, v);
+    if (fourthComp == 0.0f)
+        fourthComp = 1.0f;
+    return fourthComp;
+}
+
 CatmullClark1::CatmullClark1() {
 
 }
@@ -27,9 +34,8 @@ HE_MESH CatmullClark1::operator()(HE_MESH &_m, size_t _n, const bool _update_poi
         HE_MESH::HalfedgeHandle start = _m.halfedge_handle(*v_it);
         HE_MESH::HalfedgeHandle he = start;
         int sharpNeighbours = 0;
-        do
-        {
-            if(_m.property(_m.sharpedge, he) == true) {
+        do {
+            if (_m.property(_m.sharpedge, he) == true) {
                 sharpNeighbours++;
             }
 
@@ -85,9 +91,8 @@ HE_MESH::Point CatmullClark1::calc_face_centroid_weighted(const HE_MESH::FaceHan
     pt.vectorize(0);
     float valence = 0.0, fourthComp = 0.0f;
     for (HE_MESH::ConstFaceVertexIter cfv_it = this->mesh.cfv_iter(_fh); cfv_it.is_valid(); ++cfv_it) {
-        fourthComp = this->mesh.property(this->mesh.vp_fourth, *cfv_it);
-        if (fourthComp == 0.0f)
-            fourthComp = 1.0f;
+        fourthComp = getFourthComponent(this->mesh, cfv_it);
+
 
         pt += this->mesh.point(*cfv_it) * fourthComp;
         valence += fourthComp;
@@ -103,9 +108,16 @@ void CatmullClark1::compute_midpoint(HE_MESH &_m, const HE_MESH::EdgeHandle &_eh
     //heh = _m.halfedge_handle(_eh, 0);
     opp_heh = _m.halfedge_handle(_eh, 1);
 
+    float homo = 0.0f, fourthComponent;
     HE_MESH::Point pos(_m.point(_m.to_vertex_handle(heh)));
+    fourthComponent = getFourthComponent(this->mesh, _m.to_vertex_handle(heh));
+    homo += fourthComponent;
+    pos *= fourthComponent;
     //pos *= this->mesh.property(this->mesh.vp_fourth, _m.to_vertex_handle(heh));
-    pos += ( _m.point(_m.to_vertex_handle(opp_heh)) );//* this->mesh.property(this->mesh.vp_fourth, _m.to_vertex_handle(opp_heh)) );
+    fourthComponent = getFourthComponent(this->mesh, _m.to_vertex_handle(opp_heh));
+    homo += fourthComponent;
+    pos += (_m.point(_m.to_vertex_handle(opp_heh)) *
+            fourthComponent);//* this->mesh.property(this->mesh.vp_fourth, _m.to_vertex_handle(opp_heh)) );
 
     std::vector<HE_MESH::HalfedgeHandle> edgesSharp;
 
@@ -113,25 +125,24 @@ void CatmullClark1::compute_midpoint(HE_MESH &_m, const HE_MESH::EdgeHandle &_eh
     HE_MESH::HalfedgeHandle he = start;
 
 
-    if(_m.property(_m.sharpedge, he) == true
+    if (_m.property(_m.sharpedge, he) == true
         && _m.property(_m.sharpneighbours, _m.to_vertex_handle(he)) == 2
         && _m.property(_m.sharpneighbours, _m.from_vertex_handle(he)) == 2) {
-            edgesSharp.push_back(he);
+        edgesSharp.push_back(he);
     }
 
     if (_m.is_boundary(_eh) || !_update_points
-            || (
+        || (
                 _m.property(_m.sharpedge, heh) == true
-                            && _m.property(_m.sharpneighbours, _m.to_vertex_handle(heh)) == 2
-                            && _m.property(_m.sharpneighbours, _m.from_vertex_handle(heh)) == 2)
-            ){
-            //|| edgesSharp.size() == 2) { //|| _m.property(_m.sharpedge, heh) == true) {
-        pos *= 0.5f;
-    } else
-    {
+                && _m.property(_m.sharpneighbours, _m.to_vertex_handle(heh)) == 2
+                && _m.property(_m.sharpneighbours, _m.from_vertex_handle(heh)) == 2)
+            ) {
+        //|| edgesSharp.size() == 2) { //|| _m.property(_m.sharpedge, heh) == true) {
+        pos /= homo;
+    } else {
         pos += _m.property(fp_pos_, _m.face_handle(heh));
         pos += _m.property(fp_pos_, _m.face_handle(opp_heh));
-        pos *= 0.25;
+        pos /= (homo + 2);
     }
     _m.property(ep_pos_, _eh) = pos;
 }
@@ -146,7 +157,7 @@ void CatmullClark1::update_vertex(HE_MESH &_m, const HE_MESH::VertexHandle &_vh)
     HE_MESH::HalfedgeHandle he = start;
 
     do {
-        if(_m.property(_m.sharpedge, he) == true
+        if (_m.property(_m.sharpedge, he) == true
             && _m.property(_m.sharpneighbours, _m.to_vertex_handle(he)) == 2
             && _m.property(_m.sharpneighbours, _m.from_vertex_handle(he)) == 2)
             edgesSharp.push_back(he);
@@ -156,16 +167,16 @@ void CatmullClark1::update_vertex(HE_MESH &_m, const HE_MESH::VertexHandle &_vh)
     } while (he != start);
 
     if (edgesSharp.size() == 2) {
-            pos += 3.0f / 4.0f * point;
-            float weight = 1.0f / 8.0f;
+        pos += point * 3.0f / 4.0f;
+        float weight = 1.0f / 8.0f;
 
-            HE_MESH::Point point0A = _m.point(_m.to_vertex_handle(edgesSharp[0]));
-            pos += weight * point0A;
+        HE_MESH::Point point0A = _m.point(_m.to_vertex_handle(edgesSharp[0]));
+        pos += point0A * weight;
 
-            HE_MESH::Point point1A = _m.point(_m.to_vertex_handle(edgesSharp[1]));
-            pos += weight * point1A;
+        HE_MESH::Point point1A = _m.point(_m.to_vertex_handle(edgesSharp[1]));
+        pos += point1A * weight;
 
-        } else if(_m.is_boundary(_vh)) {
+    } else if (_m.is_boundary(_vh)) {
 
         HE_MESH::Normal Vec;
         pos = _m.point(_vh);
@@ -179,10 +190,11 @@ void CatmullClark1::update_vertex(HE_MESH &_m, const HE_MESH::VertexHandle &_vh)
         double valence(0.0);
         HE_MESH::VOHIter voh_it = _m.voh_iter(_vh);
         for (; voh_it.is_valid(); ++voh_it) {
-            pos += _m.point(_m.to_vertex_handle(*voh_it));
+            pos += _m.property(ep_pos_, _m.edge_handle(*voh_it));
+
             valence += 1.0;
         }
-        pos /= valence * valence;
+        pos /= valence;
 
         HE_MESH::VertexFaceIter vf_itr;
         HE_MESH::Point Q(0, 0, 0);
@@ -192,9 +204,10 @@ void CatmullClark1::update_vertex(HE_MESH &_m, const HE_MESH::VertexHandle &_vh)
             Q += _m.property(fp_pos_, *vf_itr);
         }
 
-        Q /= valence * valence;//neigboring_faces;
+        Q /= valence;//neigboring_faces;
 
-        pos += _m.point(_vh) * (valence - 2.0) / valence + Q;
+        HE_MESH::Point old_point = _m.point(_vh);
+        pos = old_point * (valence - 3) / valence + Q / valence + pos * 2 / valence;
         //      pos = vector_cast<Vec>(_m.point(_vh));
     }
 
@@ -323,8 +336,7 @@ void CatmullClark1::calcLimitNormal(HE_MESH &newMesh, const OpenMesh::VertexHand
     HE_MESH::HalfedgeHandle start = newMesh.halfedge_handle(vertex);
     HE_MESH::HalfedgeHandle he = start;
 
-    do
-    {
+    do {
         he = newMesh.opposite_halfedge_handle(he);
         vertices.push_back(newMesh.from_vertex_handle(he));
         he = newMesh.next_halfedge_handle(he);
@@ -335,8 +347,7 @@ void CatmullClark1::calcLimitNormal(HE_MESH &newMesh, const OpenMesh::VertexHand
     start = newMesh.halfedge_handle(vertex);
     he = start;
 
-    do
-    {
+    do {
         halfEdges.push_back(he);
 
         he = newMesh.opposite_halfedge_handle(he);
@@ -348,12 +359,12 @@ void CatmullClark1::calcLimitNormal(HE_MESH &newMesh, const OpenMesh::VertexHand
 
     int k = (int) vertices.size();
 
-    float a = 1.0f + std::cos(2.0f * M_PI / k) + std::cos(M_PI / k) * std::sqrt(2.0f * (9.0f + std::cos(2.0f * M_PI / k)));
+    float a = 1.0f + std::cos(2.0f * M_PI / k) +
+              std::cos(M_PI / k) * std::sqrt(2.0f * (9.0f + std::cos(2.0f * M_PI / k)));
 
     int i = 0;
 
-    for (HE_MESH::HalfedgeHandle halfEdge : halfEdges)
-    {
+    for (HE_MESH::HalfedgeHandle halfEdge : halfEdges) {
         float beta1 = a * std::cos(2.0f * M_PI * (i + 1) / k);
         float gamma1 = std::cos(2.0f * M_PI * (i + 1) / k) + std::cos(2.0f * M_PI * (i + 2) / k);
 
