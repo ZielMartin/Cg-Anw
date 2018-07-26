@@ -41,7 +41,7 @@ HE_MESH CatmullClark1::operator()(HE_MESH &_m, size_t _n, const bool _update_poi
         } while (he != start);
         newMesh.property(newMesh.sharpneighbours, *v_it) = sharpNeighbours;
         HE_MESH::Point nextPoint = _m.point(*v_it);
-   // std::cout << nextPoint << " : " << sharpNeighbours << " == " << _m.property(_m.sharpneighbours, *v_it) << std::endl;
+    std::cout << nextPoint << " : " << sharpNeighbours << " == " << _m.property(_m.sharpneighbours, *v_it) << std::endl;
     }
 
     // initialize all weights to 0 (= smooth edge)
@@ -99,9 +99,9 @@ HE_MESH CatmullClark1::operator()(HE_MESH &_m, size_t _n, const bool _update_poi
 HE_MESH::Point CatmullClark1::calc_face_centroid_weighted(const HE_MESH::FaceHandle &_fh) {
     HE_MESH::Point pt;
     pt.vectorize(0);
-    float valence = 0.0;
+    float valence = 0.0, fourthComp = 0.0f;
     for (HE_MESH::ConstFaceVertexIter cfv_it = this->mesh.cfv_iter(_fh); cfv_it.is_valid(); ++cfv_it) {
-        float fourthComp = this->mesh.property(this->mesh.vp_fourth, *cfv_it);
+        fourthComp = this->mesh.property(this->mesh.vp_fourth, *cfv_it);
         if (fourthComp == 0.0f)
             fourthComp = 1.0f;
 
@@ -109,7 +109,7 @@ HE_MESH::Point CatmullClark1::calc_face_centroid_weighted(const HE_MESH::FaceHan
         valence += fourthComp;
     }
     pt /= valence;
-    return pt;
+    return pt; // / fourthComp;
 }
 
 void CatmullClark1::compute_midpoint(HE_MESH &_m, const HE_MESH::EdgeHandle &_eh, const bool _update_points) {
@@ -119,11 +119,9 @@ void CatmullClark1::compute_midpoint(HE_MESH &_m, const HE_MESH::EdgeHandle &_eh
     opp_heh = _m.halfedge_handle(_eh, 1);
 
     HE_MESH::Point pos(_m.point(_m.to_vertex_handle(heh)));
+    //pos *= this->mesh.property(this->mesh.vp_fourth, _m.to_vertex_handle(heh));
+    pos += ( _m.point(_m.to_vertex_handle(opp_heh)) );//* this->mesh.property(this->mesh.vp_fourth, _m.to_vertex_handle(opp_heh)) );
 
-    pos += _m.point(_m.to_vertex_handle(opp_heh));
-    //========
-
-    //========
     std::vector<HE_MESH::HalfedgeHandle> edgesSharp;
 
     HE_MESH::HalfedgeHandle start = heh; //_eh;
@@ -198,7 +196,7 @@ void CatmullClark1::update_vertex(HE_MESH &_m, const HE_MESH::VertexHandle &_vh)
         he = _m.next_halfedge_handle(he);
     } while (he != start);
 
-    if (_m.is_boundary(_vh) || edgesSharp.size() == 2) { //|| _m.property(_m.sharpedge, heh) == true) {
+    if (edgesSharp.size() == 2) { //|| _m.property(_m.sharpedge, heh) == true) {
 std::cout << "REEEEEEEEEEEEEEEEEEEEEEEEEE" << std::endl;
         //switch (edgesSharp.size()) {
         //case 2:
@@ -222,41 +220,17 @@ std::cout << "REEEEEEEEEEEEEEEEEEEEEEEEEE" << std::endl;
             //break;
         //}
 
+        } else if(_m.is_boundary(_vh)) {
 
-/*
         HE_MESH::Normal Vec;
         pos = _m.point(_vh);
         HE_MESH::VertexEdgeIter ve_itr;
         for (ve_itr = _m.ve_iter(_vh); ve_itr.is_valid(); ++ve_itr)
             if (_m.is_boundary(*ve_itr))
                 pos += _m.property(ep_pos_, *ve_itr);
-        pos /= static_cast<typename OpenMesh::vector_traits<typename HE_MESH::Point>::value_type>(3.0); */
+        pos /= static_cast<typename OpenMesh::vector_traits<typename HE_MESH::Point>::value_type>(3.0);
     } else // inner vertex
     {
-        /* For each (non boundary) vertex V, introduce a new vertex whose
-           position is F/n + 2E/n + (n-3)V/n where F is the average of
-           the new face vertices of all faces adjacent to the old vertex
-           V, E is the average of the midpoints of all edges incident
-           on the old vertex V, and n is the number of edges incident on
-           the vertex.
-           */
-
-        /*
-        Normal           Vec;
-        VertexEdgeIter   ve_itr;
-        double           valence(0.0);
-
-        // R = Calculate Valence and sum of edge midpoints
-        for ( ve_itr = _m.ve_iter( _vh); ve_itr; ++ve_itr)
-        {
-          valence+=1.0;
-          pos += _m.property(ep_pos_, *ve_itr);
-        }
-        pos /= valence*valence;
-        */
-
-
-
         double valence(0.0);
         HE_MESH::VOHIter voh_it = _m.voh_iter(_vh);
         for (; voh_it.is_valid(); ++voh_it) {
@@ -389,6 +363,9 @@ void CatmullClark1::split_edge(HE_MESH &_m, const HE_MESH::EdgeHandle &_eh) {
         _m.set_halfedge_handle(_m.face_handle(heh), heh);
     }
 
+    _m.property(_m.sharpedge, new_heh) = _m.property(_m.sharpedge, heh);
+    _m.property(_m.sharpedge, opp_heh) = _m.property(_m.sharpedge, heh);
+
     _m.set_halfedge_handle(vh, new_heh);
     _m.set_halfedge_handle(vh1, opp_new_heh);
 
@@ -412,16 +389,7 @@ void CatmullClark1::calcLimitNormal(HE_MESH &newMesh, const OpenMesh::VertexHand
         he = newMesh.next_halfedge_handle(he);
     } while (he != start);
 
-
-    HE_MESH::Point LP(0.0, 0.0, 0.0);
     std::vector<HE_MESH::HalfedgeHandle> halfEdges;
-
-    /* HE_MESH::VertexOHalfedgeIter voh_it = _m.voh_iter(*v_itr);
-     for(++voh_it; voh_it != newMesh.voh_iter(*v_itr) ; ++voh_it) {
-             // Iterate over all outgoing halfedges...
-             halfEdges.push_back(*voh_it);
-     }*/
-
 
     start = newMesh.halfedge_handle(vertex);
     he = start;
@@ -434,8 +402,7 @@ void CatmullClark1::calcLimitNormal(HE_MESH &newMesh, const OpenMesh::VertexHand
         he = newMesh.next_halfedge_handle(he);
     } while (he != start);
 
-    QVector3D tangent0(0, 0, 0); //tangent
-    QVector3D tangent1(0, 0, 0); //HE_MESH::Normal
+    QVector3D tangent1(0, 0, 0);
     QVector3D tangent2(0, 0, 0);
 
     int k = (int) vertices.size();
@@ -443,7 +410,6 @@ void CatmullClark1::calcLimitNormal(HE_MESH &newMesh, const OpenMesh::VertexHand
     float a = 1.0f + std::cos(2.0f * M_PI / k) + std::cos(M_PI / k) * std::sqrt(2.0f * (9.0f + std::cos(2.0f * M_PI / k)));
 
     int i = 0;
-   // std::cout << VP << std::endl;
 
     for (HE_MESH::HalfedgeHandle halfEdge : halfEdges)
     {
@@ -453,43 +419,21 @@ void CatmullClark1::calcLimitNormal(HE_MESH &newMesh, const OpenMesh::VertexHand
         float beta2 = a * std::cos(2.0f * M_PI * i / k);
         float gamma2 = std::cos(2.0f * M_PI * i / k) + std::cos(2.0f * M_PI * (i + 1) / k);
 
-        // beta
         HE_MESH::HalfedgeHandle nextHE = newMesh.next_halfedge_handle(halfEdge);
         HE_MESH::Point nextPoint = newMesh.point(newMesh.from_vertex_handle(nextHE));
-    //std::cout << nextPoint << std::endl;
+
         HE_MESH::HalfedgeHandle nextNextHE = newMesh.next_halfedge_handle(nextHE);
         HE_MESH::Point nextNextPoint = newMesh.point(newMesh.from_vertex_handle(nextNextHE));
 
         QVector3D p1 = {nextPoint[0], nextPoint[1], nextPoint[2]};
         QVector3D p2 = {nextNextPoint[0], nextNextPoint[1], nextNextPoint[2]};
 
-     //   tangent1.setX((nextPoint[0] * beta1) + (nextNextPoint[0] * gamma1)); //nextPoint[0]
-       // std::cout << nextNextPoint << std::endl;
-//std::cout << nextPoint[0] << " + " << nextNextPoint[0] << std::endl;
-     //   tangent1.setY((nextPoint[1] * beta1 )+ (nextNextPoint[1] * gamma1));
-     //   tangent1.setZ((nextPoint[2] * beta1) + (nextNextPoint[2] * gamma1));
-
         tangent1 += p1 * beta1 + p2 * gamma1;
-
-     //   tangent2.setX((nextPoint[0] * beta2) + (nextNextPoint[0] * gamma2)); //nextPoint[0]
-     //   tangent2.setY((nextPoint[1] * beta2) + (nextNextPoint[1] * gamma2));
-    //    tangent2.setZ((nextPoint[2] * beta2) + (nextNextPoint[2] * gamma2));
         tangent2 += p1 * beta2 + p2 * gamma2;
-
-        // gamma
-        //HE_MESH::HalfedgeHandle nextNextHE = newMesh.next_halfedge_handle(nextHE);
-        //HE_MESH::Point nextNextPoint = newMesh.point(newMesh.from_vertex_handle(nextNextHE));
-
-        //tangent1 += nextNextPoint * gamma1;
-        //tangent2 += nextNextPoint * gamma2;
-
         i++;
     }
 
-     //HE_MESH::Normal LimitNormal = OpenMesh::VectorT<OpenMesh::Vec3f, 3>::cross(tangent2, tangent1);
     QVector3D normal = QVector3D::normal(tangent2, tangent1);
-    //std::cout <<  HE_MESH::Normal(normal.x(), normal.y(), normal.z()) << std::endl;
     newMesh.property(newMesh.limitnormal, vertex) = HE_MESH::Normal(normal.x(), normal.y(), normal.z());
-    //HE_MESH::Normal g = newMesh.property(newMesh.limitnormal, vertex);
-    //std::cout << g << std::endl;
+
 }

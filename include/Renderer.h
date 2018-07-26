@@ -72,7 +72,7 @@ public:
     bool isRenderLines() const;
 
     void setRenderLines(bool renderLines);
-
+    bool renderLimitNormals;
 
 private:
 

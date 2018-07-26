@@ -22,7 +22,7 @@ Window::Window(QWidget *parent) {
 
     slider = new QSlider(Qt::Horizontal, this);
     slider->setFocusPolicy(Qt::StrongFocus);
-    connect(slider, SIGNAL(valueChanged(int)), this, SLOT(sliderValueChanged(int)));
+    connect(slider, SIGNAL(valueChanged(float)), this, SLOT(sliderValueChanged(int)));
 
     QLabel *smoothingLabel = new QLabel("Smoothing");
 
@@ -64,7 +64,7 @@ void Window::setCheckBox(bool sharp) {
     checkbox->setCheckable(true);
 }
 
-void Window::sliderValueChanged(int k) {
+void Window::sliderValueChanged(float k) {
     glWidget->applySmoothedVertices(k);
 }
 
@@ -108,6 +108,7 @@ void Window::userControl() {
                    "Disable/Enable grid:\t\tpress 'g'\n"
                    "Disable/Enable points:\t\tpress 'p'\n\n"
                    "Select point:\t\t\tCtrl + left-click on point\n"
+                   "Select edge:\t\t\tShift+ left-click on edge\n"
                    "Add new point:\t\tright-click on grid or object\n"
                    "Delete selected points:\t\tpress 'r'\n"
                    "Move selected points:\t\tarrow-keys,'+','-'\n\n"

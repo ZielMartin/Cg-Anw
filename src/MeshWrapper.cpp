@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <cassert>
 #include <QtWidgets/QInputDialog>
 #include <libs/glm-0.9.7.2/glm/geometric.hpp>
 #include "MeshWrapper.h"
@@ -430,7 +431,7 @@ void MeshWrapper::smoothMesh(bool pushToBackstack) {
     }
 }
 
-void MeshWrapper::applySmoothedVertices(int interpolationValue) {
+void MeshWrapper::applySmoothedVertices(float interpolationValue) {
     int i = 0;
     for (OpenMesh::PolyConnectivity::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it) {
         //vector from old to new vertex
@@ -438,9 +439,12 @@ void MeshWrapper::applySmoothedVertices(int interpolationValue) {
                                   smoothedVertices.at(i)[1] - unSmoothedVertices.at(i)[1],
                                   smoothedVertices.at(i)[2] - unSmoothedVertices.at(i)[2]);
         //float lenght = (vec.length()/99)*interpolationValue;
-        mesh.point(*v_it)[0] = unSmoothedVertices.at(i)[0] + (vec.x / 99) * interpolationValue;
-        mesh.point(*v_it)[1] = unSmoothedVertices.at(i)[1] + (vec.y / 99) * interpolationValue;
-        mesh.point(*v_it)[2] = unSmoothedVertices.at(i)[2] + (vec.z / 99) * interpolationValue;
+        mesh.point(*v_it)[0] = (1-interpolationValue)*unSmoothedVertices.at(i)[0] + (vec.x * interpolationValue);
+        mesh.point(*v_it)[1] = (1-interpolationValue)*unSmoothedVertices.at(i)[1] + (vec.y * interpolationValue);
+        mesh.point(*v_it)[2] = (1-interpolationValue)*unSmoothedVertices.at(i)[2] + (vec.z * interpolationValue);
+        //mesh.point(*v_it)[0] = unSmoothedVertices.at(i)[0] + (vec.x / 99) * interpolationValue;
+        //mesh.point(*v_it)[1] = unSmoothedVertices.at(i)[1] + (vec.y / 99) * interpolationValue;
+        //mesh.point(*v_it)[2] = unSmoothedVertices.at(i)[2] + (vec.z / 99) * interpolationValue;
         i++;
     }
 }
@@ -524,7 +528,31 @@ std::vector<OpenMesh::HalfedgeHandle> &MeshWrapper::getSelectedHalfEdges() {
     return selectedHalfEdges;
 }
 
+void MeshWrapper::test() {
+    for (HE_MESH::HalfedgeIter he_it = mesh.halfedges_begin(); he_it != mesh.halfedges_end(); ++he_it) {
+        assert(mesh.opposite_halfedge_handle(mesh.opposite_halfedge_handle(*he_it)) == *he_it);
+        std::cout << "dasölk" << std::endl;
+    }
 
+    for (HE_MESH::FaceIter f_it = mesh.faces_begin(); f_it != mesh.faces_end(); ++f_it) {
+        HE_MESH::HalfedgeHandle firstHE = mesh.halfedge_handle(*f_it);
+        HE_MESH::HalfedgeHandle curr = mesh.halfedge_handle(*f_it);
+
+        do{
+            assert(mesh.face_handle(curr) == *f_it);
+            curr = mesh.next_halfedge_handle(curr);
+        }while(firstHE != curr);
+    }
+
+    for (HE_MESH::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it) {
+        HE_MESH::HalfedgeHandle curr = mesh.halfedge_handle(*v_it);
+        do{
+            assert(*v_it == mesh.from_vertex_handle(curr));
+            curr = mesh.next_halfedge_handle(mesh.opposite_halfedge_handle(curr));
+        }while(curr != mesh.halfedge_handle(*v_it));
+    }
+
+}
 
 
 

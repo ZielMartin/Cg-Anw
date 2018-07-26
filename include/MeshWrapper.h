@@ -64,10 +64,10 @@ public:
 
     void smoothMesh(bool pushToBackstack);
 
-    void applySmoothedVertices(int interpolationValue);
+    void applySmoothedVertices(float interpolationValue);
 
     void setSelectedEdgesSharp(bool sharp);
-
+    void test();
     std::vector<OpenMesh::HalfedgeHandle> &getSelectedHalfEdges();
 
     bool limit;
